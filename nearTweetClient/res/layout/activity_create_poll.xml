@@ -1,0 +1,80 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/poll_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".CreatePollActivity" >
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/poll_newDescription_text"
+        android:layout_alignParentTop="true"
+        android:text="@string/createPollTitle"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/poll_newDescription_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/poll_vote_options"
+        android:layout_alignRight="@+id/poll_addOption_button"
+        android:layout_below="@+id/titleTextView"
+        android:ems="10"
+        android:hint="@string/poll_description_hint"
+        android:inputType="textMultiLine"
+        android:lines="2" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/poll_removeOption_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/poll_vote_options"
+        android:layout_centerHorizontal="true"
+        android:text="@string/poll_removeOption_button" />
+
+    <EditText
+        android:id="@+id/poll_newOption_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/poll_newDescription_text"
+        android:layout_alignRight="@+id/poll_newDescription_text"
+        android:layout_below="@+id/poll_newDescription_text"
+        android:ems="10"
+        android:hint="@string/poll_newOption_text"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/poll_addOption_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/poll_newOption_text"
+        android:layout_toRightOf="@+id/poll_removeOption_button"
+        android:text="@string/poll_addOption_button" />
+
+    <RadioGroup
+        android:id="@+id/poll_vote_options"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/poll_addOption_button"
+        android:orientation="vertical" >
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/poll_startPoll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/poll_vote_options"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/poll_vote_options"
+        android:text="@string/poll_startPoll" />
+
+</RelativeLayout>
