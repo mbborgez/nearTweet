@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 	private static final String WELLCOME = "Wellcome ";
+	private static final CharSequence MESSAGE_ENTER_LOGIN = "Please enter a user name";
+	
 	Button loginButton;
 	EditText userNameText;
 
@@ -26,8 +28,12 @@ public class LoginActivity extends Activity {
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showWellcomeMessage();
-				changeToPollCreationActivity();
+				if(userNameText.getText().toString().length()>0){
+					showWellcomeMessage();
+					changeToPollCreationActivity();
+				} else {
+					showEmptyLoginMessage();
+				}
 			}
 		});
 	}
@@ -35,6 +41,10 @@ public class LoginActivity extends Activity {
 	private void changeToPollCreationActivity() {
 		Intent changeAcivityIntent = new Intent(this, CreatePollActivity.class);
 		startActivity(changeAcivityIntent);
+	}
+	
+	private void showEmptyLoginMessage() {
+		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_LONG).show();
 	}
 	
 	private void showWellcomeMessage() {
