@@ -33,11 +33,11 @@ public class CreatePollActivity extends Activity {
 		setContentView(R.layout.activity_create_poll);
 
 		numberOfWords = 0;
-		pollOptions = (RadioGroup) findViewById(R.id.poll_vote_options);
-		addPollOptionButton = (Button) findViewById(R.id.poll_addOption_button);
+		pollOptions = (RadioGroup) findViewById(R.id.poll_newVote_options);
+		addPollOptionButton = (Button) findViewById(R.id.poll_addNewOption_button);
 		removePollOptionButton = (Button) findViewById(R.id.poll_removeOption_button);
 		newPollOptionEditText = (EditText) findViewById(R.id.poll_newOption_text);
-		startPollButton = (Button) findViewById(R.id.poll_startPoll);
+		startPollButton = (Button) findViewById(R.id.poll_startNewPoll);
 		
 		newPollOptionEditText.addTextChangedListener(new TextWatcher() {
 			

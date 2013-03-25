@@ -1,5 +1,7 @@
 package pt.utl.ist.cm.neartweetclient;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -39,16 +41,27 @@ public class LoginActivity extends Activity {
 	}
 	
 	private void changeToPollCreationActivity() {
-		Intent changeAcivityIntent = new Intent(this, CreatePollActivity.class);
+		
+		ArrayList<String> pollVoteOptions = new ArrayList<String>();
+		pollVoteOptions.add("Option1");
+		pollVoteOptions.add("Option2");
+		pollVoteOptions.add("Option3");
+		pollVoteOptions.add("Option4");
+
+		String pollVoteDescription = "BLBLBLA descritpion";
+		
+		Intent changeAcivityIntent = new Intent(this, PollDetailsActivity.class);
+		changeAcivityIntent.putStringArrayListExtra(PollDetailsActivity.POLL_OPTIONS, pollVoteOptions);
+		changeAcivityIntent.putExtra(PollDetailsActivity.POLL_DESCRIPTION, pollVoteDescription);
 		startActivity(changeAcivityIntent);
 	}
 	
 	private void showEmptyLoginMessage() {
-		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_LONG).show();
+		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_SHORT).show();
 	}
 	
 	private void showWellcomeMessage() {
-		Toast.makeText(this, WELLCOME + userNameText.getText(), Toast.LENGTH_LONG).show();
+		Toast.makeText(this, WELLCOME + userNameText.getText(), Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override
