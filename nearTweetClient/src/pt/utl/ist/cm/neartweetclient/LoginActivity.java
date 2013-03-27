@@ -1,5 +1,7 @@
 package pt.utl.ist.cm.neartweetclient;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -12,6 +14,8 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 	private static final String WELLCOME = "Wellcome ";
+	private static final CharSequence MESSAGE_ENTER_LOGIN = "Please enter a user name";
+	
 	Button loginButton;
 	EditText userNameText;
 
@@ -26,19 +30,38 @@ public class LoginActivity extends Activity {
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showWellcomeMessage();
-				changeToPollCreationActivity();
+				if(userNameText.getText().toString().length()>0){
+					showWellcomeMessage();
+					changeToPollCreationActivity();
+				} else {
+					showEmptyLoginMessage();
+				}
 			}
 		});
 	}
 	
 	private void changeToPollCreationActivity() {
-		Intent changeAcivityIntent = new Intent(this, CreatePollActivity.class);
+		
+		ArrayList<String> pollVoteOptions = new ArrayList<String>();
+		pollVoteOptions.add("Option1");
+		pollVoteOptions.add("Option2");
+		pollVoteOptions.add("Option3");
+		pollVoteOptions.add("Option4");
+
+		String pollVoteDescription = "BLBLBLA descritpion";
+		
+		Intent changeAcivityIntent = new Intent(this, PollDetailsActivity.class);
+		changeAcivityIntent.putStringArrayListExtra(PollDetailsActivity.POLL_OPTIONS, pollVoteOptions);
+		changeAcivityIntent.putExtra(PollDetailsActivity.POLL_DESCRIPTION, pollVoteDescription);
 		startActivity(changeAcivityIntent);
 	}
 	
+	private void showEmptyLoginMessage() {
+		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_SHORT).show();
+	}
+	
 	private void showWellcomeMessage() {
-		Toast.makeText(this, WELLCOME + userNameText.getText(), Toast.LENGTH_LONG).show();
+		Toast.makeText(this, WELLCOME + userNameText.getText(), Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override
