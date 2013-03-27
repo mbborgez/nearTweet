@@ -1,5 +1,6 @@
 package pt.utl.ist.cm.neartweetclient;
 
+import pt.utl.ist.cm.neartweetclient.tasks.ClientServerConnectorTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
@@ -37,10 +38,21 @@ public class LoginActivity extends Activity {
 				} else {
 					showEmptyLoginMessage();
 				}
+//				registerInServer();
+				if(userNameText.getText().toString().length()>0){
+					showWellcomeMessage();
+					changeToTweetsStreamActiviy();
+				} else {
+					showEmptyLoginMessage();
+				}
 			}
 		});
 	}
 	
+	protected void registerInServer() {
+       new ClientServerConnectorTask().execute("1");		
+	}
+
 	private void changeToTweetsStreamActiviy() {
 		startActivity(new Intent(this, TweetsStreamActivity.class));
 	}	

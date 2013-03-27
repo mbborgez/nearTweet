@@ -5,9 +5,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import PDU.PollVotePDU;
-import PDU.PublishPollPDU;
-import PDU.TweetPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PollVotePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.TweetPDU;
+
 
 public class TempMemory 
 {

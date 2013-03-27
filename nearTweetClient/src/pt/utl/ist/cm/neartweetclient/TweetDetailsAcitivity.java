@@ -19,6 +19,8 @@ public class TweetDetailsAcitivity extends Activity {
 		String tweetId = getIntent().getStringExtra(TWEET_ID);
 		if(tweetId.length()>0){
 			tweetDetailsTextView = (TextView) findViewById(R.id.tweet_details_text);
+			// IDEIA: ter um serviço que vai buscar os dados do tweet pelo id
+			// e popular o ecra com essa informaçao.
 			tweetDetailsTextView.setText(tweetId);
 		}
 	}

@@ -2,13 +2,15 @@ package PDU.PDUVisitor;
 
 import java.io.ObjectOutputStream;
 
-import PDU.GenericMessagePDU;
-import PDU.PollVotePDU;
-import PDU.PublishPollPDU;
-import PDU.RegisterPDU;
-import PDU.ReplyPDU;
-import PDU.SpamVotePDU;
-import PDU.TweetPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.GenericMessagePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PDUVisitor;
+import pt.utl.ist.cm.neartweetEntities.PDU.PollVotePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.RegisterPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.ReplyPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.SpamVotePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.TweetPDU;
+
 import Server.RequestHandler;
 
 public class ClientServerVisitor extends PDUVisitor

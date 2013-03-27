@@ -5,7 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import PDU.PDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+
 import PDU.PDUVisitor.ClientServerVisitor;
 
 public class RequestHandler implements Runnable
@@ -19,8 +20,6 @@ public class RequestHandler implements Runnable
 		this.socket = socket;
 		this.memory = memory;
 		objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-
-
 	}
 	
 	public void sendPollResponse(PDU pdu, ObjectOutputStream stream) 

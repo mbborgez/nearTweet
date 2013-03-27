@@ -29,6 +29,7 @@ public class TweetsStreamActivity extends ListActivity {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				//enviar o ID do tweet que foi clicado
 				showTweetDetails("t1");
 			}
 			
