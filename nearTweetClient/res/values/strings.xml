@@ -15,8 +15,9 @@
     <string name="createPollTitle">Create Poll</string>
     <string name="title_activity_poll_details">PollDetailsActivity</string>
     <string name="poll_description_text">PollDescription</string>
-    <string name="poll_submit_vote_button">Vote</string>    
-    <string name="pollDetailsTitle">Poll Details</string>    
-    
-    
+    <string name="poll_submit_vote_button">Vote</string>
+    <string name="pollDetailsTitle">Poll Details</string>
+    <string name="title_activity_tweets_stream">TweetsStreamActivity</string>
+    <string name="title_activity_tweet_details_acitivity">TweetDetailsAcitivity</string>
+
 </resources>

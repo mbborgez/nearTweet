@@ -1,7 +1,5 @@
 package pt.utl.ist.cm.neartweetclient;
 
-import java.util.ArrayList;
-
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -32,7 +30,7 @@ public class LoginActivity extends Activity {
 			public void onClick(View v) {
 				if(userNameText.getText().toString().length()>0){
 					showWellcomeMessage();
-					changeToPollCreationActivity();
+					changeToTweetsStreamActiviy();
 				} else {
 					showEmptyLoginMessage();
 				}
@@ -40,21 +38,25 @@ public class LoginActivity extends Activity {
 		});
 	}
 	
-	private void changeToPollCreationActivity() {
-		
-		ArrayList<String> pollVoteOptions = new ArrayList<String>();
-		pollVoteOptions.add("Option1");
-		pollVoteOptions.add("Option2");
-		pollVoteOptions.add("Option3");
-		pollVoteOptions.add("Option4");
-
-		String pollVoteDescription = "BLBLBLA descritpion";
-		
-		Intent changeAcivityIntent = new Intent(this, PollDetailsActivity.class);
-		changeAcivityIntent.putStringArrayListExtra(PollDetailsActivity.POLL_OPTIONS, pollVoteOptions);
-		changeAcivityIntent.putExtra(PollDetailsActivity.POLL_DESCRIPTION, pollVoteDescription);
-		startActivity(changeAcivityIntent);
-	}
+	private void changeToTweetsStreamActiviy() {
+		startActivity(new Intent(this, TweetsStreamActivity.class));
+	}	
+	
+//	private void changeToPollCreationActivity2() {
+//		
+//		ArrayList<String> pollVoteOptions = new ArrayList<String>();
+//		pollVoteOptions.add("Option1");
+//		pollVoteOptions.add("Option2");
+//		pollVoteOptions.add("Option3");
+//		pollVoteOptions.add("Option4");
+//
+//		String pollVoteDescription = "BLBLBLA descritpion";
+//		
+//		Intent changeAcivityIntent = new Intent(this, PollDetailsActivity.class);
+//		changeAcivityIntent.putStringArrayListExtra(PollDetailsActivity.POLL_OPTIONS, pollVoteOptions);
+//		changeAcivityIntent.putExtra(PollDetailsActivity.POLL_DESCRIPTION, pollVoteDescription);
+//		startActivity(changeAcivityIntent);
+//	}
 	
 	private void showEmptyLoginMessage() {
 		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_SHORT).show();
