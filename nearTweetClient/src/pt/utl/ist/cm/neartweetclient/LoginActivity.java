@@ -1,11 +1,17 @@
 package pt.utl.ist.cm.neartweetclient;
 
 import pt.utl.ist.cm.neartweetclient.tasks.ClientServerConnectorTask;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectTask;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.ReceiveService;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.SendTask;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,7 +20,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-	private static final String WELLCOME = "Welcome ";
+	private static final String WELLCOME = "Wellcome ";
 	private static final CharSequence MESSAGE_ENTER_LOGIN = "Please enter a user name";
 	
 	Button loginButton;
@@ -28,34 +34,47 @@ public class LoginActivity extends Activity {
 		loginButton = (Button) findViewById(R.id.loginButton);
 		userNameText = (EditText) findViewById(R.id.usernameText);
 
+
+		 
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(userNameText.getText().toString().length()>0){
 					registerUser(userNameText.getText().toString());
-					showWellcomeMessage();
+				registerInServer();
 					changeToTweetsStreamActiviy();
 				} else {
 					showEmptyLoginMessage();
 				}
 //				registerInServer();
-				if(userNameText.getText().toString().length()>0){
-					showWellcomeMessage();
-					changeToTweetsStreamActiviy();
-				} else {
-					showEmptyLoginMessage();
-				}
+//				if(userNameText.getText().toString().length()>0){
+//					showWellcomeMessage();
+//					changeToTweetsStreamActiviy();
+//				} else {
+//					showEmptyLoginMessage();
+//				}
 			}
 		});
 	}
 	
 	protected void registerInServer() {
-       new ClientServerConnectorTask().execute("1");		
+		//Connect to the server
+		new ConnectTask().execute();
+        
+		// Starts receiving messages from the server
+		PduReceiver pduReceiver = new PduReceiver();
+        IntentFilter pduReceiverFilter = new IntentFilter(ConnectionStatus.PDU_RECEIVED_DATA);
+		LocalBroadcastManager.getInstance(this).registerReceiver(pduReceiver, pduReceiverFilter);
+
+//		startService(new Intent(ConnectionStatus.RECEIVE_PDU_SERVICE));
+		startService(new Intent(this, ReceiveService.class));
+		// Sends a register request
+		new SendTask().execute("borgez");
 	}
 
-	private void changeToTweetsStreamActiviy() {
-		startActivity(new Intent(this, TweetsStreamActivity.class));
-	}	
+//	private void changeToTweetsStreamActiviy() {
+//		startActivity(new Intent(this, TweetsStreamActivity.class));
+//	}	
 	
 
 	private void showEmptyLoginMessage() {
@@ -78,6 +97,24 @@ public class LoginActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
+	}
+	
+	// Broadcast receiver for receiving status updates from the IntentService
+	private class PduReceiver extends BroadcastReceiver
+	{
+	    // Prevents instantiation
+	    private PduReceiver() {}
+	    // Called when the BroadcastReceiver gets an Intent it's registered to receive
+		@Override
+		public void onReceive(Context context, Intent intent) {	        
+			/*
+	         * Handle Intents here.
+	         */	
+			Object obj = intent.getSerializableExtra(ConnectionStatus.PDU_RECEIVED_DATA);
+			if(obj!=null && obj instanceof PDU){
+				throw new RuntimeException("EIIIIIIIII a new pdu arrived " + (PDU) obj);
+			}
+		}
 	}
 
 }

@@ -10,6 +10,7 @@
 
 	<uses-permission 
 	    android:name="android.permission.INTERNET" />
+	
     
     <application
         android:allowBackup="true"
@@ -45,6 +46,9 @@
             android:name="pt.utl.ist.cm.neartweetclient.TweetDetailsAcitivity"
             android:label="@string/title_activity_tweet_details_acitivity" >
         </activity>
+        <service
+			android:name=".ReceiveService"
+			android:exported="false"/>
     </application>
 
 </manifest>
