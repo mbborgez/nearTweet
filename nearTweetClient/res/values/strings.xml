@@ -19,5 +19,7 @@
     <string name="pollDetailsTitle">Poll Details</string>
     <string name="title_activity_tweets_stream">TweetsStreamActivity</string>
     <string name="title_activity_tweet_details_acitivity">TweetDetailsAcitivity</string>
-
+    <string name ="new_tweet_button">New Tweet</string>
+    <string name ="submit_tweet">Tweet</string>
+    <string name ="cancel">Cancel</string>
 </resources>

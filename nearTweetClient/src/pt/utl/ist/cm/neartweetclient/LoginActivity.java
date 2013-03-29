@@ -1,8 +1,10 @@
 package pt.utl.ist.cm.neartweetclient;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -11,7 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-	private static final String WELLCOME = "Wellcome ";
+	private static final String WELLCOME = "Welcome ";
 	private static final CharSequence MESSAGE_ENTER_LOGIN = "Please enter a user name";
 	
 	Button loginButton;
@@ -29,6 +31,7 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				if(userNameText.getText().toString().length()>0){
+					registerUser(userNameText.getText().toString());
 					showWellcomeMessage();
 					changeToTweetsStreamActiviy();
 				} else {
@@ -42,28 +45,20 @@ public class LoginActivity extends Activity {
 		startActivity(new Intent(this, TweetsStreamActivity.class));
 	}	
 	
-//	private void changeToPollCreationActivity2() {
-//		
-//		ArrayList<String> pollVoteOptions = new ArrayList<String>();
-//		pollVoteOptions.add("Option1");
-//		pollVoteOptions.add("Option2");
-//		pollVoteOptions.add("Option3");
-//		pollVoteOptions.add("Option4");
-//
-//		String pollVoteDescription = "BLBLBLA descritpion";
-//		
-//		Intent changeAcivityIntent = new Intent(this, PollDetailsActivity.class);
-//		changeAcivityIntent.putStringArrayListExtra(PollDetailsActivity.POLL_OPTIONS, pollVoteOptions);
-//		changeAcivityIntent.putExtra(PollDetailsActivity.POLL_DESCRIPTION, pollVoteDescription);
-//		startActivity(changeAcivityIntent);
-//	}
-	
+
 	private void showEmptyLoginMessage() {
 		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_SHORT).show();
 	}
 	
 	private void showWellcomeMessage() {
 		Toast.makeText(this, WELLCOME + userNameText.getText(), Toast.LENGTH_SHORT).show();
+	}
+	
+	private void registerUser(String username) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("username", username);
+		editor.commit();
 	}
 	
 	@Override
