@@ -1,6 +1,6 @@
 package pt.utl.ist.cm.neartweetclient;
 
-import pt.utl.ist.cm.neartweetclient.tasks.ClientServerConnectorTask;
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectTask;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ReceiveService;
@@ -10,7 +10,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.View;
@@ -34,25 +36,16 @@ public class LoginActivity extends Activity {
 		loginButton = (Button) findViewById(R.id.loginButton);
 		userNameText = (EditText) findViewById(R.id.usernameText);
 
-
-		 
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(userNameText.getText().toString().length()>0){
 					registerUser(userNameText.getText().toString());
-				registerInServer();
+					registerInServer();
 					changeToTweetsStreamActiviy();
 				} else {
 					showEmptyLoginMessage();
 				}
-//				registerInServer();
-//				if(userNameText.getText().toString().length()>0){
-//					showWellcomeMessage();
-//					changeToTweetsStreamActiviy();
-//				} else {
-//					showEmptyLoginMessage();
-//				}
 			}
 		});
 	}
@@ -72,9 +65,9 @@ public class LoginActivity extends Activity {
 		new SendTask().execute("borgez");
 	}
 
-//	private void changeToTweetsStreamActiviy() {
-//		startActivity(new Intent(this, TweetsStreamActivity.class));
-//	}	
+	private void changeToTweetsStreamActiviy() {
+		startActivity(new Intent(this, TweetsStreamActivity.class));
+	}	
 	
 
 	private void showEmptyLoginMessage() {
