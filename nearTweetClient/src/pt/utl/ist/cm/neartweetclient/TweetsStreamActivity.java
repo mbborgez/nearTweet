@@ -18,10 +18,10 @@ public class TweetsStreamActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		// storing string resources into Array
-		String[] adobe_products = new String[]{"t1", "t2", "t3", "t4", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5","t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5"};
+		final String[] options = new String[]{"t1", "t2", "t3", "t4", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5","t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5"};
 		
 		// Binding resources Array to ListAdapter
-		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, R.id.tweets_stream_text, adobe_products));
+		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, R.id.tweets_stream_text, options));
 
 		// Adding a click listener to each tweet item
 		ListView tweetsListView = getListView();
@@ -30,7 +30,7 @@ public class TweetsStreamActivity extends ListActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				//enviar o ID do tweet que foi clicado
-				showTweetDetails("t1");
+				showTweetDetails(options[position]);
 			}
 			
 		});

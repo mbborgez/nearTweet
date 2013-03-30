@@ -197,4 +197,9 @@ public class ClientServerVisitor extends PDUVisitor
 			System.out.println("--- User doesn't exists!");
 		}	
 	}
+
+	@Override
+	public void processGenericMessagePDU(GenericMessagePDU pdu) {
+		System.out.println("--- Generic message " + pdu.GetDescription());
+	}
 }

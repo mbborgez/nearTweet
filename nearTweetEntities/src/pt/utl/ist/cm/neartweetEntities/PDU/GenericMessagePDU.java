@@ -20,5 +20,6 @@ public class GenericMessagePDU extends PDU
 	@Override
 	public void accept(PDUVisitor visitor) 
 	{
+		visitor.processGenericMessagePDU(this);
 	}
 }
