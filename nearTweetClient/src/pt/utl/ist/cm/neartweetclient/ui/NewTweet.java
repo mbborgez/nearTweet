@@ -1,5 +1,6 @@
-package pt.utl.ist.cm.neartweetclient;
+package pt.utl.ist.cm.neartweetclient.ui;
 
+import pt.utl.ist.cm.neartweetclient.R;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;

@@ -1,20 +1,20 @@
-package pt.utl.ist.cm.neartweetclient;
+package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectTask;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ReceiveService;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.SendTask;
+import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,8 +22,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-	private static final String WELLCOME = "Wellcome ";
-	private static final CharSequence MESSAGE_ENTER_LOGIN = "Please enter a user name";
 	
 	Button loginButton;
 	EditText userNameText;
@@ -39,17 +37,48 @@ public class LoginActivity extends Activity {
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(userNameText.getText().toString().length()>0){
-					registerUser(userNameText.getText().toString());
-					registerInServer();
-					changeToTweetsStreamActiviy();
-				} else {
-					showEmptyLoginMessage();
+				String nameCollected = userNameText.getText().toString();
+				if (nameCollected.length() > 0) {
+					registerUser(nameCollected);
+					nextScreen();
+					return;
 				}
+				invalidLogin();
 			}
 		});
 	}
 	
+	/**
+	 * registerUser - it is responsible to delegate the Registration to the 
+	 * Service Layer
+	 * @param username - the name which this user will identify future interactions with
+	 * the remaining entities on the network
+	 */
+	private void registerUser(String username) {
+		RegisterUserService service = new RegisterUserService(username,getApplicationContext());
+		service.execute();
+	}
+
+	/**
+	 * Actually this transition should be synchronous and wait by RegisterUserService Response
+	 * If the network already has one user the name selected we should present an error to the user   
+	 * it will be able to start a new activity
+	 * FIXME! - AQ
+	 */
+	private void nextScreen() {
+		startActivity(new Intent(this, TweetsStreamActivity.class));
+	}
+	
+	/**
+	 * shows an alert message with invalid Login
+	 */
+	private void invalidLogin() {
+		Toast.makeText(this, UiMessages.MESSAGE_ENTER_LOGIN,Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * This code should live inside of Service Layer instead.
+	 */
 	protected void registerInServer() {
 		//Connect to the server
 		new ConnectTask().execute();
@@ -63,33 +92,6 @@ public class LoginActivity extends Activity {
 		startService(new Intent(this, ReceiveService.class));
 		// Sends a register request
 		new SendTask().execute("borgez");
-	}
-
-	private void changeToTweetsStreamActiviy() {
-		startActivity(new Intent(this, TweetsStreamActivity.class));
-	}	
-	
-
-	private void showEmptyLoginMessage() {
-		Toast.makeText(this, MESSAGE_ENTER_LOGIN,Toast.LENGTH_SHORT).show();
-	}
-	
-	private void showWellcomeMessage() {
-		Toast.makeText(this, WELLCOME + userNameText.getText(), Toast.LENGTH_SHORT).show();
-	}
-	
-	private void registerUser(String username) {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("username", username);
-		editor.commit();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.login, menu);
-		return true;
 	}
 	
 	// Broadcast receiver for receiving status updates from the IntentService
