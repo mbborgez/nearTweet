@@ -1,6 +1,6 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
-import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectTask;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="nearTweetServer" default="run-server" basedir=".">
+  <description>nearTweet Server Application</description>
+
+  <property environment="env" />
+  <!-- Main Definitions to Project Configuration -->
+  <property name="application.name"   value="nearTweet" />
+  <property name="javac.encoding"     value="UTF-8" />
+  <property name="java.file.encoding" value="UTF-8" />
+  <property name="build.base" 		  value="build/" />
+  <property name="src.base" 		  value="src/main/" />
+  <property name="libs.base" 		  value="../lib/" />
+  <property name="ant.pdus.command"   value="refresh-pdus-jar"/>
+  <property name="pdus.path"          value="../nearTweetEntities/"/>
+  <property name="server.class"       value="main.java.com.cm.server.Server"/>
+  
+  <path id="project.classpath">
+    <pathelement location="${build.base}" />
+    <fileset dir="${libs.base}">
+        <include name="**/*.jar" />
+    </fileset>
+  </path>
+    
+  <target name="clean">
+    <delete dir="${build.base}"/>
+  </target>
+  
+  <target name="prepare-pdus" depends="clean">
+      <subant target="${ant.pdus.command}">
+	  	<fileset dir="../nearTweetEntities/" includes="build.xml"/>
+	  </subant>
+  </target>
+
+  <target name="compile" depends="clean">
+    <mkdir dir="${build.base}"/>
+    <javac srcdir="${src.base}" destdir="${build.base}" includeantruntime="false">
+        <classpath refid="project.classpath" />
+    </javac>
+  </target>
+  
+  <target name="test-server" description="Run Test cases" >
+  </target>
+
+  <target name="run-server" depends="compile">
+    <java classname="${server.class}" classpath="${build.base}" fork="true">
+        <arg value="${application.name}"/>
+    </java>
+  </target>
+
+</project>

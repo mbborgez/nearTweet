@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="nearTweet PDU's" default="refresh-pdus-jar" basedir=".">
+  <description>nearTweet PDU Interface</description>
+
+  <property environment="env" />
+  <!-- Main Definitions to Project Configuration -->
+  <property name="application.name"   value="nearTweetPdu's" />
+  <property name="javac.encoding"     value="UTF-8" />
+  <property name="java.file.encoding" value="UTF-8" />
+  <!-- 	Directories -->
+  <property name="build.base" value="build/" />
+  <property name="libs.base" value="../lib/" />
+  <property name="bin.base"   value="bin/"/>
+  <property name="src.base"   value="src/" />
+  <!-- PDU's Jar NAME  -->
+  <property name="jar.name"   value="pdus"/>
+  
+    
+  <target name="clean">
+    <delete dir="${build.base}"/>
+    <delete dir="${bin.base}"/>
+  </target>
+
+  <target name="compile" depends="clean">
+    <mkdir dir="${build.base}"/>
+    <javac srcdir="${src.base}" destdir="${build.base}" includeantruntime="false" />
+  </target>
+  
+  
+  <target name="generate-jar" depends="compile">
+      <mkdir dir="${bin.base}"/>
+      <jar destfile="${bin.base}/${jar.name}.jar" basedir="${build.base}"/>
+  </target>
+  
+  <target name="refresh-pdus-jar" depends="generate-jar">
+  	<copy file="${bin.base}/${jar.name}.jar" todir="${libs.base}" />
+  </target>
+
+</project>

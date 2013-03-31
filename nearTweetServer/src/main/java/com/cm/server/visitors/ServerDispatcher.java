@@ -1,23 +1,23 @@
-package PDU.PDUVisitor;
+package main.java.com.cm.server.visitors;
 
 import java.io.ObjectOutputStream;
 
-import pt.utl.ist.cm.neartweetEntities.PDU.GenericMessagePDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.PDUVisitor;
-import pt.utl.ist.cm.neartweetEntities.PDU.PollVotePDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.PublishPollPDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.RegisterPDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.ReplyPDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.SpamVotePDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.TweetPDU;
+import main.java.com.cm.server.handlers.RequestHandler;
 
-import Server.RequestHandler;
+import pt.utl.ist.cm.neartweetEntities.pdu.GenericMessagePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
+import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 
-public class ClientServerVisitor extends PDUVisitor
-{
+
+public class ServerDispatcher extends PDUVisitor {
 	private RequestHandler connectionHandler;
 	
-	public ClientServerVisitor(RequestHandler connectionHandler)
+	public ServerDispatcher(RequestHandler connectionHandler)
 	{
 		this.connectionHandler = connectionHandler;
 	}
@@ -39,19 +39,19 @@ public class ClientServerVisitor extends PDUVisitor
 				}
 				else
 				{
-					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Poll owner isn't registered anymore!"), this.connectionHandler.objectOutputStream);
+					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Poll owner isn't registered anymore!"), this.connectionHandler.connection);
 					System.out.println("--- Poll owner isn't registered!");
 				}
 			}
 			else
 			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.objectOutputStream);
+				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
 				System.out.println("--- Unrecognized target tweet ID!");
 			}
 		}
 		else
 		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.objectOutputStream);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
 		
@@ -71,13 +71,13 @@ public class ClientServerVisitor extends PDUVisitor
 			}
 			else
 			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.objectOutputStream);
+				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.connection);
 				System.out.println("--- Tweet ID already exists!");
 			}
 		}
 		else
 		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.objectOutputStream);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}		
 	}
@@ -90,13 +90,13 @@ public class ClientServerVisitor extends PDUVisitor
 		if(!connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
 		{
 			//I need to save ObjectOutputStream because we cannot open it twice using the same socket 
-			connectionHandler.memory.InsertUser(pdu.GetUserId(), this.connectionHandler.objectOutputStream);
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are Logged"), this.connectionHandler.objectOutputStream);
+			connectionHandler.memory.InsertUser(pdu.GetUserId(), this.connectionHandler.connection);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are Logged"), this.connectionHandler.connection);
 			System.out.println("--- User " + pdu.GetUserId() + " created!");
 		}
 		else
 		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "The user name choosed already exists!"), this.connectionHandler.objectOutputStream);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "The user name choosed already exists!"), this.connectionHandler.connection);
 			System.out.println("--- This user already exists!");
 		}
 	}
@@ -118,19 +118,19 @@ public class ClientServerVisitor extends PDUVisitor
 				}
 				else
 				{
-					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet owner isn't registered!"), this.connectionHandler.objectOutputStream);
+					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet owner isn't registered!"), this.connectionHandler.connection);
 					System.out.println("--- Tweet owner isn't registered!");
 				}
 			}
 			else
 			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.objectOutputStream);
+				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
 				System.out.println("--- Unrecognized target tweet ID!");
 			}	
 		}
 		else
 		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.objectOutputStream);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
 	}
@@ -162,13 +162,13 @@ public class ClientServerVisitor extends PDUVisitor
 			}
 			else
 			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.objectOutputStream);
+				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
 				System.out.println("--- Unrecognized target tweet ID!");
 			}	
 		}
 		else
 		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.objectOutputStream);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
 	}
@@ -187,13 +187,13 @@ public class ClientServerVisitor extends PDUVisitor
 			}
 			else
 			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.objectOutputStream);
+				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.connection);
 				System.out.println("--- Tweet ID already exists!");
 			}
 		}
 		else
 		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.objectOutputStream);
+			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}	
 	}

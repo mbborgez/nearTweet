@@ -1,4 +1,4 @@
-package pt.utl.ist.cm.neartweetEntities.PDU;
+package pt.utl.ist.cm.neartweetEntities.pdu;
 
 
 public class RegisterPDU extends PDU

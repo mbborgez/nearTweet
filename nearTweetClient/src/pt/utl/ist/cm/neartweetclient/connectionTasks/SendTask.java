@@ -2,7 +2,8 @@ package pt.utl.ist.cm.neartweetclient.connectionTasks;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import pt.utl.ist.cm.neartweetEntities.PDU.RegisterPDU;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import android.os.AsyncTask;
 
 public class SendTask extends AsyncTask<String, Void, Integer> {

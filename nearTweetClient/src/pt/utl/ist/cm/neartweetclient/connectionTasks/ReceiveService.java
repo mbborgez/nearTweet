@@ -1,6 +1,6 @@
 package pt.utl.ist.cm.neartweetclient.connectionTasks;
 
-import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
