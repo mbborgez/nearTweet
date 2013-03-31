@@ -38,7 +38,24 @@
     </javac>
   </target>
   
+  <target name="compile-tests" depends="compile" description="Compile the tests">
+  	<javac destdir="${build.base}" debug="true" debuglevel="lines,vars,source"  
+		   optimize="true" deprecation="true" verbose="false" 
+		   includeantruntime="false" encoding="${javac.encoding}">
+		<classpath refid="project.classpath" />
+		<src>
+			<pathelement path="src/" />
+		</src>
+	</javac>
+  </target>
+  
   <target name="test-server" description="Run Test cases" >
+  	<echo message="Testing Server services..." />
+	<junit>
+		<classpath refid="project.classpath" />
+	    <formatter type="brief" usefile="false" />
+	    <test name="test.java.com.cm.server.utils.DatabaseTestCase" />
+	 </junit>
   </target>
 
   <target name="run-server" depends="compile">
