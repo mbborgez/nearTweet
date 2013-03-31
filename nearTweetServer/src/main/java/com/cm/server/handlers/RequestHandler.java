@@ -55,12 +55,21 @@ public class RequestHandler implements Runnable {
 			System.out.println("Socket connected on port: " + socket.getPort());
 			ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 			while (true) {
-				PDU pdu = (PDU) objectInputStream.readObject();
-				pdu.accept(this.dispatcher);
+				try {
+					PDU pdu = (PDU) objectInputStream.readObject();
+					pdu.accept(this.dispatcher);
+				} catch (IOException e) {
+					e.printStackTrace();
+					continue;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+					continue;
+				}
 			}
-		} catch (Exception e) { 
-			System.out.println(e.getClass());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 }

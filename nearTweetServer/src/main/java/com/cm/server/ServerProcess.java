@@ -27,7 +27,6 @@ public class ServerProcess
 			System.err.println("An error ocurred while getting InetAddress: " + e.getMessage()); 
 			System.exit(-1);
 		}
-		
 	}
 	
 	/**
@@ -39,10 +38,15 @@ public class ServerProcess
 	public void run() {
 		try {
 			startingMessage();
-			this.serverSocket = new ServerSocket(port);
+			this.serverSocket = new ServerSocket(this.port);
 			while(true) {
+				try {
 				Socket socket = this.serverSocket.accept();
 				(new Thread(new RequestHandler(socket, this.memory))).start();
+				} catch(Exception e) {
+					System.err.println("Something went wrong with this connection: " + e.getClass());
+					continue;
+				}
 			}
 		}
 		catch (IOException e) {
