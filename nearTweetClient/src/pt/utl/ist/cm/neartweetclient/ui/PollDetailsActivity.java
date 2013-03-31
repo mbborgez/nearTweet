@@ -1,6 +1,8 @@
-package pt.utl.ist.cm.neartweetclient;
+package pt.utl.ist.cm.neartweetclient.ui;
 
 import java.util.ArrayList;
+
+import pt.utl.ist.cm.neartweetclient.R;
 
 import android.os.Bundle;
 import android.app.Activity;

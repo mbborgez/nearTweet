@@ -1,8 +1,10 @@
-package pt.utl.ist.cm.neartweetclient;
+package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetEntities.PDU.GenericMessagePDU;
+import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
-import pt.utl.ist.cm.neartweetclient.services.RegistUserService;
+import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,8 +20,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-	private static final CharSequence MESSAGE_ENTER_LOGIN = "Please enter a user name";
-
 	Button loginButton;
 	EditText userNameText;
 
@@ -36,23 +36,46 @@ public class LoginActivity extends Activity {
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (userNameText.getText().toString().length() > 0) {
-					registerUser(userNameText.getText().toString());
-				} else {
-					showEmptyLoginMessage();
+				String nameCollected = userNameText.getText().toString();
+				if (nameCollected.length() > 0) {
+					registerUser(nameCollected);
+					return;
 				}
+				invalidLogin();
 			}
 		});
 	}
-
-	protected void registerUser(String username) {
-
-		RegistUserService registUserService = new RegistUserService(username, getApplicationContext());
+	
+	/**
+	 * registerUser - it is responsible to delegate the Registration to the 
+	 * Service Layer
+	 * @param username - the name which this user will identify future interactions with
+	 * the remaining entities on the network
+	 */
+	private void registerUser(String username) {
+		RegisterUserService registUserService = new RegisterUserService(username, getApplicationContext());
 		registUserService.execute();
 		
 		// Register for the connection status action
 		IntentFilter filter = new IntentFilter(ConnectionStatus.GENERIC_MESSAGE_PDU_RECEIVED);
 		LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(loginStatusReceiver, filter);
+	}
+
+	/**
+	 * Actually this transition should be synchronous and wait by RegisterUserService Response
+	 * If the network already has one user the name selected we should present an error to the user   
+	 * it will be able to start a new activity
+	 * FIXME! - AQ
+	 */
+	private void nextScreen() {
+		startActivity(new Intent(this, TweetsStreamActivity.class));
+	}
+	
+	/**
+	 * shows an alert message with invalid Login
+	 */
+	private void invalidLogin() {
+		Toast.makeText(this, UiMessages.MESSAGE_ENTER_LOGIN, Toast.LENGTH_SHORT).show();
 	}
 
 	public class LoginStatusReceiver extends BroadcastReceiver {
@@ -65,7 +88,7 @@ public class LoginActivity extends Activity {
 					if(receivedObj instanceof GenericMessagePDU){
 						GenericMessagePDU pdu = (GenericMessagePDU) receivedObj;
 						Toast.makeText(getApplicationContext(), pdu.GetDescription(), Toast.LENGTH_SHORT).show();
-						changeToTweetsStreamActiviy();
+						nextScreen();
 //						unregisterUser();
 					}
 				}
@@ -73,18 +96,9 @@ public class LoginActivity extends Activity {
 		}
 	}
 
-	private void changeToTweetsStreamActiviy() {
-		startActivity(new Intent(this, TweetsStreamActivity.class));
-	}
-
-	private void showEmptyLoginMessage() {
-		Toast.makeText(this, MESSAGE_ENTER_LOGIN, Toast.LENGTH_SHORT).show();
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}
 
@@ -100,5 +114,5 @@ public class LoginActivity extends Activity {
 		//TODO kill the threads
 		unregisterReceiver(loginStatusReceiver);
 	}
-	
+
 }
