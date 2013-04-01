@@ -19,7 +19,7 @@ public class ConnectionStatus {
 	
 	private ConnectionStatus() throws UnknownHostException, IOException {
 		Log.i("CONNECTION", "STARTING CONNECTION");
-		this.socket = new Socket("10.0.2.2", 8000);
+		this.socket = new Socket("localhost", 8000);
 		Log.i("CONNECTION", "STARTING CONNECTION");
 		this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 		//this.inputStream  = new ObjectInputStream(socket.getInputStream());

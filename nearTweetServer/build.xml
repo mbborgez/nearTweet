@@ -59,7 +59,8 @@
   </target>
 
   <target name="run-server" depends="compile">
-    <java classname="${server.class}" classpath="${build.base}" fork="true">
+    <java classname="${server.class}"  fork="true">
+        <classpath refid="project.classpath" />
         <arg value="${application.name}"/>
     </java>
   </target>
