@@ -105,6 +105,7 @@ public class LoginActivity extends Activity {
 	
 	@Override
 	protected void onDestroy() {
+		super.onDestroy();
 		unregisterUser();
 	}
 	
