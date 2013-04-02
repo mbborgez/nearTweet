@@ -5,7 +5,13 @@ public class Server
 {	
 	public static void main(String args[])
 	{
-		ServerProcess server = new ServerProcess(args[0], 8000);
+		String serverName;
+		if(args.length<1){
+			serverName = "DEFAULT_SERVER_NAME";
+		} else {
+			serverName = args[0];
+		}
+		ServerProcess server = new ServerProcess(serverName, 8000);
 		server.run();
 		server.close();
 	}

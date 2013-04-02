@@ -1,14 +1,24 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import pt.utl.ist.cm.neartweetEntities.pdu.GenericMessagePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
-import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchReceiveTask;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.BaseAsyncTask;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
+import pt.utl.ist.cm.neartweetclient.utils.Constants;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -16,7 +26,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-	
+
 	private Button loginButton;
 	private EditText userNameText;
 
@@ -24,34 +34,67 @@ public class LoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-		
+
 		// referencing objects
 		loginButton = (Button) findViewById(R.id.loginButton);
 		userNameText = (EditText) findViewById(R.id.usernameText);
-		
+
 		//arming listeners
-	    userNameText.addTextChangedListener(textWatcherGuard());
+		userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
 	}
-	
+
 	/**
 	 * registerUser - it is responsible to delegate the Registration to the 
 	 * Service Layer
 	 * @param username - the name which this user will identify future interactions with
 	 * the remaining entities on the network
 	 */
-	private void registerUser(String username) {
-		// Register for the connection status action
-		IntentFilter filter = new IntentFilter(ConnectionStatus.GENERIC_MESSAGE_PDU_RECEIVED);
-		LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(loginStatusReceiver, filter);
-		//invoke a service that regists the user
-		RegisterUserService service = new RegisterUserService(username, this);
-		try {
-			service.execute();
-		} catch(NearTweetException e) {
-			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-			loginButton.setEnabled(false);
-		}
+//	private void registerUser(final String username) {
+//		AsyncTask<Void, Void, Void> registerAsync = new AsyncTask<Void, Void, Void>(){
+//			@Override
+//			protected Void doInBackground(Void... params) {
+//				ConnectToServerService connectService = new ConnectToServerService(Constants.SERVER_ADDRESS, Constants.SERVER_PORT);
+//				connectService.execute();
+//				return null;
+//			}
+//			@Override
+//			protected void onPostExecute(Void result){
+//				// Register for the connection status action
+//				IntentFilter receivedPDUFilter = new IntentFilter(Constants.GENERIC_MESSAGE_PDU_RECEIVED);
+//				LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(loginStatusReceiver, receivedPDUFilter);
+//
+//				//invoke a service that regists the user
+//				RegisterUserService registerUserService = new RegisterUserService(username, getApplicationContext());
+//				registerUserService.execute();
+//			}
+//		};
+//		registerAsync.execute();
+//	}
+	private void registerUser(final String username) {
+		AsyncTask<Void, Void, Void> registerAsync = new BaseAsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				//Connects to the server
+				connect(Constants.SERVER_ADDRESS, Constants.SERVER_PORT);
+				//Start a thread that receives messages in the background
+				asyncReceiveThread = new Thread(new AsynchReceiveTask(getApplicationContext()));
+				asyncReceiveThread.start();
+				// Register for the connection status action
+				IntentFilter receivedPDUFilter = new IntentFilter(Constants.GENERIC_MESSAGE_PDU_RECEIVED);
+				LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(loginStatusReceiver, receivedPDUFilter);
+
+				return null;
+			}
+			@Override
+			protected void onPostExecute(Void result){
+				
+				//invoke a service that regists the user after being connected
+				RegisterPDU registerPdu = new RegisterPDU(username);
+				sendPDU(registerPdu);
+			}
+		};
+		registerAsync.execute();
 	}
 
 	/**
@@ -63,14 +106,14 @@ public class LoginActivity extends Activity {
 	public void nextScreen() {
 		startActivity(new Intent(this, TweetsStreamActivity.class));
 	}
-	
+
 	/**
 	 * shows an alert message with invalid Login
 	 */
 	public void invalidLogin() {
 		Toast.makeText(this, UiMessages.ERROR_MESSAGE,Toast.LENGTH_SHORT).show();
 	}
-	
+
 	private TextWatcher textWatcherGuard() {
 		loginButton.setEnabled(false);
 		return new TextWatcher() {
@@ -88,20 +131,19 @@ public class LoginActivity extends Activity {
 			}
 		};
 	}
-	
+
 	private OnClickListener loginRequestCallback() {
 		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				loginButton.setEnabled(false);
 				String userName = userNameText.getText().toString();
-				if (userName.length() > 0) {
-					registerUser(userName);
-					return;
-				}
-				invalidLogin();
+				registerUser(userName);
 			}
 		};
 	}
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,35 +151,51 @@ public class LoginActivity extends Activity {
 		return true;
 	}
 
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterUser();
+		System.exit(0);
 	}
-	
+
 	public void unregisterUser() {
-		//TODO send a unregister request to the server
-		//TODO close the socket
-		//TODO kill the threads
-		unregisterReceiver(loginStatusReceiver);
+		new BaseAsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				//TODO send a unregister request to the server
+				//TODO close the socket
+				ConnectionStatus.getInstance().disconnect();
+				//TODO kill the threads
+				unregisterReceiver(loginStatusReceiver);
+				try {
+					asyncReceiveThread.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+
 	}
-	
-	public class LoginStatusReceiver extends BroadcastReceiver {
+
+	private BroadcastReceiver loginStatusReceiver = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (ConnectionStatus.GENERIC_MESSAGE_PDU_RECEIVED.equals(intent.getAction())) {
+			if (Constants.GENERIC_MESSAGE_PDU_RECEIVED.equals(intent.getAction())) {
 				Bundle bundle = intent.getExtras();
 				if(bundle!=null){
-					Object receivedObj = bundle.get(ConnectionStatus.MESSAGE_RECEIVED_DATA);
+					Object receivedObj = bundle.get(Constants.MESSAGE_RECEIVED_DATA);
 					if(receivedObj instanceof GenericMessagePDU){
 						GenericMessagePDU pdu = (GenericMessagePDU) receivedObj;
 						Toast.makeText(getApplicationContext(), pdu.GetDescription(), Toast.LENGTH_SHORT).show();
 						nextScreen();
-//						unregisterUser();
+						//						unregisterUser();
 					}
 				}
 			}
 		}
-	}
+	};
+	private Thread asyncReceiveThread;
+
 }

@@ -60,10 +60,14 @@ public class RequestHandler implements Runnable {
 					pdu.accept(this.dispatcher);
 				} catch (IOException e) {
 					e.printStackTrace();
-					continue;
+//					continue;
+					//TODO: disconnect user
+					System.exit(-1);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
-					continue;
+					System.exit(-1);
+					//TODO: disconnect user
+					//					continue;
 				}
 			}
 		} catch (IOException e) {

@@ -1,9 +1,6 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.R.id;
-import pt.utl.ist.cm.neartweetclient.R.layout;
-import pt.utl.ist.cm.neartweetclient.R.menu;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;

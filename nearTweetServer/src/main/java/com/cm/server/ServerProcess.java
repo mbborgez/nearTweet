@@ -42,6 +42,7 @@ public class ServerProcess
 			while(true) {
 				try {
 				Socket socket = this.serverSocket.accept();
+				System.out.println("Receiving new connection");
 				(new Thread(new RequestHandler(socket, this.memory))).start();
 				} catch(Exception e) {
 					System.err.println("Something went wrong with this connection: " + e.getClass());

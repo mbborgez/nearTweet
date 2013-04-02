@@ -11,7 +11,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
     <uses-feature android:name="android.hardware.camera"></uses-feature>  
+    
+    
     
     <application
         android:allowBackup="true"
@@ -53,6 +56,9 @@
             android:label="@string/title_activity_take_photo" 
             android:screenOrientation="portrait">
         </activity>
+        
+	    <service android:enabled="true" android:name="pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchReceiveService" />
+    
     </application>
 
 </manifest>
