@@ -1,32 +1,38 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import pt.utl.ist.cm.neartweetEntities.PDU.RegisterPDU;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchConnectTask;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchReceiveTask;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchSendTask;
-import android.content.Context;
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import pt.utl.ist.cm.neartweetclient.ui.LoginActivity;
 
 public class RegisterUserService implements Service {
 
 	private String username;
 	private Context context;
+	Activity activity;
 
-	public RegisterUserService(String username, Context context) {
+	public RegisterUserService(String username, Context context, Activity activity) {
 		this.username = username;
 		this.context = context;
+		this.activity = activity;
 	}
 
 	@Override
 	public void execute() {
-		saveUserPreferences(username, context);
+		createCookieSession(username, context);
 		connectToServer();
 		startReceivingData();
 		registUser();
 	}
 	
-	private void saveUserPreferences(String username, Context context) {
+	private void createCookieSession(String username, Context context) {
 		// save the username in the preference manager
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = settings.edit();

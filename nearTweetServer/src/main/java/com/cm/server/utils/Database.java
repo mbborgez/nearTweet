@@ -1,16 +1,14 @@
-package Server;
+package main.java.com.cm.server.utils;
 
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import pt.utl.ist.cm.neartweetEntities.PDU.PollVotePDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.PublishPollPDU;
-import pt.utl.ist.cm.neartweetEntities.PDU.TweetPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 
 
-public class TempMemory 
+public class Database 
 {
 	static int TWEETSPAMLIMIT = 3;
 	static int USERSPAMLIMIT = 5;
@@ -21,8 +19,7 @@ public class TempMemory
 	public HashMap<String, Integer> tweetSpamVotes;
 	public HashMap<String, Integer> userSpamVotes;
 	
-	public TempMemory()
-	{
+	public Database() {
 		this.listUsers = new HashMap<String, ObjectOutputStream>();
 		this.listTweets = new ArrayList<TweetPDU>();
 		this.listPolls = new ArrayList<PublishPollPDU>();
@@ -30,32 +27,25 @@ public class TempMemory
 		this.userSpamVotes = new HashMap<String, Integer>();
 	}
 	
-	public void InsertUser(String userId, ObjectOutputStream obj)
-	{
+	public void InsertUser(String userId, ObjectOutputStream obj) {
 		listUsers.put(userId, obj);
 	}
 	
-	public void RemoveUser(ObjectOutputStream obj)
-	{
-		for(String user :  this.listUsers.keySet())
-		{
+	public void RemoveUser(ObjectOutputStream obj) {
+		for(String user :  this.listUsers.keySet()){
 			if(this.listUsers.get(user) == obj)
 				this.listUsers.remove(user);
 		}
 	}
 	
-	public int TweetSpamVote(String tweetId)
-	{
-		if(tweetSpamVotes.containsKey(tweetId))
-		{
+	public int TweetSpamVote(String tweetId){
+		if(tweetSpamVotes.containsKey(tweetId)){
 			tweetSpamVotes.put(tweetId, tweetSpamVotes.get(tweetId) + 1);
-			if(tweetSpamVotes.get(tweetId) >= TWEETSPAMLIMIT)
-			{
+			if(tweetSpamVotes.get(tweetId) >= TWEETSPAMLIMIT) {
 				this.tweetSpamVotes.remove(tweetId);
 				return 1;
 			}
-			else
-			{
+			else {
 				return 0;
 			}
 		}
