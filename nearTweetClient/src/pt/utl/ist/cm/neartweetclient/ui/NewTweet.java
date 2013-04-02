@@ -1,6 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.services.CreateTweetService;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -47,14 +48,26 @@ public class NewTweet extends Activity {
     	 * it should call the service layer
     	 */
     	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	Toast.makeText(this,
-    			"Great Tweet " + settings.getString("username", "ASDASD"), 
-    			Toast.LENGTH_LONG).show();
+    	String username = settings.getString("username", null);
+    	if (username == null) {
+    		errorMessage();
+    	} else {
+    		CreateTweetService service = new CreateTweetService(username, text, this);
+    		try {
+    			service.execute("");
+    		} catch(Exception e) {
+    			errorMessage();
+    			finish();
+    		}
+    	}
+    }
+    
+    public void nextScreen() {
     	finish();
     }
     
     
-    private void errorMessage() {
+    public void errorMessage() {
     	Toast.makeText(this,"You cannot tweet an empty message", Toast.LENGTH_SHORT).show();
     }
 

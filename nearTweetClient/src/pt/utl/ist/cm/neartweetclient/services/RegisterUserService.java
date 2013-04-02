@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
@@ -22,6 +23,10 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 		this.activity = activity;
 	}
 	
+	/**
+	 * createCookieSession - it should only be activated when 
+	 * the server responds with void (meaning that everything went ok)
+	 */
 	private void createCookieSession() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.activity.getApplicationContext());
 		SharedPreferences.Editor editor = settings.edit();
@@ -41,10 +46,11 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 
 	@Override
 	protected Boolean doInBackground(String... params) {
-		createCookieSession();
 		try {
 			registerUserOnServer();
 		} catch(NearTweetException e) {
+			e.printStackTrace();
+			Log.i("NEART WEET EXCEPTION", e.getMessage());
 			return false;
 		}
 		return true;
@@ -54,6 +60,7 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 	 protected void onPostExecute(Boolean result) {
          LoginActivity act = (LoginActivity) this.activity;
          if (result) {
+        	 createCookieSession();
         	 act.nextScreen(); 
          } else {
         	 act.invalidLogin();

@@ -54,7 +54,6 @@ public class LoginActivity extends Activity {
 	 * Actually this transition should be synchronous and wait by RegisterUserService Response
 	 * If the network already has one user the name selected we should present an error to the user   
 	 * it will be able to start a new activity
-	 * FIXME! - AQ
 	 */
 	public void nextScreen() {
 		startActivity(new Intent(this, TweetsStreamActivity.class));
@@ -64,7 +63,18 @@ public class LoginActivity extends Activity {
 	 * shows an alert message with invalid Login
 	 */
 	public void invalidLogin() {
-		Toast.makeText(this, UiMessages.ERROR_MESSAGE,Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, 
+				UiMessages.ERROR_MESSAGE,
+				Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * shows an alert message with the user didn't type anything on the text field
+	 */
+	public void invalidTextFormat() {
+		Toast.makeText(this, 
+				UiMessages.ENTER_LOGIN, 
+				Toast.LENGTH_SHORT).show();
 	}
 	
 	private TextWatcher textWatcherGuard() {
@@ -94,7 +104,7 @@ public class LoginActivity extends Activity {
 					registerUser(userName);
 					return;
 				}
-				invalidLogin();
+				invalidTextFormat();
 			}
 		};
 	}
