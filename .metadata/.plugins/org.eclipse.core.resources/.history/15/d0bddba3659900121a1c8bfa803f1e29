@@ -1,0 +1,38 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+import pt.utl.ist.cm.neartweetclient.ClientPDUVisitor;
+import android.util.Log;
+
+public class AsynchReceiveTask implements Runnable {
+  
+	@Override
+	public void run() {
+		
+		while(!ConnectionStatus.getInstance().isConnected()){
+			try {
+				Thread.sleep(1000);//wait for the connect thread to start
+			} catch (InterruptedException e) {}
+		}
+		
+		while(ConnectionStatus.getInstance().isConnected()){
+			Object receivedObj;
+			try {
+				Log.i(this.getClass().toString(), "Waiting to receive object");
+				receivedObj = ConnectionStatus.getInstance().getInputStream().readObject();
+				Log.i(this.getClass().toString(), "Object received -  " + receivedObj);
+			} catch (Exception e) {
+				e.printStackTrace();
+				receivedObj = null;
+				Log.i(this.getClass().toString(), "Object received -  " + receivedObj);
+			}
+			
+			if(receivedObj!=null && receivedObj instanceof PDU){
+				ClientPDUVisitor pduVisitor = new ClientPDUVisitor();
+				PDU pdu = (PDU) receivedObj;
+				pdu.accept(pduVisitor);
+				
+			}
+		}
+	}
+}

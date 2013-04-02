@@ -1,0 +1,41 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+import android.util.Log;
+
+public class AsynchReceiveThread implements Runnable {
+	
+	private boolean isConnected;
+	
+	public void run() {
+		
+    	while (ConnectionStatus.getInstance().getInputStream() == null){
+    		//DO NOTHING in a bruteforce way
+    	}
+    	
+		Object receivedObj;
+		try {
+			Log.i(this.getClass().toString(), "Waiting to receive object");
+			receivedObj = ConnectionStatus.getInstance().getInputStream().readObject();
+			Log.i(this.getClass().toString(), "Object received -  " + receivedObj);
+		} catch (Exception e) {
+			receivedObj = null;
+		}	
+		
+		if(receivedObj!=null && receivedObj instanceof PDU){
+			throw new RuntimeException("RECEIVED A NEW PDU " + receivedObj);
+			//update things on the activity
+		}
+    }
+
+	
+	
+	public boolean getIsConnected() {
+		return isConnected;
+	}
+
+	public void setIsConnected(boolean isConnected) {
+		this.isConnected = isConnected;
+	}
+    
+}

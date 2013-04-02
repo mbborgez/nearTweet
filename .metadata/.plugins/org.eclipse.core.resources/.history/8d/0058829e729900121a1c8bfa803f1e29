@@ -1,0 +1,42 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+
+public class AsynchSendTask implements Runnable {
+
+	private PDU pdu;
+
+	public AsynchSendTask(PDU pdu) {
+		this.pdu = pdu;
+	}
+
+	@Override
+	public void run() {
+		while (ConnectionStatus.getInstance().getOutputStream() == null) {
+			waitForConnection();
+		}
+
+		try {
+			ConnectionStatus.getInstance().getOutputStream().writeObject(pdu);
+			ConnectionStatus.getInstance().getOutputStream().flush();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void waitForConnection() {
+		try {
+			Thread.sleep(500); /* Wait for the connection */
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}

@@ -1,0 +1,8 @@
+package pt.utl.ist.cm.neartweetEntities.PDU;
+
+public class Snippet {
+	public static void main(String[] args) {
+		pt.utl.ist.cm.neartweetclient
+	}
+}
+

@@ -1,0 +1,72 @@
+package pt.utl.ist.cm.neartweetclient.services;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchConnectTask;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchReceiveTask;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchSendTask;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.Constants;
+import pt.utl.ist.cm.neartweetclient.exceptions.ErrorConnectingException;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
+public class RegisterUserService implements Service {
+
+	private String username;
+	private Context context;
+
+	public RegisterUserService(String username, Context context) {
+		this.username = username;
+		this.context = context;
+	}
+
+	@Override
+	public void execute() {
+		createCookieSession(username, context);
+		connectToServer(Constants.SERVER_ADDRESS, Constants.SERVER_PORT);
+		startReceivingData();
+		registUser();
+	}
+	
+	private void createCookieSession(String username, Context context) {
+		// save the username in the preference manager
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("username", username);
+		editor.commit();
+	}
+	
+	private void asynchConnectToServer(String serverAddress, int serverPort) {
+		// Connect to the server
+		Thread connectThread = new Thread(new AsynchConnectTask(serverAddress, serverPort));
+		connectThread.start();
+	}
+	
+	private void connectToServer(String serverAddress, int serverPort){
+		if(!ConnectionStatus.getInstance().isConnected()){
+			try {
+				Log.i(this.getClass().toString(), "Connecting..");
+				ConnectionStatus.getInstance().connect(serverAddress, serverPort);
+				Log.i(this.getClass().toString(), "Connected");
+			} catch (ErrorConnectingException e) {
+				e.printStackTrace();
+				Log.e(this.getClass().toString(), "Error connecting");
+			}
+		}
+	}
+	
+	private void startReceivingData() {
+		// start receiving data from the server
+		Thread receiveThread = new Thread(new AsynchReceiveTask(context));
+		receiveThread.start();
+	}
+
+	private void registUser() {
+		// send a regist request to the server.
+		RegisterPDU registerPdu = new RegisterPDU(username);
+		Thread sendThread = new Thread(new AsynchSendTask(registerPdu));
+		sendThread.start();
+	}
+}

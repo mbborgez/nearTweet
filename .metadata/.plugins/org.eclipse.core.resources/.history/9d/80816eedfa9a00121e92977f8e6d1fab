@@ -1,0 +1,47 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+
+public class AsynchConnectTask implements Runnable {
+	private String serverAddress;
+	private int serverPort;
+	private Context context;
+	private static boolean isConnecting;
+
+	public AsynchConnectTask(Context context, String serverAddress, int serverPort){
+		this.context = context;
+		this.serverAddress = serverAddress;
+		this.serverPort = serverPort;
+	}
+	
+	public void run() {
+		if(AsynchConnectTask.isConnecting()){
+			return;
+		} else {
+			AsynchConnectTask.setConnecting(true);
+			connect();
+			Log.i(this.getClass().toString(), "Connected");
+			AsynchConnectTask.setConnecting(false);
+		}
+	}
+
+	private void connect() {
+		try {
+			ConnectionStatus.getInstance().connect(serverAddress, serverPort);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			Log.e(this.getClass().toString(), "Error connecting");
+		} catch (IOException e) {
+			e.printStackTrace();
+			Log.e(this.getClass().toString(), "Error connecting");
+		}
+	}
+	
+	
+}

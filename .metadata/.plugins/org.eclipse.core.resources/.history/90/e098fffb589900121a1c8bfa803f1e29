@@ -1,0 +1,38 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+
+public class MessageQueue {
+
+	private Queue<PDU> sendQueue = new LinkedList<PDU>();
+	private Queue<PDU> receiveQueue = new LinkedList<PDU>();
+	
+	private MessageQueue instance = new MessageQueue();
+	
+	private MessageQueue(){}
+	
+	
+	public synchronized void registerSend(PDU pdu)
+	{
+		sendQueue.add(pdu);
+	}
+	
+	public synchronized PDU peekSend()
+	{
+		return sendQueue.peek();
+	}
+	
+	public synchronized void registerReceive(PDU pdu)
+	{
+		receiveQueue.add(pdu);
+	}
+	
+	public synchronized PDU peekReceive()
+	{
+		return receiveQueue.peek();
+	}
+	
+}

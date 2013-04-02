@@ -1,0 +1,13 @@
+package pt.utl.ist.cm.neartweetclient.exceptions;
+
+public class ErrorSendingMessageException extends NearTweetException {
+
+	private static final String ERROR_MESSAGE = "Error sending message";
+
+	public ErrorSendingMessageException() {
+		super(ERROR_MESSAGE);
+	}
+
+	private static final long serialVersionUID = 1L;
+
+}

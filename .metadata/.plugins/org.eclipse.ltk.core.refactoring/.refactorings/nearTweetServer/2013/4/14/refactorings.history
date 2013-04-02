@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Extract local variable &apos;serverName&apos; from expression &apos;args[0]&apos;&#x0D;&#x0A;- Original project: &apos;nearTweetServer&apos;&#x0D;&#x0A;- Variable name: &apos;serverName&apos;&#x0D;&#x0A;- Destination method: &apos;main.java.com.cm.server.Server.main()&apos;&#x0D;&#x0A;- Variable expression: &apos;args[0]&apos;&#x0D;&#x0A;- Replace occurrences of expression with variable" description="Extract local variable &apos;serverName&apos;" final="false" id="org.eclipse.jdt.ui.extract.temp" input="/src&lt;main.java.com.cm.server{Server.java" name="serverName" replace="true" selection="184 7" stamp="1364830887316" version="1.0"/>
+</session>

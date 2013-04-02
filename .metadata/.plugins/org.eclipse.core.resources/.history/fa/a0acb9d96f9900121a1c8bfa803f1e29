@@ -1,0 +1,10 @@
+package pt.utl.ist.cm.neartweetclient.services;
+
+public class RegistUserService implements Service{
+
+	@Override
+	public void execute() {
+		
+	}
+
+}

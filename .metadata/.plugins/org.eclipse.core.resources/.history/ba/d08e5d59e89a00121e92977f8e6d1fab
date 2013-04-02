@@ -1,0 +1,64 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+
+public class AsynchConnectTask implements Runnable {
+	private String serverAddress;
+	private int serverPort;
+	private Context context;
+	private static boolean isConnecting;
+
+	public AsynchConnectTask(Context context, String serverAddress, int serverPort){
+		this.context = context;
+		this.serverAddress = serverAddress;
+		this.serverPort = serverPort;
+	}
+	
+	public void run() {
+		if(AsynchConnectTask.isConnecting()){
+			return;
+		} else {
+			AsynchConnectTask.setConnecting(true);
+			try {
+				ConnectionStatus.getInstance().connect(serverAddress, serverPort);
+				notifyConnectionStatus(Constants.CONNECTION_STATUS_OK);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+				Log.e(this.getClass().toString(), "Error connecting");
+				notifyConnectionStatus(Constants.CONNECTION_STATUS_FAIL);
+			} catch (IOException e) {
+				e.printStackTrace();
+				Log.e(this.getClass().toString(), "Error connecting");
+				notifyConnectionStatus(Constants.CONNECTION_STATUS_FAIL);
+			}
+	
+			Log.i(this.getClass().toString(), "Connected");
+			AsynchConnectTask.setConnecting(false);
+		}
+	}
+
+	private void notifyConnectionStatus(Integer status){
+		Intent intent = new Intent();
+		intent.setAction(Constants.ACTION_CONNECTION_STATUS);
+	    // Puts the status into the Intent
+		intent.putExtra(Constants.CONNECTION_STATUS, status);
+	    // Broadcasts the Intent to receivers in this app
+	    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+	}
+
+	public static synchronized boolean isConnecting() {
+		return isConnecting;
+	}
+
+	public static synchronized void setConnecting(boolean isConnecting) {
+		AsynchConnectTask.isConnecting = isConnecting;
+	}
+	
+	
+}

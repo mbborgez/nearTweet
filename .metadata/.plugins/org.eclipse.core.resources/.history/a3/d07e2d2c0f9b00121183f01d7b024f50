@@ -1,0 +1,68 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+//import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import android.util.Log;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+
+public class ConnectionStatus {
+	private static ConnectionStatus currentConnection;
+
+	private ObjectOutputStream outputStream;
+	private ObjectInputStream inputStream;
+	private Socket socket;
+	
+	private ConnectionStatus() { /* Avoid instantiation */}
+	
+	public void connect(String host, int port) throws UnknownHostException, IOException {
+		Log.i("CONNECTION", "STARTING CONNECTION");
+		socket = new Socket(host, port);
+		Log.i("CONNECTION", "STARTING CONNECTION");
+		this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+		this.inputStream  = new ObjectInputStream(socket.getInputStream());
+	}
+	
+	public static ConnectionStatus getInstance() {
+		if (currentConnection == null) {
+			currentConnection = new ConnectionStatus();
+		}
+		return currentConnection;
+	}
+	
+	public void sendPDU(PDU pdu) {
+		try {
+			outputStream.writeObject(pdu);
+			outputStream.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public PDU receivePDU() {
+		PDU receivedPDU = null;
+		while(receivedPDU == null){
+			Object receivedObj;
+			try {
+				receivedObj = inputStream.readObject();
+				if(receivedObj != null && receivedObj instanceof PDU){
+					receivedPDU = (PDU) receivedObj;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				receivedObj = null;
+			}
+		}
+		return receivedPDU;
+	}
+
+	public boolean isConnected(){
+		return socket != null;
+	}
+}

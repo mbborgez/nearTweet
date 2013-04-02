@@ -1,0 +1,54 @@
+1364404247249	Rename field 'label'
+1364407484641	Rename package 'pt.utl.ist.cm.neartweetclient.service'
+1364409628614	Extract constant '_8000'
+1364409641151	Extract constant '_10_0_2_2'
+1364419797558	Rename type 'ClientServerConnectorTask'
+1364419987237	Rename package 'pt.utl.ist.cm.neartweetclient.tasks'
+1364420042301	Encapsulate field 'instance'
+1364420145931	Encapsulate field 'outputStream'
+1364420148781	Encapsulate field 'inputStream'
+1364420267690	Copy compilation unit
+1364420284018	Rename type 'CopyOfClientServerConnectTask'
+1364420287955	Rename type 'ClientServerConnectTask'
+1364420297391	Rename type 'ClientServerSendTask'
+1364420304918	Rename type 'ClientServerReceiveService'
+1364420386163	Rename field 'client'
+1364426002217	Rename field 'PDU_RECEIVED'
+1364426956139	Rename type 'ResponseReceiver'
+1364427478906	Extract local variable 'intentFilter'
+1364427503194	Rename local variable 'pduReceiverilter'
+1364430737539	Rename field 'PDU_RECEIVED_ACTION'
+1364431232765	Rename field 'RECEIVE_PDU_ACTION'
+1364577407993	Rename type 'ReceiveService'
+1364577433700	Rename type 'ConnectTask'
+1364577439063	Rename type 'SendTask'
+1364577444413	Rename type 'ConnectionStatus'
+1364578109919	Delete element
+1364586390608	Rename type 'AsyncConnectionStatus'
+1364590131982	Copy compilation unit
+1364657523848	Copy compilation unit
+1364657677641	Encapsulate field 'isConnected'
+1364661274363	Rename type 'AsyncConnectTask'
+1364661277724	Rename type 'AsyncReceiveTask'
+1364661280637	Rename type 'AsyncReceiveThread'
+1364661283407	Rename type 'AsyncSendTask'
+1364661971938	Rename method 'registerSend'
+1364661976559	Rename method 'registerReceive'
+1364664020188	Delete element
+1364665612560	Delete element
+1364667483113	Rename type 'ReceivePDUBackgroundService'
+1364667616441	Rename field 'RECEIVE_PDU_SERVICE'
+1364667655279	Rename field 'PDU_RECEIVED_DATA'
+1364668207849	Delete element
+1364668251425	Rename local variable 'code'
+1364668794557	Rename local variable 'localIntent'
+1364669902245	Move compilation unit
+1364670329379	Rename field 'myReceiver'
+1364670334451	Rename type 'MyReceiver'
+1364671146460	Extract method 'extracted'
+1364671233909	Extract local variable 'pdu'
+1364672026885	Rename method 'registerInServer'
+1364693725570	Rename method 'startReceivingDataFromServer'
+1364693822424	Delete element
+1364694086498	Rename field 'textView1'
+1364694726064	Move compilation unit

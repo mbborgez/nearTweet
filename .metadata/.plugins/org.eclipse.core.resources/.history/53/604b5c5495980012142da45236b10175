@@ -1,0 +1,24 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import pt.utl.ist.cm.neartweetEntities.PDU.PDU;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+	// Broadcast receiver for receiving status updates from the IntentService
+	public class ReceivePDUBroadcastReceiver extends BroadcastReceiver
+	{
+	    // Prevents instantiation
+	    private PduReceiver() {}
+	    // Called when the BroadcastReceiver gets an Intent it's registered to receive
+		@Override
+		public void onReceive(Context context, Intent intent) {	        
+			/*
+	         * Handle Intents here.
+	         */	
+			Object obj = intent.getSerializableExtra(AsyncConnectionStatus.PDU_RECEIVED_DATA);
+			if(obj!=null && obj instanceof PDU){
+				throw new RuntimeException("EIIIIIIIII a new pdu arrived " + (PDU) obj);
+			}
+		}
+}

@@ -1,0 +1,19 @@
+package PDU;
+
+import pt.utl.ist.cm.neartweetEntities.PDU.PDUVisitor;
+
+public class RegisterPDU extends PDU
+{
+
+	public RegisterPDU(String userId) 
+	{
+		super(userId);
+	}
+
+	@Override
+	public void accept(PDUVisitor visitor) 
+	{
+		visitor.processRegisterPDU(this);
+	}
+	
+}

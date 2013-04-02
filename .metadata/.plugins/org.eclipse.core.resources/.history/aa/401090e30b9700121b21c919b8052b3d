@@ -1,0 +1,26 @@
+package PDU;
+
+import pt.utl.ist.cm.neartweetEntities.entities.PDU.PDUVisitor.PDUVisitor;
+
+public class SpamVotePDU extends PDU
+{
+	private String targetMessageId;
+	
+	public SpamVotePDU(String userId, String targetMessageId) 
+	{
+		super(userId);
+		
+		this.targetMessageId = targetMessageId;
+	}
+
+	public String GetTargetMessageId()
+	{
+		return this.targetMessageId;
+	}
+
+	@Override
+	public void accept(PDUVisitor visitor) 
+	{
+		visitor.processSpamVotePDU(this);
+	}
+}

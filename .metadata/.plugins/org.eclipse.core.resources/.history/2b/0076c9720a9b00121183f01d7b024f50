@@ -1,0 +1,18 @@
+package main.java.com.cm.server;
+
+
+public class Server 
+{	
+	public static void main(String args[])
+	{
+		String serverName;
+		if(args.length<2){
+			serverName = "DEFAULT_SERVER_NAME";
+		} else {
+			args[0];
+		}
+		ServerProcess server = new ServerProcess(serverName, 8000);
+		server.run();
+		server.close();
+	}
+}

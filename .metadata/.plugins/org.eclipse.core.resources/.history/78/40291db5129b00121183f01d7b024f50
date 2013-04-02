@@ -1,0 +1,7 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+
+public class NotConnectedException extends NearTweetException {
+
+}

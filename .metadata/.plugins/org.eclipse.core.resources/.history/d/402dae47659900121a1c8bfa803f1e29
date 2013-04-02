@@ -1,0 +1,58 @@
+package pt.utl.ist.cm.neartweetclient;
+
+import android.util.Log;
+import pt.utl.ist.cm.neartweetEntities.PDU.GenericMessagePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PDUVisitor;
+import pt.utl.ist.cm.neartweetEntities.PDU.PollVotePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.RegisterPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.ReplyPDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.SpamVotePDU;
+import pt.utl.ist.cm.neartweetEntities.PDU.TweetPDU;
+
+public class ClientPDUVisitor extends PDUVisitor {
+
+	@Override
+	public void processPollVotePDU(PollVotePDU pdu) {
+		// TODO
+		Log.i(getClass().toString(), "Received a PollVotePDU  -  " + pdu);
+	}
+
+	@Override
+	public void processPublishPollPDU(PublishPollPDU pdu) {
+		// TODO
+		Log.i(getClass().toString(),"Received a PublishPollPDU  -  " + pdu);
+	}
+
+	@Override
+	public void processRegisterPDU(RegisterPDU pdu) {
+		// TODO
+		Log.i(getClass().toString(),"Received a RegisterPDU  -  " + pdu);
+	}
+
+	@Override
+	public void processReplyPDU(ReplyPDU pdu) {
+		// TODO
+		Log.i(getClass().toString(),"Received a ReplyPDU  -  " + pdu);
+	}
+
+	@Override
+	public void processSpamVotePDU(SpamVotePDU pdu) {
+		// TODO
+		Log.i(getClass().toString(),"Received a SpamVotePDU  -  " + pdu);
+	}
+
+	@Override
+	public void processTweetPDU(TweetPDU pdu) {
+		// TODO
+		Log.i(getClass().toString(),"Received a TweetPDU  -  " + pdu);
+		
+	}
+
+	@Override
+	public void processGenericMessagePDU(GenericMessagePDU pdu) {
+		// TODO Auto-generated method stub
+		Log.i(getClass().toString(),"Received a GenericMessagePDU  -  " + pdu);
+	}
+
+}

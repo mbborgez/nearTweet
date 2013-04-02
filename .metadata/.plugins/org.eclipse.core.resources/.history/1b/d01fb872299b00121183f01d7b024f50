@@ -1,0 +1,7 @@
+package pt.utl.ist.cm.neartweetclient.connectionTasks;
+
+import android.os.AsyncTask;
+
+public class BaseAsyncTask <Params, Progress, Result> extends AsyncTask<Params, Progress, Result>{
+
+}
