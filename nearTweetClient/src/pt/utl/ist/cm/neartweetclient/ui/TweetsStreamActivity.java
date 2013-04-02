@@ -27,7 +27,10 @@ public class TweetsStreamActivity extends ListActivity {
 		// storing string resources into Array
 		// tmp variable
 		final String[] tweetsList = new String[]{"t1", "t2", "t3", "t4", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5","t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5"};
-		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, 
+//		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, 
+//				R.id.tweets_stream_text, 
+//				tweetsList));
+		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.tweets_stream_list, 
 				R.id.tweets_stream_text, 
 				tweetsList));
 

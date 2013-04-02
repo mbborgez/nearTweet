@@ -26,5 +26,6 @@
     <string name="cancel">Cancel</string>
     <string name="welcome">Hello!</string>
     <string name="title_activity_take_photo">TakePhotoActivity</string>
+    <string name="create_tweet">Create Tweet</string>
 
 </resources>
