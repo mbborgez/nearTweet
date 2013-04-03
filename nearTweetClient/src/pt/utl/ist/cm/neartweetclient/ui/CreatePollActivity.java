@@ -39,28 +39,28 @@ public class CreatePollActivity extends Activity {
 		removePollOptionButton = (Button) findViewById(R.id.poll_removeOption_button);
 		newPollOptionEditText = (EditText) findViewById(R.id.poll_newOption_text);
 		startPollButton = (Button) findViewById(R.id.poll_startNewPoll);
-		
+
 		newPollOptionEditText.addTextChangedListener(new TextWatcher() {
-			
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				numberOfWords = count;
 				addPollOptionButton.setEnabled(numberOfWords > 0);
 				updateWordCounter(numberOfWords);
 			}
-			
+
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 				// DO NOTHING
 			}
-			
+
 			@Override
 			public void afterTextChanged(Editable s) {
 				// DO NOTHING
 			}
 		});
-		
+
 		addPollOptionButton.setEnabled(false);
 		addPollOptionButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -73,7 +73,7 @@ public class CreatePollActivity extends Activity {
 				}
 			}
 		});
-		
+
 		removePollOptionButton.setEnabled(false);
 		removePollOptionButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -83,7 +83,7 @@ public class CreatePollActivity extends Activity {
 				}
 			}
 		});
-		
+
 		startPollButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -96,7 +96,7 @@ public class CreatePollActivity extends Activity {
 			}
 		});
 	}
-	
+
 	private void addPollOption(String pollOptionText){
 		RadioButton radioButton = new RadioButton(this);
 		radioButton.setText(pollOptionText);
@@ -112,7 +112,7 @@ public class CreatePollActivity extends Activity {
 		newPollOptionEditText.setText("");
 		addPollOptionButton.setEnabled(numberOfWords > 0 && pollOptions.getChildCount()<MAX_NUM_POLL_OPTIONS);
 	}
-	
+
 	private void startPoll() {
 		//TODO
 	}
@@ -135,7 +135,7 @@ public class CreatePollActivity extends Activity {
 	private void showEnterPollOptionsError() {
 		Toast.makeText(this, MESSAGE_ENTER_MINIMUM_POLL_OPTIONS, Toast.LENGTH_LONG).show();				
 	}
-	
+
 	private void updateWordCounter(int count) {
 		//TODO
 	}

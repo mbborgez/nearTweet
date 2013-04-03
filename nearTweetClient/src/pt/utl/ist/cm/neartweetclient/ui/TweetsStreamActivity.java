@@ -21,9 +21,9 @@ public class TweetsStreamActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		greetingUser();
-		
+
 		// storing string resources into Array
 		// tmp variable
 		final String[] tweetsList = new String[]{"t1", "t2", "t3", "t4", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5","t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5"};
@@ -41,16 +41,16 @@ public class TweetsStreamActivity extends ListActivity {
 				//enviar o ID do tweet que foi clicado
 				showTweetDetails(tweetsList[position]);
 			}
-			
+
 		});
 	}
-	
+
 	private void greetingUser() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		String greeting = String.format(UiMessages.WELCOME_MESSAGE,settings.getString("username", null));
     	Toast.makeText(this, greeting, Toast.LENGTH_LONG).show();
 	}
-	
+
 	protected void showTweetDetails(String tweetId) {
 		Intent tweetDetailsIntent = new Intent(this, TweetDetailsAcitivity.class);
 		tweetDetailsIntent.putExtra(TweetDetailsAcitivity.TWEET_ID, tweetId);
@@ -63,7 +63,7 @@ public class TweetsStreamActivity extends ListActivity {
 		getMenuInflater().inflate(R.menu.tweets_stream, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -77,11 +77,11 @@ public class TweetsStreamActivity extends ListActivity {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
-	
+
 	private void showTweetScreen() {
 		startActivity(new Intent(this, NewTweet.class));
 	}
-	
+
 	private void showPollScreen() {
 		startActivity(new Intent(this, CreatePollActivity.class));
 	}

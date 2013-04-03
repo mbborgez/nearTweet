@@ -10,19 +10,17 @@ import android.widget.TextView;
 public class TweetDetailsAcitivity extends Activity {
 
 	public static final String TWEET_ID = "pt.utl.ist.cm.neartweetclient.TweetDetailsAcitivity.tweet_id";
-	
+
 	TextView tweetDetailsTextView;
-	
-	@Override
+
+	@Override 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tweet_details_acitivity);
-		
+
 		String tweetId = getIntent().getStringExtra(TWEET_ID);
 		if(tweetId.length()>0){
 			tweetDetailsTextView = (TextView) findViewById(R.id.tweet_details_text);
-			// IDEIA: ter um servi�o que vai buscar os dados do tweet pelo id
-			// e popular o ecra com essa informa�ao.
 			tweetDetailsTextView.setText(tweetId);
 		}
 	}
@@ -38,7 +36,7 @@ public class TweetDetailsAcitivity extends Activity {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
-	
+
 	private void showTweetScreen() {
 		startActivity(new Intent(this, NewTweet.class));
 	}

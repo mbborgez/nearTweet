@@ -27,6 +27,7 @@ public class ClientPDUVisitor extends PDUVisitor {
 	public void processPollVotePDU(PollVotePDU pdu) {
 		// TODO
 		Log.i(getClass().toString(), "Received a PollVotePDU  -  " + pdu);
+		savePDU(pdu);
 		notifyPDUArrived(pdu, Constants.POLL_VOTE_PDU_RECEIVED);
 	}
 
@@ -34,20 +35,20 @@ public class ClientPDUVisitor extends PDUVisitor {
 	public void processPublishPollPDU(PublishPollPDU pdu) {
 		// TODO
 		Log.i(getClass().toString(),"Received a PublishPollPDU  -  " + pdu);
+		savePDU(pdu);
 		notifyPDUArrived(pdu, Constants.PUBLISH_POLL_PDU_RECEIVED);
 	}
 
 	@Override
 	public void processRegisterPDU(RegisterPDU pdu) {
-		// TODO
-		Log.i(getClass().toString(),"Received a RegisterPDU  -  " + pdu);
-		notifyPDUArrived(pdu, Constants.REGISTER_PDU_RECEIVED);
+		// Does not make sence in the case of the android client.
 	}
 
 	@Override
 	public void processReplyPDU(ReplyPDU pdu) {
 		// TODO
 		Log.i(getClass().toString(),"Received a ReplyPDU  -  " + pdu);
+		savePDU(pdu);
 		notifyPDUArrived(pdu, Constants.REPLY_PDU_RECEIVED);
 	}
 
@@ -55,6 +56,7 @@ public class ClientPDUVisitor extends PDUVisitor {
 	public void processSpamVotePDU(SpamVotePDU pdu) {
 		// TODO
 		Log.i(getClass().toString(),"Received a SpamVotePDU  -  " + pdu);
+		savePDU(pdu);
 		notifyPDUArrived(pdu, Constants.SPAM_VOTE_PDU_RECEIVED);
 	}
 
@@ -62,14 +64,19 @@ public class ClientPDUVisitor extends PDUVisitor {
 	public void processTweetPDU(TweetPDU pdu) {
 		// TODO
 		Log.i(getClass().toString(),"Received a TweetPDU  -  " + pdu);
+		savePDU(pdu);
 		notifyPDUArrived(pdu, Constants.TWEET_PDU_RECEIVED);
 	}
 
 	@Override
 	public void processGenericMessagePDU(GenericMessagePDU pdu) {
-		// TODO Auto-generated method stub
 		Log.i(getClass().toString(),"Received a GenericMessagePDU  -  " + pdu);
+		savePDU(pdu);
 		notifyPDUArrived(pdu, Constants.GENERIC_MESSAGE_PDU_RECEIVED);
+	}
+
+	private void savePDU(PDU pdu) {
+		InboxSingleton.getInstance().addReceivedMessage(pdu);
 	}
 
 	private void notifyPDUArrived(PDU pdu, String pduCode){

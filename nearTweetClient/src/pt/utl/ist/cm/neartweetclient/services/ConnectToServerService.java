@@ -1,10 +1,10 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
-import pt.utl.ist.cm.neartweetclient.exceptions.ErrorConnectingException;
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import android.util.Log;
 
-public class ConnectToServerService implements Service {
+public class ConnectToServerService extends NearTweetService {
 
 	String serverAddress;
 	int serverPort;
@@ -15,21 +15,14 @@ public class ConnectToServerService implements Service {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws NearTweetException {
 		connectToServer(serverAddress, serverPort);
 	}
 	
-	private void connectToServer(String serverAddress, int serverPort){
-		if(!ConnectionStatus.getInstance().isConnected()){
-			try {
-				Log.i(this.getClass().toString(), "Connecting..");
-				ConnectionStatus.getInstance().connect(serverAddress, serverPort);
-				Log.i(this.getClass().toString(), "Connected");
-			} catch (ErrorConnectingException e) {
-				e.printStackTrace();
-				Log.e(this.getClass().toString(), "Error connecting");
-			}
-		}
+	private void connectToServer(String serverAddress, int serverPort) throws NearTweetException {
+		Log.i(this.getClass().toString(), "Connecting..");
+		ConnectionStatus.getInstance().connect(serverAddress, serverPort);
+		Log.i(this.getClass().toString(), "Connected");
 	}
 	
 }

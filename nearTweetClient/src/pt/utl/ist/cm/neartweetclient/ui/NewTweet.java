@@ -30,7 +30,7 @@ public class NewTweet extends Activity {
 		});
         
         submitButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				if (tweet.getText().toString().length() > 0) {
@@ -38,7 +38,7 @@ public class NewTweet extends Activity {
 				} else {
 					errorMessage();
 				}
-				
+
 			}
 		});
     }

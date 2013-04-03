@@ -1,8 +1,5 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
