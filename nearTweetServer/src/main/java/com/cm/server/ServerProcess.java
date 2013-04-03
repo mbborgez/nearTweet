@@ -36,13 +36,18 @@ public class ServerProcess
 	 * with a Request Handler on it
 	 */
 	public void run() {
+		Thread t;
+		RequestHandler handler;
 		try {
 			startingMessage();
 			this.serverSocket = new ServerSocket(this.port);
 			while(true) {
 				try {
 				Socket socket = this.serverSocket.accept();
-				(new Thread(new RequestHandler(socket, this.memory))).start();
+				handler = new RequestHandler(socket, this.memory);
+				t = new Thread(handler);
+				handler.setContextThread(t);
+				t.start();
 				} catch(Exception e) {
 					System.err.println("Something went wrong with this connection: " + e.getClass());
 					continue;

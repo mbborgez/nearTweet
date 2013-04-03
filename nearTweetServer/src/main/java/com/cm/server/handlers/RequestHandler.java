@@ -17,6 +17,7 @@ public class RequestHandler implements Runnable {
 	public Database memory;
 	private ServerDispatcher dispatcher;
 	public ObjectOutputStream connection;
+	private Thread currentContext;
 
 	public RequestHandler(Socket socket, Database memory) throws IOException {
 		this.socket = socket;
@@ -31,8 +32,12 @@ public class RequestHandler implements Runnable {
 			stream.flush();
 		} 
 		catch (IOException e) {
-			this.memory.RemoveUser(stream);
-			System.err.println("Removed user with ID: " + memory.GetUserID(stream));
+			try {
+				stream.close();
+				this.memory.RemoveUser(stream);
+			} catch (IOException e1) {
+				abortThread();
+			}
 		}
 	}
 	
@@ -43,10 +48,19 @@ public class RequestHandler implements Runnable {
 				obj.flush();	
 			}
 			catch (IOException e) {
-				System.err.println("Removed user with ID: " + memory.GetUserID(obj));
-				this.memory.RemoveUser(obj);
+				try {
+					obj.close();
+					this.memory.RemoveUser(obj);
+					System.err.println("Removed user with ID: " + memory.GetUserID(obj));
+				} catch (IOException e1) {
+					abortThread();
+				}
 			}
 		} 
+	}
+	
+	public void setContextThread(Thread context) {
+		this.currentContext = context;
 	}
 	
 	@Override
@@ -59,17 +73,24 @@ public class RequestHandler implements Runnable {
 					PDU pdu = (PDU) objectInputStream.readObject();
 					pdu.accept(this.dispatcher);
 				} catch (IOException e) {
-					e.printStackTrace();
-					continue;
+					abortThread();
+					return;
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-					continue;
+					abortThread();
+					return;
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abortThread();
+		}
+	}
+	
+	private void abortThread() {
+		System.err.println("Aborting Thread " + this.currentContext.getId());
+		if (this.currentContext ==  null) {
 			System.exit(-1);
+		} else {
+			this.currentContext.interrupt();
 		}
 	}
 }
