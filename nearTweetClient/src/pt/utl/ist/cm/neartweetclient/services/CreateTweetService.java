@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.Connection;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.ui.NewTweet;
 import android.app.Activity;
@@ -50,7 +50,7 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 	
 	private void sendTweet(String tweetID) {
 		try {
-			ConnectionStatus connection = ConnectionStatus.getInstance();
+			Connection connection = Connection.getInstance();
 			TweetPDU pdu = new TweetPDU(this.userName, tweetID, this.content, null);
 			connection.sendPDU(pdu);
 			incrementTweetID();

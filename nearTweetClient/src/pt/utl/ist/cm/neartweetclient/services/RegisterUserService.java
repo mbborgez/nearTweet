@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.Connection;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.ui.LoginActivity;
 
@@ -36,7 +36,7 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 	
 	private void registerUserOnServer() throws NearTweetException {
         try {
-			ConnectionStatus.getInstance().sendPDU(new RegisterPDU(this.userName));
+			Connection.getInstance().sendPDU(new RegisterPDU(this.userName));
 		} catch (UnknownHostException e) {
 			throw new NearTweetException(e.getClass().getName()); 
 		} catch (IOException e) {

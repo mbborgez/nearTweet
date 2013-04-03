@@ -5,6 +5,8 @@ import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
@@ -17,19 +19,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class TweetsStreamActivity extends ListActivity {
-
+	private BroadcastReceiver streammingHandler;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		streammingHandler = new StreammingHandler();
 		greetingUser();
 		
-		// storing string resources into Array
-		// tmp variable
-		String[] tweetsList = new String[]{"t1", "t2", "t3", "t4", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5","t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5", "t5"};
-		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, 
-				R.id.tweets_stream_text, 
-				tweetsList));
+		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, R.id.tweets_stream_text, null));
 
 		ListView tweetsListView = getListView();
 		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
@@ -40,6 +37,23 @@ public class TweetsStreamActivity extends ListActivity {
 			
 		});
 	}
+	
+	@Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter iff = new IntentFilter();
+        iff.addAction("android.intent.action.MEDIA_BUTTON");
+        // Put whatever message you want to receive as the action
+        this.registerReceiver(this.mBroadcastReceiver,iff);
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.unregisterReceiver(this.mBroadcastReceiver);
+    }
+    private void receivedBroadcast(Intent i) {
+        // Put your receive handling code here
+    }
 	
 	private void greetingUser() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

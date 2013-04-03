@@ -10,14 +10,14 @@ import android.util.Log;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 
-public class ConnectionStatus {
-	public static ConnectionStatus currentConnection;
+public class Connection {
+	public static Connection currentConnection;
 
 	private ObjectOutputStream outputStream;
 	private ObjectInputStream inputStream;
 	private Socket socket;
 	
-	private ConnectionStatus() throws UnknownHostException, IOException {
+	private Connection() throws UnknownHostException, IOException {
 		Log.i("CONNECTION", "STARTING CONNECTION");
 		this.socket = new Socket("10.0.2.2", 8000);
 		Log.i("CONNECTION", "CONNECTION STARTED SUCCESSFULL");
@@ -25,9 +25,9 @@ public class ConnectionStatus {
 		this.inputStream  = new ObjectInputStream(socket.getInputStream());
 	}
 	
-	public static ConnectionStatus getInstance() throws UnknownHostException, IOException {
+	public static Connection getInstance() throws UnknownHostException, IOException {
 		if (currentConnection == null) {
-			currentConnection = new ConnectionStatus();
+			currentConnection = new Connection();
 		}
 		return currentConnection;
 	}
@@ -35,5 +35,26 @@ public class ConnectionStatus {
 	public void sendPDU(PDU pdu) throws IOException {
 		 this.outputStream.writeObject(pdu);
 		 this.outputStream.flush();
+	}
+	
+	public PDU receiveData() {
+		PDU pdu = null;
+		Object obj = null;
+		
+		if (isAlive()) {
+			while(pdu == null) {
+				try {
+					obj = inputStream.readObject();
+					if(obj != null && obj instanceof PDU) {
+						pdu = (PDU) obj;
+					}
+				} catch (Exception e) { obj = null; }
+			}
+		}
+		return pdu;		
+	}
+	
+	public boolean isAlive() {
+		return (this.socket != null && this.inputStream != null && this.outputStream != null);
 	}
 }
