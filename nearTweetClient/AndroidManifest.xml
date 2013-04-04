@@ -40,11 +40,16 @@
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.TweetsStreamActivity"
             android:label="@string/title_activity_tweets_stream" >
+            <intent-filter>
+    			<action android:name="new_tweets" />
+   			</intent-filter>      
         </activity>
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.TweetDetailsAcitivity"
             android:label="@string/title_activity_tweet_details_acitivity" >
         </activity>
+        <service android:enabled="true" android:name="pt.utl.ist.cm.neartweetclient.connectionTasks.StreamingHandler" />
+        <receiver android:enabled="true" android:name="pt.utl.ist.cm.neartweetclient.connectionTasks.TweetsReceiver" />
     </application>
 
 </manifest>

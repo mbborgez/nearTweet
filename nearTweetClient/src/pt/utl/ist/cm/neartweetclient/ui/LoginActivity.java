@@ -95,6 +95,10 @@ public class LoginActivity extends Activity {
 		};
 	}
 	
+	/**
+	 * Method responsible for dealing with the logic before making a Server Request
+	 * @return
+	 */
 	private OnClickListener loginRequestCallback() {
 		return new OnClickListener() {
 			@Override

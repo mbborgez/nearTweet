@@ -32,16 +32,23 @@ public class Connection {
 		return currentConnection;
 	}
 	
+	/**
+	 * sendPDU sends a pdu through the socket created
+	 * @param pdu
+	 * @throws IOException
+	 */
 	public void sendPDU(PDU pdu) throws IOException {
-		 this.outputStream.writeObject(pdu);
-		 this.outputStream.flush();
+		if (this.outputStream != null) {
+			this.outputStream.writeObject(pdu);
+			this.outputStream.flush();
+		}
 	}
 	
 	public PDU receiveData() {
 		PDU pdu = null;
 		Object obj = null;
 		
-		if (isAlive()) {
+		if (this.inputStream != null) {
 			while(pdu == null) {
 				try {
 					obj = inputStream.readObject();
@@ -55,6 +62,6 @@ public class Connection {
 	}
 	
 	public boolean isAlive() {
-		return (this.socket != null && this.inputStream != null && this.outputStream != null);
+		return (this.socket != null);
 	}
 }

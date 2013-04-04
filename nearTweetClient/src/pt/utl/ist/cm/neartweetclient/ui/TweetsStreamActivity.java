@@ -1,13 +1,17 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.util.ArrayList;
+
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.StreamingHandler;
+import pt.utl.ist.cm.neartweetclient.connectionTasks.TweetsReceiver;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,15 +23,26 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class TweetsStreamActivity extends ListActivity {
-	private BroadcastReceiver streammingHandler;
+	
+	/* Handles the incoming tweets */
+	private BroadcastReceiver streammingReceiver;
+	private ArrayList<String> tweets;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		streammingHandler = new StreammingHandler();
 		greetingUser();
+		tweets = new ArrayList<String>();
+		Thread t = new Thread(new StreamingHandler(this));
+		t.start();
 		
-		this.setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_tweets_stream, R.id.tweets_stream_text, null));
-
+		streammingReceiver = new TweetsReceiver(this);
+	    IntentFilter filter = new IntentFilter();
+        filter.addAction("new_tweets");
+        registerReceiver(streammingReceiver, filter);
+        
+	    setListAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice,
+	            android.R.id.text1, this.tweets));
 		ListView tweetsListView = getListView();
 		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -39,22 +54,22 @@ public class TweetsStreamActivity extends ListActivity {
 	}
 	
 	@Override
-    public void onResume() {
+    protected void onResume() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("new_tweets");
+        registerReceiver(streammingReceiver, filter);
         super.onResume();
-        IntentFilter iff = new IntentFilter();
-        iff.addAction("android.intent.action.MEDIA_BUTTON");
-        // Put whatever message you want to receive as the action
-        this.registerReceiver(this.mBroadcastReceiver,iff);
     }
+
     @Override
-    public void onPause() {
+    protected void onPause() {
+        unregisterReceiver(streammingReceiver);
         super.onPause();
-        this.unregisterReceiver(this.mBroadcastReceiver);
-    }
-    private void receivedBroadcast(Intent i) {
-        // Put your receive handling code here
     }
 	
+	/**
+	 * After User Login the system should greeting him with a Toast Message!
+	 */
 	private void greetingUser() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		String greeting = String.format(UiMessages.WELCOME_MESSAGE,settings.getString("username", null));
@@ -94,5 +109,12 @@ public class TweetsStreamActivity extends ListActivity {
 	
 	private void showPollScreen() {
 		startActivity(new Intent(this, CreatePollActivity.class));
+	}
+	
+	public void updateList(String newTweet) {
+		tweets.add(newTweet);
+        @SuppressWarnings("unchecked")
+		ArrayAdapter<String> a = (ArrayAdapter<String>) getListView().getAdapter();
+        a.notifyDataSetChanged();
 	}
 }

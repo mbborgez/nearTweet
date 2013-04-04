@@ -1,32 +1,32 @@
 package pt.utl.ist.cm.neartweetclient.connectionTasks;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
-import android.content.Context;
+import android.app.Activity;
+import android.util.Log;
 
 public class StreamingHandler implements Runnable {
 
-	private Context context;
+	private Activity activity;
 
-	public StreamingHandler(Context context){
-		this.context = context;
+	public StreamingHandler(Activity activity){
+		this.activity = activity;
 	}
 
 	@Override
 	public void run() {
 		try {
+			PDUHandler pduVisitor;
+			PDU pdu;
 			while(Connection.getInstance().isAlive()){
-				PDU pdu = Connection.getInstance().receiveData();
-				ClientPDUVisitor pduVisitor = new ClientPDUVisitor(this.context);
-				pdu.accept(pduVisitor);
+				pdu = Connection.getInstance().receiveData();
+				if (pdu != null) {
+					pduVisitor = new PDUHandler(this.activity.getApplicationContext());
+					Log.i(pdu.getClass().getName(), "PDU ARRIVED");
+					pdu.accept(pduVisitor);
+				}
 			}
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
