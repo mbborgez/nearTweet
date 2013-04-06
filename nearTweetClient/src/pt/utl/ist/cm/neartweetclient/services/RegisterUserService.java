@@ -9,8 +9,8 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.Connection;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.ui.LoginActivity;
 
 public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {

@@ -1,4 +1,4 @@
-package pt.utl.ist.cm.neartweetclient.connectionTasks;
+package pt.utl.ist.cm.neartweetclient.sync;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,22 +11,27 @@ import android.util.Log;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 
 public class Connection {
+	
+	// Network configurations
+	public final String IP_ADDRESS = "192.168.1.66";
+	public final int PORT = 8000;
+	
 	public static Connection currentConnection;
-
 	private ObjectOutputStream outputStream;
 	private ObjectInputStream inputStream;
 	private Socket socket;
 	
 	private Connection() throws UnknownHostException, IOException {
-		Log.i("CONNECTION", "STARTING CONNECTION");
-		this.socket = new Socket("10.0.2.2", 8000);
-		Log.i("CONNECTION", "CONNECTION STARTED SUCCESSFULL");
+		Log.i("DEBUG", "STARTING CONNECTION");
+		this.socket = new Socket(IP_ADDRESS, PORT);
+		Log.i("DEBUG", "CONNECTION STARTED SUCCESSFULL");
 		this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 		this.inputStream  = new ObjectInputStream(socket.getInputStream());
 	}
 	
 	public static Connection getInstance() throws UnknownHostException, IOException {
 		if (currentConnection == null) {
+			Log.i("DEBUG","CREATING A NEW CONNECTION");
 			currentConnection = new Connection();
 		}
 		return currentConnection;

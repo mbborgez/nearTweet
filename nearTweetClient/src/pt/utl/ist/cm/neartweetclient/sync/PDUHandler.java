@@ -1,8 +1,7 @@
-package pt.utl.ist.cm.neartweetclient.connectionTasks;
+package pt.utl.ist.cm.neartweetclient.sync;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
 import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
@@ -10,6 +9,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
 
 public class PDUHandler extends PDUVisitor {
 	
@@ -49,10 +49,12 @@ public class PDUHandler extends PDUVisitor {
 	@Override
 	public void processTweetPDU(TweetPDU pdu) {
 		Intent intent = new Intent();
-		intent.setAction("new_tweets");
-		intent.putExtra("tweet", pdu.GetText());
-		System.out.println("Broadcasting");
-	    LocalBroadcastManager.getInstance(this.context).sendBroadcast(intent);
+		String tweetTemplate = "%s said: %s!";
+		intent.setAction(Actions.NEW_TWEET);
+		intent.putExtra("tweet", String.format(tweetTemplate, pdu.GetUserId(), pdu.GetText()));
+		if (this.context != null) {
+			this.context.sendBroadcast(intent);
+		}
 	}
 
 }

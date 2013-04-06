@@ -1,70 +1,68 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import java.util.ArrayList;
-
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.StreamingHandler;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.TweetsReceiver;
+import pt.utl.ist.cm.neartweetclient.sync.StreamingHandler;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 public class TweetsStreamActivity extends ListActivity {
 	
-	/* Handles the incoming tweets */
-	private BroadcastReceiver streammingReceiver;
 	private ArrayList<String> tweets;
+	BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(Actions.NEW_TWEET)) {
+				String tweet = intent.getStringExtra("tweet");
+				updateList(tweet);
+			}
+			
+		}
+    };
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		greetingUser();
 		tweets = new ArrayList<String>();
-		Thread t = new Thread(new StreamingHandler(this));
-		t.start();
-		
-		streammingReceiver = new TweetsReceiver(this);
-	    IntentFilter filter = new IntentFilter();
-        filter.addAction("new_tweets");
-        registerReceiver(streammingReceiver, filter);
-        
 	    setListAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice,
 	            android.R.id.text1, this.tweets));
-		ListView tweetsListView = getListView();
-		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				showTweetDetails("tw");
-			}
-			
-		});
+	    
+		// Start listening the socket for future tweets
+		AsyncTask<Void, Void, Void> backgroundTask = new StreamingHandler(this.getApplicationContext());
+		backgroundTask.execute();
+		
+		IntentFilter iff = new IntentFilter();
+        iff.addAction(Actions.NEW_TWEET);
+        // Put whatever message you want to receive as the action
+        this.registerReceiver(this.tweetsReceiver,iff);
 	}
 	
 	@Override
-    protected void onResume() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("new_tweets");
-        registerReceiver(streammingReceiver, filter);
+    public void onResume() {
         super.onResume();
+        IntentFilter iff = new IntentFilter();
+        iff.addAction(Actions.NEW_TWEET);
+        // Put whatever message you want to receive as the action
+        this.registerReceiver(this.tweetsReceiver,iff);
     }
-
     @Override
-    protected void onPause() {
-        unregisterReceiver(streammingReceiver);
+    public void onPause() {
         super.onPause();
+        this.unregisterReceiver(this.tweetsReceiver);
     }
 	
 	/**
@@ -75,12 +73,7 @@ public class TweetsStreamActivity extends ListActivity {
 		String greeting = String.format(UiMessages.WELCOME_MESSAGE,settings.getString("username", null));
     	Toast.makeText(this, greeting, Toast.LENGTH_LONG).show();
 	}
-	
-	protected void showTweetDetails(String tweetId) {
-		Intent tweetDetailsIntent = new Intent(this, TweetDetailsAcitivity.class);
-		tweetDetailsIntent.putExtra(TweetDetailsAcitivity.TWEET_ID, tweetId);
-		startActivity(tweetDetailsIntent);
-	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

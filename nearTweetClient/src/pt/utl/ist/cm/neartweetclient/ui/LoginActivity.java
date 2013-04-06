@@ -49,34 +49,11 @@ public class LoginActivity extends Activity {
 			loginButton.setEnabled(false);
 		}
 	}
-
-	/**
-	 * Actually this transition should be synchronous and wait by RegisterUserService Response
-	 * If the network already has one user the name selected we should present an error to the user   
-	 * it will be able to start a new activity
-	 */
-	public void nextScreen() {
-		startActivity(new Intent(this, TweetsStreamActivity.class));
-	}
 	
 	/**
-	 * shows an alert message with invalid Login
+	 * Login Button should only be active when text field area isn't empty.  
+	 * @return Watcher Logic to deal with his responsibility
 	 */
-	public void invalidLogin() {
-		Toast.makeText(this, 
-				UiMessages.ERROR_MESSAGE,
-				Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * shows an alert message with the user didn't type anything on the text field
-	 */
-	public void invalidTextFormat() {
-		Toast.makeText(this, 
-				UiMessages.ENTER_LOGIN, 
-				Toast.LENGTH_SHORT).show();
-	}
-	
 	private TextWatcher textWatcherGuard() {
 		loginButton.setEnabled(false);
 		return new TextWatcher() {
@@ -111,6 +88,37 @@ public class LoginActivity extends Activity {
 				invalidTextFormat();
 			}
 		};
+	}
+	
+	/**
+	 * Actually this transition should be synchronous and wait by RegisterUserService Response
+	 * If the network already has one user the name selected we should present an error to the user   
+	 * it will be able to start a new activity
+	 */
+	public void nextScreen() {
+		startActivity(new Intent(this, TweetsStreamActivity.class));
+	}
+	
+	/**
+	 *  Toast messages for invalid text format and connection error
+	 */
+	
+	/**
+	 * shows an alert message with the user didn't type anything on the text field
+	 */
+	public void invalidTextFormat() {
+		Toast.makeText(this, 
+				UiMessages.ENTER_LOGIN, 
+				Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * shows an alert message with invalid Login
+	 */
+	public void invalidLogin() {
+		Toast.makeText(this, 
+				UiMessages.ERROR_MESSAGE,
+				Toast.LENGTH_SHORT).show();
 	}
 	 
 }
