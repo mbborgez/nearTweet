@@ -7,6 +7,5 @@ public class Server
 	{
 		ServerProcess server = new ServerProcess(args[0], 8000);
 		server.run();
-		server.close();
 	}
 }

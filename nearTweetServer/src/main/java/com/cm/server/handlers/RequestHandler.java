@@ -85,6 +85,10 @@ public class RequestHandler implements Runnable {
 		}
 	}
 	
+	/**
+	 * When a connection is closed we need to kill the thread that was handling that socket in
+	 * order to keep the broadcast behavior safe
+	 */
 	private void abortThread() {
 		System.err.println("Aborting Thread " + this.currentContext.getId());
 		if (this.currentContext ==  null) {
