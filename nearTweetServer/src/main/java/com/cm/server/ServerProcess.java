@@ -2,8 +2,12 @@ package main.java.com.cm.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
 
 import main.java.com.cm.server.handlers.RequestHandler;
 import main.java.com.cm.server.utils.Database;
@@ -14,20 +18,12 @@ public class ServerProcess
     private String server;
     private Database memory;
     private ServerSocket serverSocket;
-    private InetAddress myInnetInfo;
 	
 	public ServerProcess(String serverName, int port) {
-		try {
-			this.myInnetInfo = InetAddress.getLocalHost();
-			this.memory = new Database();
-			this.server = serverName;
-			this.port = port;
-		}
-		catch (java.io.IOException e) {
-			System.err.println("An error ocurred while getting InetAddress: " + e.getMessage()); 
-			System.exit(-1);
-		}
-	}
+		this.memory = new Database();
+		this.server = serverName;
+		this.port = port;
+	}	
 	
 	/**
 	 * make all the surround procedures to push 
@@ -39,8 +35,8 @@ public class ServerProcess
 		Thread t;
 		RequestHandler handler;
 		try {
-			startingMessage();
-			this.serverSocket = new ServerSocket(this.port);
+			this.serverSocket = new ServerSocket(this.port, 300, findEthernetIP());
+			startingMessage();	
 			while(true) {
 				try {
 				Socket socket = this.serverSocket.accept();
@@ -77,8 +73,30 @@ public class ServerProcess
 		System.out.println("########## Server Information ##########");
 		System.out.println("########## Server Name: "+ this.server);
 		System.out.println("########## Port in Use: "+ this.port);
-        System.out.println("########## HostName: "+ this.myInnetInfo.getHostName());
-        System.out.println("########## HostAddress: "+ this.myInnetInfo.getHostAddress());
+        System.out.println("########## HostName: "+ this.serverSocket.getInetAddress().getHostName());
+        System.out.println("########## HostAddress: "+ this.serverSocket.getInetAddress().getHostAddress());
 		System.out.println("############# Server Ready #############");
+	}
+	
+	/**
+	 * Not the beautiful method to get our IP Address [We Accept suggestions to improve it]
+	 * @return
+	 * @throws UnknownHostException
+	 * @throws SocketException
+	 */
+	private InetAddress findEthernetIP() throws UnknownHostException, SocketException {
+		byte [] ipBytes = null;
+		Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
+		while (n.hasMoreElements()) {
+			NetworkInterface e = n.nextElement();
+            if (e.getDisplayName().equals("wlan0")) {
+            	Enumeration<InetAddress> a = e.getInetAddresses();
+                while (a.hasMoreElements()) {
+                	InetAddress addr = a.nextElement();
+                    ipBytes = addr.getAddress();
+                }
+            }
+		}
+		return InetAddress.getByAddress(ipBytes);
 	}
 }
