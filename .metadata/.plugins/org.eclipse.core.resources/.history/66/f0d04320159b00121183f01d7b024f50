@@ -1,5 +1,0 @@
-package pt.utl.ist.cm.neartweetclient.exceptions;
-
-public class ErrorConnectingException extends NearTweetException {
-
-}

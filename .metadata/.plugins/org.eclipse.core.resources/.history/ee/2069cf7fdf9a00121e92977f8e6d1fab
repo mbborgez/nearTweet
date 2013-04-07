@@ -1,9 +1,0 @@
-package pt.utl.ist.cm.neartweetclient.connectionTasks;
-
-public class Constants {
-
-	private static final String CONSTANT_PREFIX = "pt.utl.ist.cm.neartweetclient";
-	
-	protected static final String GENERIC_MESSAGE_PDU_RECEIVED = CONSTANT_PREFIX + "GENERIC_MESSAGE_PDU_RECEIVED";
-
-}
