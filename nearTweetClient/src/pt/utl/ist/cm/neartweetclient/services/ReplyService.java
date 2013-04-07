@@ -1,10 +1,10 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
+import android.content.Context;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
 
 public class ReplyService extends NearTweetService {
 
@@ -12,12 +12,14 @@ public class ReplyService extends NearTweetService {
 	private String targetMessageId;
 	private String text;
 	private String addresse;
+	private Context context;
 	
-	public ReplyService(String userId, String targetMessageId, String text, String targetId) {
+	public ReplyService(String userId, String targetMessageId, String text, String targetId, Context context) {
 		super(userId);
-		this.tweetId = "aa";
+		this.tweetId = userId + Actions.getLastTweet(context);
 		this.targetMessageId = targetMessageId;
 		this.text = text;
+		this.context = context;
 		this.addresse = targetId;
 	}
 
@@ -34,8 +36,7 @@ public class ReplyService extends NearTweetService {
 
 	@Override
 	protected void afterRun() {
-		// TODO Auto-generated method stub
-		
+		Actions.incrementTweetID(this.context);
 	}
 
 }

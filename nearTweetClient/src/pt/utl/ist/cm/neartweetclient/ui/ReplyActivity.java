@@ -59,7 +59,7 @@ public class ReplyActivity extends Activity {
     	if (username == null) {
     		errorMessage();
     	} else {
-    		ReplyService service = new ReplyService(username, this.pdu.GetTweetId(), text, this.pdu.GetUserId());
+    		ReplyService service = new ReplyService(username, this.pdu.GetTweetId(), text, this.pdu.GetUserId(), this.getApplicationContext());
     		try {
     			service.execute();
     			nextScreen();

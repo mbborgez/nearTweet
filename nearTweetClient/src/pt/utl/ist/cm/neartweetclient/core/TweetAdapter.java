@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 
@@ -56,6 +57,16 @@ public class TweetAdapter extends ArrayAdapter<PDU> {
 	        		}
 	        		if (message != null) {
 	        			message.setText("POLL MESSAGE: " + currentPDU.GetText());
+	        		}
+	        	} else if(pdu instanceof ReplyPDU) {
+	        		ReplyPDU currentPDU = (ReplyPDU) pdu;
+	        		TextView name = (TextView) view.findViewById(R.id.userName);
+	        		TextView message = (TextView) view.findViewById(R.id.tweetMessage);
+	        		if (name != null) {
+	        			name.setText(currentPDU.GetTweetId());
+	        		}
+	        		if (message != null) {
+	        			message.setText("RESPONSE: " + currentPDU.GetText());
 	        		}
 	        	}
 	            

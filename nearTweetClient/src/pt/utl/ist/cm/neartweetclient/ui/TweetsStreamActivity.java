@@ -3,6 +3,7 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
@@ -79,6 +80,14 @@ public class TweetsStreamActivity extends ListActivity {
         iff.addAction(Actions.BROADCAST_TWEET);
         // Put whatever message you want to receive as the action
         this.registerReceiver(this.tweetsReceiver,iff);
+        
+        //Update all the PDUS on the Adapter
+        if (!MemCacheProvider.isEmpty()) {
+	        list = MemCacheProvider.toArrayList();
+	        tweetAdapter = new TweetAdapter(this, R.layout.tweet, list);
+	        setListAdapter(tweetAdapter);
+        }
+        
     }
     @Override
     public void onPause() {
@@ -88,8 +97,12 @@ public class TweetsStreamActivity extends ListActivity {
     
     protected void showTweetDetails(PDU pdu) {
     	if (pdu instanceof TweetPDU) {
-    		Intent tweetDetailsIntent = new Intent(this, TweetDetailsAcitivity.class);
+    		Intent tweetDetailsIntent = new Intent(this, TweetDetailsActivity.class);
     		tweetDetailsIntent.putExtra("tweet_item", ((TweetPDU) pdu).GetTweetId());
+    		startActivity(tweetDetailsIntent);
+    	} else if (pdu instanceof PublishPollPDU) {
+    		Intent tweetDetailsIntent = new Intent(this, PollDetailsActivity.class);
+    		tweetDetailsIntent.putExtra("tweet_item", ((PublishPollPDU) pdu).GetTweetId());
     		startActivity(tweetDetailsIntent);
     	}
 	}

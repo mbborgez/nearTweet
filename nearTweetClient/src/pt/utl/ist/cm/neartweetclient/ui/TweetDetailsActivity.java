@@ -15,7 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class TweetDetailsAcitivity extends Activity {
+public class TweetDetailsActivity extends Activity {
 	
 	private TextView tweetDetailsTextView;
 	private String tweetId;

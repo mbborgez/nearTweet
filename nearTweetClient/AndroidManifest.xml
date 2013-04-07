@@ -53,7 +53,7 @@
         </activity>
         
         <activity
-            android:name="pt.utl.ist.cm.neartweetclient.ui.TweetDetailsAcitivity"
+            android:name="pt.utl.ist.cm.neartweetclient.ui.TweetDetailsActivity"
             android:label="@string/title_activity_tweet_details_acitivity" >
         </activity>
     </application>
