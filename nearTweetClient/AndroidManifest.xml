@@ -8,18 +8,15 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-    <uses-feature android:name="android.hardware.camera"></uses-feature>  
+	<uses-permission android:name="android.permission.INTERNET" />
     
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:uiOptions="splitActionBarWhenNarrow"
         android:label="@string/app_name"
-        android:theme="@style/Theme.nearTweet"
-        android:uiOptions="splitActionBarWhenNarrow" >
+        android:theme="@style/Theme.nearTweet" >
+        
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.LoginActivity"
             android:label="@string/app_name" >
@@ -29,34 +26,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.CreatePollActivity"
             android:label="@string/app_name" >
         </activity>
+        
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.NewTweet"
             android:label="@string/app_name" >
         </activity>
+        
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.PollDetailsActivity"
             android:label="@string/app_name" >
         </activity>
+        
         <activity
-            android:name="pt.utl.ist.cm.neartweetclient.ui.TweetsStreamActivity"
-            android:label="@string/title_activity_tweets_stream" >
-        </activity>
-        <activity
-            android:name="pt.utl.ist.cm.neartweetclient.ui.TweetDetailsAcitivity"
-            android:label="@string/title_activity_tweet_details_acitivity" >
-        </activity>
-        <activity
-            android:name="pt.utl.ist.cm.neartweetclient.ui.TakePhotoActivity"
-            android:label="@string/title_activity_take_photo" 
-            android:screenOrientation="portrait">
+            android:name="pt.utl.ist.cm.neartweetclient.ui.ReplyActivity"
+            android:label="@string/app_name" >
         </activity>
         
-	    <service android:enabled="true" android:name="pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchReceiveService" />
-    
+        <activity
+            android:name="pt.utl.ist.cm.neartweetclient.ui.TweetsStreamActivity"
+            android:label="@string/title_activity_tweets_stream" >      
+        </activity>
+        
+        <activity
+            android:name="pt.utl.ist.cm.neartweetclient.ui.TweetDetailsActivity"
+            android:label="@string/title_activity_tweet_details_acitivity" >
+        </activity>
     </application>
 
 </manifest>

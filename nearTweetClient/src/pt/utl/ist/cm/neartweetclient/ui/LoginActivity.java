@@ -1,25 +1,17 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
-import pt.utl.ist.cm.neartweetEntities.pdu.GenericMessagePDU;
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.AsynchReceiveTask;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
-import pt.utl.ist.cm.neartweetclient.services.ConnectToServerService;
 import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
-import pt.utl.ist.cm.neartweetclient.utils.Constants;
+import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -27,42 +19,49 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-
+	
 	private Button loginButton;
 	private EditText userNameText;
-	private Thread asyncReceiveThread;
+	private boolean connectionError;
 
-	private BroadcastReceiver loginStatusReceiver = new BroadcastReceiver(){
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (Constants.GENERIC_MESSAGE_PDU_RECEIVED.equals(intent.getAction())) {
-				Bundle bundle = intent.getExtras();
-				if(bundle!=null){
-					Object receivedObj = bundle.get(Constants.MESSAGE_RECEIVED_DATA);
-					if(receivedObj instanceof GenericMessagePDU){
-						GenericMessagePDU pdu = (GenericMessagePDU) receivedObj;
-						showWellcomeMessage(pdu);
-						nextScreen();
-					}
-				}
-			}
-		}
-	};
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-
+		
+		this.connectionError = false;
 		// referencing objects
 		loginButton = (Button) findViewById(R.id.loginButton);
 		userNameText = (EditText) findViewById(R.id.usernameText);
-
+		
 		//arming listeners
-		userNameText.addTextChangedListener(textWatcherGuard());
+	    userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
+		
+		// Start listening the socket for authentication response
+		new AuthenticationHandler(this).execute();
 	}
-
+	
+	/**
+	 * registerUser - it is responsible to delegate the Registration to the 
+	 * Service Layer
+	 * @param username - the name which this user will identify future interactions with
+	 * the remaining entities on the network
+	 */
+	private void registerUser(String username) {
+		RegisterUserService service = new RegisterUserService(username, this);
+		try {
+			service.execute();
+		} catch(NearTweetException e) {
+			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+			loginButton.setEnabled(false);
+		}
+	}
+	
+	/**
+	 * Login Button should only be active when text field area isn't empty.  
+	 * @return Watcher Logic to deal with his responsibility
+	 */
 	private TextWatcher textWatcherGuard() {
 		loginButton.setEnabled(false);
 		return new TextWatcher() {
@@ -80,89 +79,38 @@ public class LoginActivity extends Activity {
 			}
 		};
 	}
-
+	
+	/**
+	 * Method responsible for dealing with the logic before making a Server Request
+	 * @return
+	 */
 	private OnClickListener loginRequestCallback() {
 		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				connectUser(userNameText.getText().toString());
-			}
-		};
-	}
-
-	private void connectUser(final String userName) {
-		AsyncTask<Void, Void, Boolean> connectTask = new AsyncTask<Void, Void, Boolean>() {
-			
-			@Override
-			protected Boolean doInBackground(Void... params) {
-				try{
-					ConnectToServerService connectService = new ConnectToServerService(Constants.SERVER_ADDRESS, Constants.SERVER_PORT);
-					connectService.execute();
-					return true;
-				} catch(NearTweetException e){
-					return false;
-				}
-			}
-			
-			@Override
-			 protected void onPostExecute(Boolean result) {
-				//only registers in the server after connecting
-				if(result){
-					startReceivingMessages();
+				String userName = userNameText.getText().toString();
+				if (userName.length() > 0) {
+					verifyConnection();
 					registerUser(userName);
-				} else {
-					errorConnecting();
+					return;
 				}
+				invalidTextFormat();
 			}
-
 		};
-		connectTask.execute();
 	}
 	
 	/**
-	 * registerUser - it is responsible to delegate the Registration to the 
-	 * Service Layer
-	 * @param username - the name which this user will identify future interactions with
-	 * the remaining entities on the network
+	 * Method responsible for dealing with the logic before making a Server response
+	 * @return
 	 */
-	private void registerUser(final String username) {
-		AsyncTask<Void, Void, Boolean> registerUserTask = new AsyncTask<Void, Void, Boolean>() {
-			@Override
-			protected Boolean doInBackground(Void... params) {
-				try{
-					RegisterUserService registerUserService = new RegisterUserService(username, getApplicationContext());
-					registerUserService.execute();
-					return true;
-				} catch(NearTweetException e){
-					return false;
-				}
-			}
-			
-			@Override
-			protected void onPostExecute(Boolean result){
-				if(!result){
-					invalidLogin();
-				}
-			}
-		};
-		registerUserTask.execute();
-	}
-	
-	private void startReceivingMessages() {
-		// Register for the connection status action
-		IntentFilter receivedPDUFilter = new IntentFilter(Constants.GENERIC_MESSAGE_PDU_RECEIVED);
-		LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(loginStatusReceiver, receivedPDUFilter);
-		
-		//Start a thread that receives messages in the background
-		asyncReceiveThread = new Thread(new AsynchReceiveTask(getApplicationContext()));
-		asyncReceiveThread.start();
-	}
-	
-	/**
-	 * shows an alert message notifying the user that the connection has failed
-	 */
-	private void errorConnecting() {
-		Toast.makeText(getApplicationContext(), UiMessages.ERROR_CONNECTING_MESSAGE, Toast.LENGTH_SHORT).show();
+	public void loginResponseCallback(boolean authenticated) {
+		String name = userNameText.getText().toString();
+		if (authenticated) {
+			createCookieSession(name);
+			nextScreen();
+		} else {
+			invalidLogin(name);
+		}
 	}
 	
 	/**
@@ -170,66 +118,58 @@ public class LoginActivity extends Activity {
 	 * If the network already has one user the name selected we should present an error to the user   
 	 * it will be able to start a new activity
 	 */
-	private void nextScreen() {
+	public void nextScreen() {
 		startActivity(new Intent(this, TweetsStreamActivity.class));
 	}
-
+	
+	/**
+	 *  Toast messages for invalid text format and connection error
+	 */
+	
+	/**
+	 * shows an alert message with the user didn't type anything on the text field
+	 */
+	public void invalidTextFormat() {
+		Toast.makeText(this, 
+				UiMessages.ENTER_LOGIN, 
+				Toast.LENGTH_SHORT).show();
+	}
+	
 	/**
 	 * shows an alert message with invalid Login
 	 */
-	private void invalidLogin() {
+	public void invalidLogin(String name) {
+		Toast.makeText(this, 
+				String.format(UiMessages.INVALID_LOGIN, name),
+				Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * shows an alert message with invalid Login
+	 */
+	public void connectionError() {
+		this.connectionError = true;
 		Toast.makeText(this, 
 				UiMessages.ERROR_MESSAGE,
 				Toast.LENGTH_SHORT).show();
 	}
-
-	/**
-	 * shows an alert message with the user didn't type anything on the text field
-	 */
-//	private void invalidTextFormat() {
-//		Toast.makeText(this, 
-//				UiMessages.ENTER_LOGIN, 
-//				Toast.LENGTH_SHORT).show();
-//	}
 	
 	/**
-	 * shows an alert message when the user registers in the server
+	 * createCookieSession - it should only be activated when 
+	 * the server responds with void (meaning that everything went ok)
 	 */
-	private void showWellcomeMessage(GenericMessagePDU pdu) {
-		Toast.makeText(getApplicationContext(), pdu.GetDescription(), Toast.LENGTH_SHORT).show();
+	protected void createCookieSession(String userName) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("username", userName);
+		editor.commit();
 	}
 	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		unregisterUser();
-		System.exit(0);
+	protected void verifyConnection() {
+		if (connectionError == true) {
+ 			// Start listening the socket for authentication response
+ 			new AuthenticationHandler(this).execute();
+		}
 	}
-
-	private void unregisterUser() {
-		AsyncTask<Void, Void, Void> unregisterUserTask = new AsyncTask<Void, Void, Void>() {
-			@Override
-			protected Void doInBackground(Void... params) {
-				//TODO send a unregister request to the server
-				//TODO close the socket
-				ConnectionStatus.getInstance().disconnect();
-				//TODO kill the threads
-				unregisterReceiver(loginStatusReceiver);
-				try {
-					asyncReceiveThread.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		};
-		unregisterUserTask.execute();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		return true;
-	}
-
+	 
 }

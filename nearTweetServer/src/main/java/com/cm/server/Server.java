@@ -13,6 +13,5 @@ public class Server
 		}
 		ServerProcess server = new ServerProcess(serverName, 8000);
 		server.run();
-		server.close();
 	}
 }

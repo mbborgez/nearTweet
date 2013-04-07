@@ -1,8 +1,13 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.util.ArrayList;
+
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.services.CreatePollService;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -39,28 +44,28 @@ public class CreatePollActivity extends Activity {
 		removePollOptionButton = (Button) findViewById(R.id.poll_removeOption_button);
 		newPollOptionEditText = (EditText) findViewById(R.id.poll_newOption_text);
 		startPollButton = (Button) findViewById(R.id.poll_startNewPoll);
-
+		
 		newPollOptionEditText.addTextChangedListener(new TextWatcher() {
-
+			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				numberOfWords = count;
 				addPollOptionButton.setEnabled(numberOfWords > 0);
 				updateWordCounter(numberOfWords);
 			}
-
+			
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 				// DO NOTHING
 			}
-
+			
 			@Override
 			public void afterTextChanged(Editable s) {
 				// DO NOTHING
 			}
 		});
-
+		
 		addPollOptionButton.setEnabled(false);
 		addPollOptionButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -73,7 +78,7 @@ public class CreatePollActivity extends Activity {
 				}
 			}
 		});
-
+		
 		removePollOptionButton.setEnabled(false);
 		removePollOptionButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -83,7 +88,7 @@ public class CreatePollActivity extends Activity {
 				}
 			}
 		});
-
+		
 		startPollButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -96,7 +101,7 @@ public class CreatePollActivity extends Activity {
 			}
 		});
 	}
-
+	
 	private void addPollOption(String pollOptionText){
 		RadioButton radioButton = new RadioButton(this);
 		radioButton.setText(pollOptionText);
@@ -112,9 +117,20 @@ public class CreatePollActivity extends Activity {
 		newPollOptionEditText.setText("");
 		addPollOptionButton.setEnabled(numberOfWords > 0 && pollOptions.getChildCount()<MAX_NUM_POLL_OPTIONS);
 	}
-
+	
 	private void startPoll() {
-		//TODO
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    	String username = settings.getString("username", null);
+    	EditText pollDescription = (EditText) (findViewById(R.id.poll_newDescription_text));
+    	String text = pollDescription.getText().toString();
+    	ArrayList<String> options = new ArrayList<String>();
+    	for(int i = 0; i < pollOptions.getChildCount(); i++) {
+    		RadioButton option = (RadioButton) pollOptions.getChildAt(0);
+    		options.add(option.getText().toString());
+    		System.out.println(option.getText().toString());
+    	}
+		CreatePollService service = new CreatePollService(username, text, options, this);
+		service.execute();
 	}
 
 	private void removePollOption(RadioButton radioButton){
@@ -135,7 +151,7 @@ public class CreatePollActivity extends Activity {
 	private void showEnterPollOptionsError() {
 		Toast.makeText(this, MESSAGE_ENTER_MINIMUM_POLL_OPTIONS, Toast.LENGTH_LONG).show();				
 	}
-
+	
 	private void updateWordCounter(int count) {
 		//TODO
 	}

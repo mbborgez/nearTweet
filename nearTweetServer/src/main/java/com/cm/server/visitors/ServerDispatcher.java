@@ -17,8 +17,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 public class ServerDispatcher extends PDUVisitor {
 	private RequestHandler connectionHandler;
 	
-	public ServerDispatcher(RequestHandler connectionHandler)
-	{
+	public ServerDispatcher(RequestHandler connectionHandler) {
 		this.connectionHandler = connectionHandler;
 	}
 
@@ -33,167 +32,125 @@ public class ServerDispatcher extends PDUVisitor {
 			{
 				String pollOwnerUser = this.connectionHandler.memory.GetUserFromPollID(pdu.GetTargetMessageId());
 				ObjectOutputStream userStream = connectionHandler.memory.GetUserStream(pollOwnerUser);
-				if(userStream != null)
-				{
-					connectionHandler.sendPollResponse(pdu, userStream);
+				if(userStream != null) {
+					connectionHandler.sendDirectedPDU(pdu, userStream);
 				}
-				else
-				{
-					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Poll owner isn't registered anymore!"), this.connectionHandler.connection);
+				else {
+					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Poll owner isn't registered anymore!"), this.connectionHandler.connection);
 					System.out.println("--- Poll owner isn't registered!");
 				}
-			}
-			else
-			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
+			} else {
+				connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
 				System.out.println("--- Unrecognized target tweet ID!");
 			}
-		}
-		else
-		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
+		} else {
+			connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
 		
 	}
 
 	@Override
-	public void processPublishPollPDU(PublishPollPDU pdu) 
-	{
+	public void processPublishPollPDU(PublishPollPDU pdu) {
 		System.out.println("### PublishPollPDU received. tweetId: " + pdu.GetTweetId());
 		
-		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
-		{
-			if(! connectionHandler.memory.VerifyIfPollExists(pdu.GetTweetId()))
-			{
+		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
+			if(! connectionHandler.memory.VerifyIfPollExists(pdu.GetTweetId())) {
 				connectionHandler.memory.InsertPoll(pdu.GetUserId(), pdu.GetTweetId(), pdu.GetText(), pdu.GetOptions());
-				connectionHandler.sendTweetToList(pdu);
-			}
-			else
-			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.connection);
+				connectionHandler.broadcastPDU(pdu);
+			} else {
+				connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.connection);
 				System.out.println("--- Tweet ID already exists!");
 			}
 		}
-		else
-		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
+		else {
+			connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}		
 	}
 
 	@Override
-	public void processRegisterPDU(RegisterPDU pdu) 
-	{
-		System.out.println("### RegisterPDU received. userId: " + pdu.GetUserId());
-		
-		if(!connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
-		{
-			//I need to save ObjectOutputStream because we cannot open it twice using the same socket 
+	public void processRegisterPDU(RegisterPDU pdu) {
+		System.out.println("[nearTweet Server] - Register Request: " + pdu.GetUserId());
+		if(!connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) { 
 			connectionHandler.memory.InsertUser(pdu.GetUserId(), this.connectionHandler.connection);
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are Logged"), this.connectionHandler.connection);
-			System.out.println("--- User " + pdu.GetUserId() + " created!");
-		}
-		else
-		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "The user name choosed already exists!"), this.connectionHandler.connection);
+			connectionHandler.broadcastPDU(
+					new GenericMessagePDU(pdu.GetUserId(), "User " + pdu.GetUserId() + " enter on the network", true));
+			System.out.println("[nearTweet Server] - User "  + pdu.GetUserId() + " has been registered on the Server!");
+		} else {
+			connectionHandler.sendDirectedPDU(
+					new GenericMessagePDU(pdu.GetUserId(), "The name choosed already exists!"), 
+					this.connectionHandler.connection);
 			System.out.println("--- This user already exists!");
 		}
 	}
 
 	@Override
-	public void processReplyPDU(ReplyPDU pdu) 
-	{
+	public void processReplyPDU(ReplyPDU pdu) {
 		System.out.println("### ReplyPDU received. Response: " + pdu.GetText());
 		
-		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
-		{
-			if(connectionHandler.memory.VerifyIfTweetExists(pdu.GetTargetMessageId()))
-			{
+		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
+			if(connectionHandler.memory.VerifyIfTweetExists(pdu.GetTargetMessageId())) {
 				String tweetOwnerUser = this.connectionHandler.memory.GetUserFromTweetID(pdu.GetTargetMessageId());
 				ObjectOutputStream userStream = connectionHandler.memory.GetUserStream(tweetOwnerUser);
-				if(userStream != null)
-				{
-					connectionHandler.sendPollResponse(pdu, userStream);
-				}
-				else
-				{
-					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet owner isn't registered!"), this.connectionHandler.connection);
+				if(userStream != null) {
+					connectionHandler.sendDirectedPDU(pdu, userStream);
+				} else {
+					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Tweet owner isn't registered!"), this.connectionHandler.connection);
 					System.out.println("--- Tweet owner isn't registered!");
 				}
-			}
-			else
-			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
+			} else {
+				connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
 				System.out.println("--- Unrecognized target tweet ID!");
 			}	
 		}
-		else
-		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
+		else {
+			connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
 	}
 
 	@Override
-	public void processSpamVotePDU(SpamVotePDU pdu) 
-	{
+	public void processSpamVotePDU(SpamVotePDU pdu) {
 		System.out.println("### SpamVotePDU received from userId: " + pdu.GetUserId());
 		
-		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
-		{
+		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
 			String tweetId = pdu.GetTargetMessageId();
-			if(this.connectionHandler.memory.VerifyIfTweetExists(tweetId))
-			{
+			if(this.connectionHandler.memory.VerifyIfTweetExists(tweetId)) {
 				String userId = this.connectionHandler.memory.GetUserFromTweetID(tweetId);
-				if(this.connectionHandler.memory.UserSpamVote(userId) == 1)
-				{
-					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You will be removed! Spam votes on your tweets reached the limit!!!"), this.connectionHandler.memory.GetUserStream(userId));
+				if(this.connectionHandler.memory.UserSpamVote(userId) == 1) {
+					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You will be removed! Spam votes on your tweets reached the limit!!!"), this.connectionHandler.memory.GetUserStream(userId));
 					this.connectionHandler.memory.RemoveUser(this.connectionHandler.memory.GetUserStream(userId));
 					System.out.println("--- Removed user: " + userId);
 				}
-				
-				if(this.connectionHandler.memory.TweetSpamVote(tweetId) == 1)
-				{
-					connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Your tweet will be removed because Spam votes on it has reached the limit!!!"), this.connectionHandler.memory.GetUserStream(userId));
+				if(this.connectionHandler.memory.TweetSpamVote(tweetId) == 1) {
+					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Your tweet will be removed because Spam votes on it has reached the limit!!!"), this.connectionHandler.memory.GetUserStream(userId));
 					this.connectionHandler.memory.RemoveTweet(tweetId);
 					System.out.println("--- Removed tweet: " + tweetId);
 				}
-			}
-			else
-			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
+			} else {
+				connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
 				System.out.println("--- Unrecognized target tweet ID!");
 			}	
-		}
-		else
-		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
+		} else {
+			connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
 	}
 
 	@Override
-	public void processTweetPDU(TweetPDU pdu) 
-	{
-		System.out.println("### TweetPDU received. tweetId: " + pdu.GetTweetId());
-		
-		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
-		{
-			if(! connectionHandler.memory.VerifyIfTweetExists(pdu.GetTweetId()))
-			{
+	public void processTweetPDU(TweetPDU pdu) {
+		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
+			if(! connectionHandler.memory.VerifyIfTweetExists(pdu.GetTweetId())) {
+				System.out.println("### TweetPDU received. tweetId: " + pdu.GetTweetId());
 				connectionHandler.memory.InsertTweet(pdu.GetUserId(), pdu.GetTweetId(), pdu.GetText(), pdu.GetMediaObject());
-				connectionHandler.sendTweetToList(pdu);
-			}
-			else
-			{
-				connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.connection);
+				connectionHandler.broadcastPDU(pdu); 
+			} else {
+				connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Tweet ID entered already exists!"), this.connectionHandler.connection);
 				System.out.println("--- Tweet ID already exists!");
 			}
-		}
-		else
-		{
-			connectionHandler.sendPollResponse(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
+		} else {
+			connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}	
 	}

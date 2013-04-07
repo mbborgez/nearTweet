@@ -17,6 +17,5 @@ public abstract class PDUVisitor
 	
 	abstract public void processTweetPDU(TweetPDU pdu);
 	
-	abstract public void processGenericMessagePDU(GenericMessagePDU pdu);
-
+	public void processGenericMessagePDU(GenericMessagePDU pdu) { }
 }

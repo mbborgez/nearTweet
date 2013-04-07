@@ -2,10 +2,15 @@ package pt.utl.ist.cm.neartweetclient.ui;
 
 import java.util.ArrayList;
 
+import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
+import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.services.PollVoteService;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,13 +22,11 @@ import android.widget.Toast;
 
 public class PollDetailsActivity extends Activity {
 
-	public static String POLL_DESCRIPTION = "pt.utl.ist.cm.neartweetclient.PollDetailsActivity.PollDescritpion";
-	public static String POLL_OPTIONS = "pt.utl.ist.cm.neartweetclient.PollDetailsActivity.PollOptions";
-
 	private TextView pollDescriptionTextView;
 	private Button pollVoteButton;
 	private RadioGroup pollOptions;
 	private RadioButton selectedPollVoteButton;
+	private PublishPollPDU pdu;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +37,9 @@ public class PollDetailsActivity extends Activity {
 		String descriptionText = null;
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			descriptionText = extras.getString(POLL_DESCRIPTION);
-			pollOptionsTexts = extras.getStringArrayList(POLL_OPTIONS);
+			pdu = (PublishPollPDU) MemCacheProvider.getTweet(extras.getString("tweet_item"));
+			descriptionText = pdu.GetText();
+			pollOptionsTexts = pdu.GetOptions();
 		}
 
 		pollDescriptionTextView = (TextView) findViewById(R.id.poll_description_textView);
@@ -54,8 +58,13 @@ public class PollDetailsActivity extends Activity {
 	}
 
 	protected void submitVote(RadioButton selectedPollVoteButton) {
-		// TODO Auto-generated method stub
-		showText(selectedPollVoteButton.getText().toString());
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    	String username = settings.getString("username", null);
+    	int index = pdu.GetOptions().lastIndexOf(selectedPollVoteButton.getText().toString());
+		PollVoteService service = new PollVoteService(username,pdu.GetTweetId(), index);
+		service.execute();
+		System.out.println(pdu.GetOptions().lastIndexOf(selectedPollVoteButton.getText().toString()) + "");
+		showText("Submitted: " + selectedPollVoteButton.getText().toString());
 		finish();
 	}
 

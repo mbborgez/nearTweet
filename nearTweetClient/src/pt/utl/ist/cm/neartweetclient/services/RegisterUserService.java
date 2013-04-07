@@ -1,44 +1,54 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
-import pt.utl.ist.cm.neartweetclient.connectionTasks.ConnectionStatus;
-import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
-public class RegisterUserService extends NearTweetService {
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.util.Log;
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import pt.utl.ist.cm.neartweetclient.sync.Connection;
+import pt.utl.ist.cm.neartweetclient.ui.LoginActivity;
+
+public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 	
-	private String userName;
-	private Context context;
+	String userName;
+	Activity activity;
 	
-	public RegisterUserService(String username, Context context) {
+	public RegisterUserService(String username, Activity activity) {
 		this.userName = username;
-		this.context = context;
+		this.activity = activity;
+	}
+	
+	private void registerUserOnServer() throws NearTweetException {
+        try {
+			Connection.getInstance().sendPDU(new RegisterPDU(this.userName));
+		} catch (UnknownHostException e) {
+			throw new NearTweetException(e.getClass().getName()); 
+		} catch (IOException e) {
+			throw new NearTweetException(e.getClass().getName()); 
+		}
 	}
 
 	@Override
-	public void execute() throws NearTweetException {
-		registerUserOnServer();
-		createCookieSession();
+	protected Boolean doInBackground(String... params) {
+		try {
+			registerUserOnServer();
+		} catch(NearTweetException e) {
+			e.printStackTrace();
+			Log.i("NEART WEET EXCEPTION", e.getMessage());
+			return false;
+		}
+		return true;
 	}
 	
-	/**
-	 * createCookieSession - it should only be activated when 
-	 * the server responds with void (meaning that everything went ok)
-	 */
-	private void createCookieSession() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("username", this.userName);
-		editor.commit();
-	}
-	/**
-	 * sends a register request to the server
-	 * @throws NearTweetException
-	 */
-	private void registerUserOnServer() throws NearTweetException {
-		ConnectionStatus.getInstance().sendPDU(new RegisterPDU(this.userName));
-	}
-	
+	@Override
+	 protected void onPostExecute(Boolean result) {
+         LoginActivity act = (LoginActivity) this.activity;
+         if (!result) {
+        	 act.connectionError();
+         }
+     }
+
 }
