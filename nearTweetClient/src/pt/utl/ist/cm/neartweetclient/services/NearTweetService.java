@@ -1,8 +1,25 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import android.os.AsyncTask;
 
-public abstract class NearTweetService {
+public abstract class NearTweetService extends AsyncTask<String, Integer, Boolean> {
 	
-	public abstract void execute() throws NearTweetException;
+	protected String userId;
+	
+	public NearTweetService(String userId) {
+		this.userId = userId;
+	}
+	
+	protected abstract boolean run();
+	protected abstract void afterRun();
+	
+	@Override
+	protected Boolean doInBackground(String... params) {
+		return run();
+	}
+	
+	@Override
+	 protected void onPostExecute(Boolean result) {
+		afterRun();
+	}
 }

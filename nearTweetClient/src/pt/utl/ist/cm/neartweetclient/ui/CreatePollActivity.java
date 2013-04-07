@@ -1,11 +1,13 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.util.ArrayList;
+
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.R.id;
-import pt.utl.ist.cm.neartweetclient.R.layout;
-import pt.utl.ist.cm.neartweetclient.R.menu;
+import pt.utl.ist.cm.neartweetclient.services.CreatePollService;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -117,7 +119,18 @@ public class CreatePollActivity extends Activity {
 	}
 	
 	private void startPoll() {
-		//TODO
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    	String username = settings.getString("username", null);
+    	EditText pollDescription = (EditText) (findViewById(R.id.poll_newDescription_text));
+    	String text = pollDescription.getText().toString();
+    	ArrayList<String> options = new ArrayList<String>();
+    	for(int i = 0; i < pollOptions.getChildCount(); i++) {
+    		RadioButton option = (RadioButton) pollOptions.getChildAt(0);
+    		options.add(option.getText().toString());
+    		System.out.println(option.getText().toString());
+    	}
+		CreatePollService service = new CreatePollService(username, text, options, this);
+		service.execute();
 	}
 
 	private void removePollOption(RadioButton radioButton){

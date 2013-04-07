@@ -26,35 +26,28 @@ public class RequestHandler implements Runnable {
 		this.connection = new ObjectOutputStream(socket.getOutputStream());
 	}
 	
-	public void sendPollResponse(PDU pdu, ObjectOutputStream stream) {
+	public void sendDirectedPDU(PDU pdu, ObjectOutputStream stream) {
 		try {
 			stream.writeObject(pdu);
 			stream.flush();
+			System.out.println("[nearTweet Server] Sending pdu for user: " + this.memory.GetUserID(stream));
 		} 
 		catch (IOException e) {
-			try {
-				stream.close();
-				this.memory.RemoveUser(stream);
-			} catch (IOException e1) {
-				abortThread();
-			}
+			System.out.println("[nearTweet Server] Removing User: " + this.memory.GetUserID(this.connection));
+			this.memory.RemoveUser(stream);
 		}
 	}
 	
-	public void sendTweetToList(PDU pdu) {
+	public void broadcastPDU(PDU pdu) {
 		for(ObjectOutputStream obj : memory.listUsers.values()) {
 			try {
 				obj.writeObject(pdu);
-				obj.flush();	
+				obj.flush();
+				System.out.println("[nearTweet Server] Sending pdu for user: " + this.memory.GetUserID(obj));
 			}
 			catch (IOException e) {
-				try {
-					obj.close();
-					this.memory.RemoveUser(obj);
-					System.err.println("Removed user with ID: " + memory.GetUserID(obj));
-				} catch (IOException e1) {
-					abortThread();
-				}
+				System.out.println("[nearTweet Server] Removing User: " + this.memory.GetUserID(this.connection));
+				this.memory.RemoveUser(obj);
 			}
 		} 
 	}
@@ -66,7 +59,7 @@ public class RequestHandler implements Runnable {
 	@Override
 	public void run() {
 		try {
-			System.out.println("Socket connected on port: " + socket.getPort());
+			System.out.println("Openning connection with port number: " + socket.getPort());
 			ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 			while (true) {
 				try {
@@ -90,10 +83,12 @@ public class RequestHandler implements Runnable {
 	 * order to keep the broadcast behavior safe
 	 */
 	private void abortThread() {
-		System.err.println("Aborting Thread " + this.currentContext.getId());
 		if (this.currentContext ==  null) {
 			System.exit(-1);
 		} else {
+			System.out.println("[nearTweet Server] Removing User: " + this.memory.GetUserID(this.connection));
+			System.out.println("[nearTweet Server] Closing Connection: " + this.socket.getPort());
+			this.memory.RemoveUser(this.connection);
 			this.currentContext.interrupt();
 		}
 	}

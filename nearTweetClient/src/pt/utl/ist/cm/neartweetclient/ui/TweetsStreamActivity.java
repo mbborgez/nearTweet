@@ -1,11 +1,15 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import java.util.ArrayList;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
+import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.TweetAdapter;
 import pt.utl.ist.cm.neartweetclient.sync.StreamingHandler;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.ListActivity;
@@ -14,19 +18,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class TweetsStreamActivity extends ListActivity {
 	
-	private ArrayList<String> tweets;
+	private TweetAdapter tweetAdapter;
+	private ArrayList<PDU> list;
+	
 	BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(Actions.NEW_TWEET)) {
-				String tweet = intent.getStringExtra("tweet");
+			Log.i("DEGUB", "RECEIVED SOMETHING");
+			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
+				Log.i("DEBUG", "New Tweet");
+				String tweet = intent.getStringExtra(Actions.TWEET_DATA);
 				updateList(tweet);
 			}
 			
@@ -37,25 +49,34 @@ public class TweetsStreamActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		greetingUser();
-		tweets = new ArrayList<String>();
-	    setListAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice,
-	            android.R.id.text1, this.tweets));
-	    
-		// Start listening the socket for future tweets
-		AsyncTask<Void, Void, Void> backgroundTask = new StreamingHandler(this.getApplicationContext());
-		backgroundTask.execute();
+		
+		list = new ArrayList<PDU>();
+		tweetAdapter = new TweetAdapter(this.getApplicationContext(), R.layout.tweet, list);
+	    setListAdapter(this.tweetAdapter);
 		
 		IntentFilter iff = new IntentFilter();
-        iff.addAction(Actions.NEW_TWEET);
+        iff.addAction(Actions.BROADCAST_TWEET);
         // Put whatever message you want to receive as the action
         this.registerReceiver(this.tweetsReceiver,iff);
+        
+        // Start listening income tweets from current connection
+        new StreamingHandler(this.getApplicationContext()).execute();
+        //new Thread(new StreamingHandler(this.getApplicationContext())).start();
+        
+		ListView tweetsListView = getListView();
+		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				showTweetDetails(list.get(position));
+			}
+		});
 	}
 	
 	@Override
     public void onResume() {
         super.onResume();
         IntentFilter iff = new IntentFilter();
-        iff.addAction(Actions.NEW_TWEET);
+        iff.addAction(Actions.BROADCAST_TWEET);
         // Put whatever message you want to receive as the action
         this.registerReceiver(this.tweetsReceiver,iff);
     }
@@ -64,6 +85,14 @@ public class TweetsStreamActivity extends ListActivity {
         super.onPause();
         this.unregisterReceiver(this.tweetsReceiver);
     }
+    
+    protected void showTweetDetails(PDU pdu) {
+    	if (pdu instanceof TweetPDU) {
+    		Intent tweetDetailsIntent = new Intent(this, TweetDetailsAcitivity.class);
+    		tweetDetailsIntent.putExtra("tweet_item", ((TweetPDU) pdu).GetTweetId());
+    		startActivity(tweetDetailsIntent);
+    	}
+	}
 	
 	/**
 	 * After User Login the system should greeting him with a Toast Message!
@@ -105,9 +134,8 @@ public class TweetsStreamActivity extends ListActivity {
 	}
 	
 	public void updateList(String newTweet) {
-		tweets.add(newTweet);
-        @SuppressWarnings("unchecked")
-		ArrayAdapter<String> a = (ArrayAdapter<String>) getListView().getAdapter();
-        a.notifyDataSetChanged();
+		list.add(0, MemCacheProvider.getTweet(newTweet));
+		tweetAdapter = new TweetAdapter(this, R.layout.tweet, list);
+        setListAdapter(tweetAdapter);
 	}
 }

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
@@ -21,17 +19,6 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 	public RegisterUserService(String username, Activity activity) {
 		this.userName = username;
 		this.activity = activity;
-	}
-	
-	/**
-	 * createCookieSession - it should only be activated when 
-	 * the server responds with void (meaning that everything went ok)
-	 */
-	private void createCookieSession() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.activity.getApplicationContext());
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("username", this.userName);
-		editor.commit();
 	}
 	
 	private void registerUserOnServer() throws NearTweetException {
@@ -59,11 +46,8 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 	@Override
 	 protected void onPostExecute(Boolean result) {
          LoginActivity act = (LoginActivity) this.activity;
-         if (result) {
-        	 createCookieSession();
-        	 act.nextScreen(); 
-         } else {
-        	 act.invalidLogin();
+         if (!result) {
+        	 act.connectionError();
          }
      }
 

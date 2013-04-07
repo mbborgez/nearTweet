@@ -7,10 +7,9 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.ui.NewTweet;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
@@ -28,7 +27,7 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 	@Override
 	protected Boolean doInBackground(String... params) {
 		try {
-			String lastTweetID = getLastTweet();
+			String lastTweetID = this.userName + Actions.getLastTweet(this.activity.getApplicationContext());
 			sendTweet(lastTweetID);
 		} catch(NearTweetException e) {
 			e.printStackTrace();
@@ -53,7 +52,7 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 			Connection connection = Connection.getInstance();
 			TweetPDU pdu = new TweetPDU(this.userName, tweetID, this.content, null);
 			connection.sendPDU(pdu);
-			incrementTweetID();
+			Actions.incrementTweetID(this.activity.getApplicationContext());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -61,20 +60,6 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private String getLastTweet() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.activity.getApplicationContext());
-    	int tweetID = settings.getInt("lastTweetID", 1);
-    	return this.userName + tweetID;
-	}
-	
-	private void incrementTweetID() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.activity.getApplicationContext());
-    	int tweetID = settings.getInt("lastTweetID", 1);
-    	SharedPreferences.Editor editor = settings.edit();
-		editor.putInt("lastTweetID", tweetID+1);
-		editor.commit();
 	}
 
 }

@@ -19,10 +19,11 @@
     <string name="pollDetailsTitle">Poll Details</string>
     <string name="title_activity_tweets_stream">TweetsStreamActivity</string>
     <string name="title_activity_tweet_details_acitivity">TweetDetailsAcitivity</string>
-    <string name ="reply_button">Reply</string>
+    <string name ="reply_tweet_button">Reply</string>
     <string name ="new_tweet_button">New Tweet</string>
     <string name ="new_pool_button">New Pool</string>
     <string name ="submit_tweet">Tweet</string>
+    <string name ="mark_as_spam">Spam</string>
     <string name ="cancel">Cancel</string>
     <string name="welcome">Hello!</string>
 </resources>

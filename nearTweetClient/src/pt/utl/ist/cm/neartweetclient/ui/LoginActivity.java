@@ -3,10 +3,13 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
+import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -19,12 +22,14 @@ public class LoginActivity extends Activity {
 	
 	private Button loginButton;
 	private EditText userNameText;
+	private boolean connectionError;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		
+		this.connectionError = false;
 		// referencing objects
 		loginButton = (Button) findViewById(R.id.loginButton);
 		userNameText = (EditText) findViewById(R.id.usernameText);
@@ -32,6 +37,9 @@ public class LoginActivity extends Activity {
 		//arming listeners
 	    userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
+		
+		// Start listening the socket for authentication response
+		new AuthenticationHandler(this).execute();
 	}
 	
 	/**
@@ -82,12 +90,27 @@ public class LoginActivity extends Activity {
 			public void onClick(View v) {
 				String userName = userNameText.getText().toString();
 				if (userName.length() > 0) {
+					verifyConnection();
 					registerUser(userName);
 					return;
 				}
 				invalidTextFormat();
 			}
 		};
+	}
+	
+	/**
+	 * Method responsible for dealing with the logic before making a Server response
+	 * @return
+	 */
+	public void loginResponseCallback(boolean authenticated) {
+		String name = userNameText.getText().toString();
+		if (authenticated) {
+			createCookieSession(name);
+			nextScreen();
+		} else {
+			invalidLogin(name);
+		}
 	}
 	
 	/**
@@ -115,10 +138,38 @@ public class LoginActivity extends Activity {
 	/**
 	 * shows an alert message with invalid Login
 	 */
-	public void invalidLogin() {
+	public void invalidLogin(String name) {
+		Toast.makeText(this, 
+				String.format(UiMessages.INVALID_LOGIN, name),
+				Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * shows an alert message with invalid Login
+	 */
+	public void connectionError() {
+		this.connectionError = true;
 		Toast.makeText(this, 
 				UiMessages.ERROR_MESSAGE,
 				Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * createCookieSession - it should only be activated when 
+	 * the server responds with void (meaning that everything went ok)
+	 */
+	protected void createCookieSession(String userName) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("username", userName);
+		editor.commit();
+	}
+	
+	protected void verifyConnection() {
+		if (connectionError == true) {
+ 			// Start listening the socket for authentication response
+ 			new AuthenticationHandler(this).execute();
+		}
 	}
 	 
 }

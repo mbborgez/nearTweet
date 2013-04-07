@@ -44,6 +44,7 @@ public class Connection {
 	 */
 	public void sendPDU(PDU pdu) throws IOException {
 		if (this.outputStream != null) {
+			Log.i("DEBUG", "SEND PDU: " + pdu.getClass().getName());
 			this.outputStream.writeObject(pdu);
 			this.outputStream.flush();
 		}
@@ -57,6 +58,7 @@ public class Connection {
 			while(pdu == null) {
 				try {
 					obj = inputStream.readObject();
+					Log.i("DEBUG", "NEW OBJECT ARRIVED");
 					if(obj != null && obj instanceof PDU) {
 						pdu = (PDU) obj;
 					}
