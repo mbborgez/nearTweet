@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="nearTweetServer/src"/>
+	<classpathentry kind="src" path="nearTweetClient/src"/>
+	<classpathentry kind="src" path="nearTweetEntities/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/alexandre/labs/currentNearTweet/nearTweet/lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="/home/alexandre/labs/currentNearTweet/nearTweet/lib/pdus.jar"/>
+	<classpathentry kind="lib" path="/home/alexandre/labs/currentNearTweet/nearTweet/lib/twitter4j-core-3.0.3.jar"/>
+	<classpathentry kind="lib" path="/home/alexandre/labs/currentNearTweet/nearTweet/nearTweetClient/libs/android-support-v4.jar"/>
+	<classpathentry kind="src" path="/nearTweetClient"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

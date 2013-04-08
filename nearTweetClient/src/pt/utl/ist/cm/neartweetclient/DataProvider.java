@@ -11,11 +11,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 
-/**
- *
- * Defines a ContentProvider that stores URLs of Picasa featured pictures
- * The provider also has a table that tracks the last time a picture URL was updated.
- */
+
 public class DataProvider extends ContentProvider {
     // Indicates that the incoming query is for a picture URL
     public static final int TWEET_URL_QUERY = 1;
