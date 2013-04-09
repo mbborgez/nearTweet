@@ -11,20 +11,22 @@ import pt.utl.ist.cm.neartweetclient.core.TweetAdapter;
 import pt.utl.ist.cm.neartweetclient.sync.StreamingHandler;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class TweetsStreamActivity extends ListActivity {
 	
 	private TweetAdapter tweetAdapter;
 	private ArrayList<PDU> list;
+	Button tweetButton;
 	
 	BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
 		@Override
@@ -45,10 +48,13 @@ public class TweetsStreamActivity extends ListActivity {
 			
 		}
     };
-	
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.activity_tweets_stream);
+		
 		greetingUser();
 		
 		list = new ArrayList<PDU>();
@@ -63,6 +69,15 @@ public class TweetsStreamActivity extends ListActivity {
         // Start listening income tweets from current connection
         new StreamingHandler(this.getApplicationContext()).execute();
         //new Thread(new StreamingHandler(this.getApplicationContext())).start();
+        
+        tweetButton = (Button) findViewById(R.id.createTweet);
+        tweetButton.setOnClickListener(new OnClickListener() {
+			
+		@Override
+		public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), NewTweet.class));
+			}
+		});
         
 		ListView tweetsListView = getListView();
 		tweetsListView.setOnItemClickListener(new OnItemClickListener() {

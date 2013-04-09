@@ -9,6 +9,7 @@
         android:paddingBottom="5dp"
         android:textIsSelectable="true"
         android:textSize="15sp"
+        android:text="userName"
         android:textStyle="normal" />
 
     <TextView
@@ -21,7 +22,17 @@
         android:maxLines="3"
         android:paddingBottom="5dp"
         android:textColor="@color/text_news_details"
+        android:text="tweetMessage"
         android:textSize="14sp"
         android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/tweetImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/tweetMessage"
+        android:maxHeight="100dp"
+        android:maxWidth="100dp"
+        android:src="@drawable/menu_span" />
 
 </RelativeLayout>

@@ -1,13 +1,18 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
-import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
 import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
+import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -38,8 +43,6 @@ public class LoginActivity extends Activity {
 	    userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
 		
-		// Start listening the socket for authentication response
-		new AuthenticationHandler(this).execute();
 	}
 	
 	/**
@@ -48,10 +51,32 @@ public class LoginActivity extends Activity {
 	 * @param username - the name which this user will identify future interactions with
 	 * the remaining entities on the network
 	 */
-	private void registerUser(String username) {
-		RegisterUserService service = new RegisterUserService(username, this);
+	private void registerUser(final String username) {
+//		RegisterUserService service = new RegisterUserService(username, this);
 		try {
-			service.execute();
+//			service.execute();
+			new AsyncTask<String, Void, Boolean>() {
+				@Override
+				protected Boolean doInBackground(String... params) {
+					try {
+						Connection.getInstance().sendPDU(new RegisterPDU(username));
+					} catch (UnknownHostException e) {
+						return false;
+					} catch (IOException e) {
+						return false;
+					}
+					return true;
+				}
+
+				@Override
+				protected void onPostExecute(Boolean result) {
+					if (!result) {
+						connectionError();
+					} else {
+						waitForAuthenticationResponse();
+					}
+				}
+			}.execute();
 		} catch(NearTweetException e) {
 			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
 			loginButton.setEnabled(false);
@@ -170,6 +195,12 @@ public class LoginActivity extends Activity {
  			// Start listening the socket for authentication response
  			new AuthenticationHandler(this).execute();
 		}
+	}
+	
+
+	private void waitForAuthenticationResponse() {
+		// Start listening the socket for authentication response
+		new AuthenticationHandler(this).execute();
 	}
 	 
 }

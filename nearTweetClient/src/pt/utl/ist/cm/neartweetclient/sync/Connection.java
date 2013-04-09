@@ -13,7 +13,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 public class Connection {
 	
 	// Network configurations
-	public final String IP_ADDRESS = "192.168.1.66";
+	public final String IP_ADDRESS = "10.0.2.2";
 	public final int PORT = 8000;
 	
 	public static Connection currentConnection;

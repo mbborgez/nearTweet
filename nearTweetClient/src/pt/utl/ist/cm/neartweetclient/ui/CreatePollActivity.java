@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.CreatePollService;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -19,6 +22,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 public class CreatePollActivity extends Activity {
 
 	private static final int MAX_NUM_POLL_OPTIONS = 4;
@@ -130,7 +134,11 @@ public class CreatePollActivity extends Activity {
     		System.out.println(option.getText().toString());
     	}
 		CreatePollService service = new CreatePollService(username, text, options, this);
-		service.execute();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+			service.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+		} else {
+			service.execute();
+		}
 	}
 
 	private void removePollOption(RadioButton radioButton){

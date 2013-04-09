@@ -17,11 +17,13 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 	private String userName;
 	private String content;
 	private Activity activity;
+	private byte[] tweetImageBytes;
 	
-	public CreateTweetService(String userName, String content, Activity activity) {
+	public CreateTweetService(String userName, String content, byte[] tweetImageBytes, Activity activity) {
 		this.userName = userName;
 		this.content  = content;
 		this.activity = activity;
+		this.tweetImageBytes = tweetImageBytes;
 	}
 	
 	@Override
@@ -31,7 +33,6 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 			sendTweet(lastTweetID);
 		} catch(NearTweetException e) {
 			e.printStackTrace();
-			Log.i("NEART WEET EXCEPTION", e.getMessage());
 			return false;
 		}
 		return true;
@@ -49,9 +50,9 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 	
 	private void sendTweet(String tweetID) {
 		try {
-			Connection connection = Connection.getInstance();
-			TweetPDU pdu = new TweetPDU(this.userName, tweetID, this.content, null);
-			connection.sendPDU(pdu);
+			
+			TweetPDU pdu = new TweetPDU(this.userName, tweetID, this.content, this.tweetImageBytes);
+			Connection.getInstance().sendPDU(pdu);
 			Actions.incrementTweetID(this.activity.getApplicationContext());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
