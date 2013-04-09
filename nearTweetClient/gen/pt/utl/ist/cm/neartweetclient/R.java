@@ -127,14 +127,14 @@ public final class R {
         public static final int textView1=0x7f09001c;
         public static final int textView2=0x7f090011;
         public static final int tweetContent=0x7f09001b;
-        public static final int tweetImage=0x7f090020;
+        public static final int tweetImage=0x7f09001f;
         public static final int tweetImagePreview=0x7f090018;
         public static final int tweetMessage=0x7f090021;
         public static final int tweetReply=0x7f09001d;
         public static final int tweetText=0x7f090012;
         public static final int tweet_details_image=0x7f09000e;
         public static final int tweet_details_text=0x7f09000f;
-        public static final int userName=0x7f09001f;
+        public static final int userName=0x7f090020;
         public static final int usernameText=0x7f090009;
     }
     public static final class layout {
