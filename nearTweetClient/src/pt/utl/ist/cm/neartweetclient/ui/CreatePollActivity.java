@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -129,10 +130,11 @@ public class CreatePollActivity extends Activity {
     	String text = pollDescription.getText().toString();
     	ArrayList<String> options = new ArrayList<String>();
     	for(int i = 0; i < pollOptions.getChildCount(); i++) {
-    		RadioButton option = (RadioButton) pollOptions.getChildAt(0);
+    		RadioButton option = (RadioButton) pollOptions.getChildAt(i);
     		options.add(option.getText().toString());
     		System.out.println(option.getText().toString());
     	}
+    	Log.i("DEBUG", " pollOptions - " + options);
 		CreatePollService service = new CreatePollService(username, text, options, this);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 			service.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);

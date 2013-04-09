@@ -34,7 +34,8 @@ public class TweetsStreamActivity extends ListActivity {
 	
 	private TweetAdapter tweetAdapter;
 	private ArrayList<PDU> list;
-	Button tweetButton;
+	Button createTweetButton;
+	Button createPollButton;
 	
 	BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
 		@Override
@@ -70,15 +71,21 @@ public class TweetsStreamActivity extends ListActivity {
         new StreamingHandler(this.getApplicationContext()).execute();
         //new Thread(new StreamingHandler(this.getApplicationContext())).start();
         
-        tweetButton = (Button) findViewById(R.id.createTweet);
-        tweetButton.setOnClickListener(new OnClickListener() {
-			
-		@Override
-		public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(), NewTweet.class));
+        createTweetButton = (Button) findViewById(R.id.createTweet);
+        createTweetButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+					startActivity(new Intent(getApplicationContext(), NewTweet.class));
 			}
 		});
         
+        createPollButton = (Button) findViewById(R.id.createPoll);
+        createPollButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
+			}
+		});
 		ListView tweetsListView = getListView();
 		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
