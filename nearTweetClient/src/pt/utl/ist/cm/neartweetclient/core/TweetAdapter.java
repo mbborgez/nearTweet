@@ -13,6 +13,7 @@ import pt.utl.ist.cm.neartweetclient.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +60,9 @@ public class TweetAdapter extends ArrayAdapter<PDU> {
 				if(currentPDU.GetMediaObject()!=null && currentPDU.GetMediaObject().length>0){
 					Bitmap bitmap = BitmapFactory.decodeByteArray(currentPDU.GetMediaObject(), 0, currentPDU.GetMediaObject().length);
 					image.setImageBitmap(bitmap);
+					image.setVisibility(View.VISIBLE);
+				} else {
+					image.setVisibility(View.GONE);
 				}
 			} else if(pdu instanceof PublishPollPDU) {
 				PublishPollPDU currentPDU = (PublishPollPDU) pdu;

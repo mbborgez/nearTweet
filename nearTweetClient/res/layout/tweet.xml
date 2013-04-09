@@ -1,38 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/ListItem" >
-
-    <TextView
-        android:id="@+id/userName"
-        style="@style/ListTitleText"
-        android:layout_alignParentTop="true"
-        android:paddingBottom="5dp"
-        android:textIsSelectable="true"
-        android:textSize="15sp"
-        android:text="userName"
-        android:textStyle="normal" />
-
-    <TextView
-        android:id="@+id/tweetMessage"
-        style="@style/ListTitleText"
-        android:layout_alignLeft="@+id/userName"
-        android:layout_below="@+id/userName"
-        android:lineSpacingExtra="3dp"
-        android:textIsSelectable="true"
-        android:maxLines="3"
-        android:paddingBottom="5dp"
-        android:textColor="@color/text_news_details"
-        android:text="tweetMessage"
-        android:textSize="14sp"
-        android:textStyle="bold" />
-
+    
     <ImageView
         android:id="@+id/tweetImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_below="@+id/tweetMessage"
         android:maxHeight="100dp"
         android:maxWidth="100dp"
         android:src="@drawable/menu_span" />
+    
+    <TextView
+        android:id="@+id/userName"
+        style="@style/ListTitleText"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/tweetImage"
+        android:paddingBottom="5dp"
+        android:text="USERNAME"
+        android:textColor="@color/text_description"
+        android:textIsSelectable="true"
+        android:textSize="15sp"
+        android:textStyle="bold" 
+        android:layout_marginLeft="10dp"/>
+
+
+    <TextView
+        android:id="@+id/tweetMessage"
+        style="@style/ListTitleText"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/userName"
+        android:lineSpacingExtra="3dp"
+        android:maxLines="3"
+        android:paddingBottom="5dp"
+        android:text="TWEET_MESSAGE"
+        android:textColor="@color/text_description"
+        android:textIsSelectable="true"
+        android:textSize="14sp"
+        android:textStyle="normal" 
+        android:layout_marginRight="10dp"/>
 
 </RelativeLayout>

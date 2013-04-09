@@ -11,14 +11,19 @@ import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class TweetDetailsActivity extends Activity {
 	
 	private TextView tweetDetailsTextView;
 	private String tweetId;
+	private ImageView tweetImage;
 	private PDU pdu;
 	
 	@Override
@@ -30,9 +35,19 @@ public class TweetDetailsActivity extends Activity {
 		pdu = MemCacheProvider.getTweet(tweetId);
 		if(tweetId.length()>0){
 			tweetDetailsTextView = (TextView) findViewById(R.id.tweet_details_text);
+			tweetImage = (ImageView) findViewById(R.id.tweet_details_image);
+			
 			if (pdu instanceof TweetPDU) {
 				TweetPDU currentPDU = (TweetPDU) pdu;
 				tweetDetailsTextView.setText(currentPDU.GetText());
+				if(currentPDU.GetMediaObject()!=null && currentPDU.GetMediaObject().length>0){
+					Bitmap bitmap = BitmapFactory.decodeByteArray(currentPDU.GetMediaObject(), 0, currentPDU.GetMediaObject().length);
+					tweetImage.setImageBitmap(bitmap);
+					tweetImage.setVisibility(View.VISIBLE);
+				} else {
+					tweetImage.setVisibility(View.GONE);
+				}
+				
 			} else if(pdu instanceof PublishPollPDU) {
 				tweetDetailsTextView.setText(((PublishPollPDU) pdu).GetText());
 			}

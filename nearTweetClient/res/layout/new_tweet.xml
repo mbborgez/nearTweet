@@ -60,19 +60,24 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/addMultimediaTweet"
-        android:layout_width="148dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_weight="1"
-        android:text="Multimedia" />
-
     <EditText
         android:id="@+id/multimediaLink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10" />
+
+    <Button
+        android:id="@+id/addMultimediaTweet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:text="Load Image from Link" />
+
+    <Button
+        android:id="@+id/takePhotoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Load Image from Camera" />
 
     <ImageView
         android:id="@+id/tweetImagePreview"

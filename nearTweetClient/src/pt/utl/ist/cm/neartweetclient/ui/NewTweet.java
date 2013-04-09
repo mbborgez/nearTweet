@@ -3,16 +3,22 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.CreateTweetService;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,9 +29,12 @@ import android.widget.Toast;
 
 public class NewTweet extends Activity {
 
+	protected static final int TAKE_PHOTO_ACTION = 1234;
 	EditText tweet;
 	Button cancelButton;
 	Button submitButton;
+	
+	Button takePhotoButton;
 	Button addMultimediaButton;
 	EditText multimediaLinkEditText;
 	ImageView tweetImagePreview;
@@ -35,13 +44,13 @@ public class NewTweet extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.new_tweet);
 
-		
 		cancelButton = (Button) findViewById(R.id.cancelTweet);
 		submitButton = (Button) findViewById(R.id.submitTweet);
+		
 		addMultimediaButton = (Button) findViewById(R.id.addMultimediaTweet);
+		takePhotoButton = (Button) findViewById(R.id.takePhotoButton);
 		
 		tweet = (EditText) findViewById(R.id.tweetText);
-		
 		
 		cancelButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -72,8 +81,47 @@ public class NewTweet extends Activity {
 				new PhotoDownloaderTask(tweetImagePreview).execute(multimediaLinkEditText.getText().toString());
 			}
 		});
+		takePhotoButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dispatchTakePictureIntent(TAKE_PHOTO_ACTION);
+			}
+		});
 		//MULTIMEDIA STUFF - end
 
+	}
+	
+	@Override
+	protected void onActivityResult (int requestCode, int resultCode, Intent data){
+		if(requestCode==TAKE_PHOTO_ACTION){
+			handleSmallCameraPhoto(data);
+		}
+	}
+	
+	private void dispatchTakePictureIntent(int actionCode) {
+		if(isIntentAvailable(getApplicationContext(), MediaStore.ACTION_IMAGE_CAPTURE)){
+			Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			startActivityForResult(takePictureIntent, actionCode);
+		} else {
+			Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	public static boolean isIntentAvailable(Context context, String action) {
+	    final PackageManager packageManager = context.getPackageManager();
+	    final Intent intent = new Intent(action);
+	    List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+	    return list.size() > 0;
+	}
+	
+	private void handleSmallCameraPhoto(Intent intent) {
+	    Bundle extras = intent.getExtras();
+	    Bitmap mImageBitmap = (Bitmap) extras.get("data");
+	    tweetImagePreview.setImageBitmap(mImageBitmap);
+	    
+	    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+	    mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+		tweetImageBytes = stream.toByteArray();
 	}
 
 	private void submitTweet(String text) {
