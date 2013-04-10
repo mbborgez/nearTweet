@@ -21,11 +21,6 @@
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.LoginActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.CreatePollActivity"
@@ -55,6 +50,15 @@
         <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.MultimediaActivity"
             android:label="@string/title_activity_multimedia" >
+        </activity>
+        <activity
+            android:name="pt.utl.ist.cm.neartweetclient.ui.ConnectActivity"
+            android:label="@string/title_activity_connect" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

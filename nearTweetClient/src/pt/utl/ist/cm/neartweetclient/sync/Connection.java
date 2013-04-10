@@ -6,32 +6,25 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import android.util.Log;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import android.util.Log;
 
 public class Connection {
 	
 	// Network configurations
-	public final String IP_ADDRESS = "10.0.2.2";
-	public final int PORT = 8000;
+	public final String DEFAULT_IP_ADDRESS = "10.0.2.2";
+	public final int DEFAULT_PORT = 8000;
 	
 	public static Connection currentConnection;
 	private ObjectOutputStream outputStream;
 	private ObjectInputStream inputStream;
 	private Socket socket;
 	
-	private Connection() throws UnknownHostException, IOException {
-		Log.i("DEBUG", "STARTING CONNECTION");
-		this.socket = new Socket(IP_ADDRESS, PORT);
-		Log.i("DEBUG", "CONNECTION STARTED SUCCESSFULL");
-		this.outputStream = new ObjectOutputStream(socket.getOutputStream());
-		this.inputStream  = new ObjectInputStream(socket.getInputStream());
-	}
+	private Connection() { /* Avoid instantiation */ }
 	
-	public static Connection getInstance() throws UnknownHostException, IOException {
+	public static Connection getInstance() {
 		if (currentConnection == null) {
-			Log.i("DEBUG","CREATING A NEW CONNECTION");
 			currentConnection = new Connection();
 		}
 		return currentConnection;
@@ -70,5 +63,20 @@ public class Connection {
 	
 	public boolean isAlive() {
 		return (this.socket != null);
+	}
+
+	public void connect(String serverAddress, int serverPort) throws NearTweetException{
+		try {
+			Log.i("DEBUG", "STARTING CONNECTION");
+			this.socket = new Socket(serverAddress, serverPort);
+			
+			Log.i("DEBUG", "CONNECTION STARTED SUCCESSFULL");
+			this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+			this.inputStream  = new ObjectInputStream(socket.getInputStream());
+		} catch (UnknownHostException e) {
+			throw new NearTweetException(e.getMessage() + "\n" + "Error Connecting");
+		} catch (IOException e) {
+			throw new NearTweetException(e.getMessage() + "\n" + "Error Connecting");
+		}
 	}
 }
