@@ -6,16 +6,18 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.CreateSpamService;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +26,11 @@ public class TweetDetailsActivity extends Activity {
 	private TextView tweetDetailsTextView;
 	private String tweetId;
 	private ImageView tweetImage;
+	
+//	private Button repplyButton;
+//	private Button cancelButton;
+	
+	
 	private PDU pdu;
 	
 	@Override
@@ -50,8 +57,25 @@ public class TweetDetailsActivity extends Activity {
 				
 			} else if(pdu instanceof PublishPollPDU) {
 				tweetDetailsTextView.setText(((PublishPollPDU) pdu).GetText());
-			}
+			} 
 		}
+		
+//		repplyButton = (Button) findViewById(R.id.reply_tweet_button);
+//		cancelButton = (Button) findViewById(R.id.cancelReplyTweetButton);
+
+//		repplyButton.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				TODO
+//			}
+//		});
+		
+//		cancelButton.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				finish();
+//			}
+//		});
 	}
 
 	@Override

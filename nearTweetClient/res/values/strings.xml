@@ -34,5 +34,10 @@
     <string name="serverAddress_hint">Server Address</string>
     <string name="connect">Connect</string>
     <string name="serverPort_hint">Server Port</string>
+    <string name="reply">Reply</string>
+    <string name="tweet_image">Tweet Image</string>
+    <string name="tweet_details">Tweet Details</string>
+    <string name="reply_text_hint">Enter Reply Text</string>
+    <string name="disconnect">Disconnect</string>
 
 </resources>

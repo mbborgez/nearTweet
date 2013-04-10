@@ -79,4 +79,16 @@ public class Connection {
 			throw new NearTweetException(e.getMessage() + "\n" + "Error Connecting");
 		}
 	}
+	
+	public void disconnect(){
+		try {
+			this.socket.close();
+			this.socket = null;
+			this.outputStream = null;
+			this.inputStream = null;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
