@@ -36,18 +36,20 @@ public class PDUHandler extends PDUVisitor {
 	
 	@Override
 	public void processPollVotePDU(PollVotePDU pdu) {
-//		PublishPollPDU pollPdu = (PublishPollPDU) MemCacheProvider.getTweet(pdu.GetTargetMessageId());
-//		String selectedOption = pollPdu.GetOptions().get(pdu.GetOptionPosition());
-//		
-//		Log.i("DEBUG", "received a pollVote [ userId: " + pdu.GetUserId() + ", option: " + selectedOption + "]" );
+		Log.i("DEBUG", "received a pollVote [ userId: " + pdu.GetUserId() + ", option: " + pdu.GetOptionPosition() + "]" );
 		
+		if(MemCacheProvider.isMyPoll(pdu.GetTweetId())){
+			if(MemCacheProvider.isMyPoll(pdu.GetTargetMessageId())){
+				MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
+			}
+		}
+			
 		Intent intent = new Intent();
-		intent.setAction(Actions.BROADCAST_TWEET);
-		intent.putExtra(Actions.TWEET_DATA, pdu.GetTweetId());
-		
+		intent.setAction(Actions.POLL_VOTE);
+		intent.putExtra(Actions.POLL_VOTE_DATA, pdu.GetTweetId());
 		if (this.context != null) {
-			MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
-			this.context.sendBroadcast(intent);
+			Log.i("DEBUG", "BroadCasting Message");
+			context.sendBroadcast(intent);
 		}
 	
 	}

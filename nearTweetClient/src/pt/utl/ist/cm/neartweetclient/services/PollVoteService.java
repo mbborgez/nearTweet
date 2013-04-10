@@ -4,7 +4,6 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.Activity;
-import android.util.Log;
 
 public class PollVoteService extends NearTweetService {
 	
@@ -12,10 +11,11 @@ public class PollVoteService extends NearTweetService {
 	private int optionPosition;
 	private Activity activity;
 	
-	public PollVoteService(String userID, String targetMessageID, int optionPosition) {
+	public PollVoteService(String userID, String targetMessageID, int optionPosition, Activity activity) {
 		super(userID);
 		this.targetMessageId = targetMessageID;
 		this.optionPosition = optionPosition;
+		this.activity = activity;
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class PollVoteService extends NearTweetService {
 			Actions.incrementTweetID(this.activity.getApplicationContext());
 			return true;
 		} catch(Exception e) {
-			Log.i("DEGUB", e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 	}

@@ -46,6 +46,10 @@ public class TweetsStreamActivity extends ListActivity {
 				String tweet = intent.getStringExtra(Actions.TWEET_DATA);
 				updateList(tweet);
 			}
+			if (intent.getAction().equals(Actions.POLL_VOTE)) {
+				Log.i("DEBUG", "NEW VOTE");
+				Toast.makeText(getApplicationContext(), "NEW VOTE ", Toast.LENGTH_LONG).show();
+			}
 			
 		}
     };
@@ -64,6 +68,7 @@ public class TweetsStreamActivity extends ListActivity {
 		
 		IntentFilter iff = new IntentFilter();
         iff.addAction(Actions.BROADCAST_TWEET);
+        iff.addAction(Actions.POLL_VOTE);
         // Put whatever message you want to receive as the action
         this.registerReceiver(this.tweetsReceiver,iff);
         
@@ -100,6 +105,7 @@ public class TweetsStreamActivity extends ListActivity {
         super.onResume();
         IntentFilter iff = new IntentFilter();
         iff.addAction(Actions.BROADCAST_TWEET);
+        iff.addAction(Actions.POLL_VOTE);
         // Put whatever message you want to receive as the action
         this.registerReceiver(this.tweetsReceiver,iff);
         

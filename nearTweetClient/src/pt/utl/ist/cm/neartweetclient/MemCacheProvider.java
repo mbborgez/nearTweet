@@ -3,8 +3,6 @@ package pt.utl.ist.cm.neartweetclient;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.util.Log;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
@@ -24,11 +22,17 @@ public class MemCacheProvider {
 		} else if(pdu instanceof PublishPollPDU){
 			pollContainer.registerPoll((PublishPollPDU) pdu);
 		}
-		
 	}
 	
+	public static boolean isMyPoll(String tweetId){
+		return pollContainer.hasPoll(tweetId);
+	}	
 	public static PDU getTweet(String tweetID) {
 		return memcache.get(tweetID);
+	}
+	
+	public static int getNumVotes(String tweetId, int optionId){
+		return pollContainer.getVotesFor(tweetId, optionId);
 	}
 	
 	public static ArrayList<PDU> toArrayList() {

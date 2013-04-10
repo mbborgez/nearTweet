@@ -10,7 +10,6 @@ import pt.utl.ist.cm.neartweetclient.ui.NewTweet;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 

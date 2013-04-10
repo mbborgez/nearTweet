@@ -1,7 +1,5 @@
 package pt.utl.ist.cm.neartweetclient.core;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
@@ -9,12 +7,9 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.opengl.Visibility;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

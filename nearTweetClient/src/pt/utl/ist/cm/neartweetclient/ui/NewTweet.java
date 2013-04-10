@@ -116,13 +116,20 @@ public class NewTweet extends Activity {
 	
 	private void handleSmallCameraPhoto(Intent intent) {
 	    Bundle extras = intent.getExtras();
-	    Bitmap mImageBitmap = (Bitmap) extras.get("data");
-	    tweetImagePreview.setImageBitmap(mImageBitmap);
+	    if(extras!=null && extras.containsKey("data") && extras.get("data")!=null){
+		    Bitmap mImageBitmap = (Bitmap) extras.get("data");
+		    tweetImagePreview.setImageBitmap(mImageBitmap);
+		    
+		    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		    mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+			tweetImageBytes = stream.toByteArray();
+	    } else { 
+	    	errorTakingPhoto();
+	    }
 	    
-	    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-	    mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-		tweetImageBytes = stream.toByteArray();
 	}
+
+
 
 	private void submitTweet(String text) {
 		/**
@@ -159,10 +166,14 @@ public class NewTweet extends Activity {
 		}
 
 		protected void onPostExecute(Bitmap result) {
-			imageView.setImageBitmap(result);
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			result.compress(Bitmap.CompressFormat.PNG, 100, stream);
-			tweetImageBytes = stream.toByteArray();
+			if(result!=null){
+				imageView.setImageBitmap(result);
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				result.compress(Bitmap.CompressFormat.PNG, 100, stream);
+				tweetImageBytes = stream.toByteArray();
+			} else {
+				errorLoadingImageFromNetwork();
+			}
 		}
 	}
 
@@ -175,6 +186,14 @@ public class NewTweet extends Activity {
 		}
 	}
 	
+	
+	public void errorLoadingImageFromNetwork() {
+		Toast.makeText(getApplicationContext(), "Error loading image from the network", Toast.LENGTH_SHORT).show();
+	}
+	
+	private void errorTakingPhoto() {
+		Toast.makeText(getApplicationContext(), "Error loading image from the camera", Toast.LENGTH_SHORT).show();
+	}
 	
 	//	private void submitTweet(final String text) {
 	//		AsyncTask<String, Integer, Boolean> my_task = new AsyncTask<String, Integer, Boolean>() {

@@ -9,7 +9,7 @@
         android:maxHeight="100dp"
         android:maxWidth="100dp"
         android:src="@drawable/menu_span" 
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
     
     <TextView
         android:id="@+id/userName"

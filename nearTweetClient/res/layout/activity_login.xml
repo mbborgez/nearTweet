@@ -26,10 +26,11 @@
         android:layout_above="@+id/loginButton"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="96dp"
-        android:textColor="@color/edit_text_inner"
         android:ems="10"
         android:hint="@string/login_hint"
-        android:inputType="text" >
+        android:inputType="text"
+        android:textColor="@color/edit_text_inner"
+        android:textColorHint="@color/sign_up_text" >
 
         <requestFocus />
     </EditText>
