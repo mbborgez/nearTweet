@@ -1,9 +1,5 @@
 package pt.utl.ist.cm.neartweetclient.sync;
 
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
-import android.widget.Toast;
 import pt.utl.ist.cm.neartweetEntities.pdu.GenericMessagePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
 import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
@@ -14,6 +10,10 @@ import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 public class PDUHandler extends PDUVisitor {
 	
@@ -36,7 +36,22 @@ public class PDUHandler extends PDUVisitor {
 	
 	@Override
 	public void processPollVotePDU(PollVotePDU pdu) {
-		// TODO Auto-generated method stub
+		Log.i("DEBUG", "received a pollVote [ userId: " + pdu.GetUserId() + ", option: " + pdu.GetOptionPosition() + "]" );
+		
+		if(MemCacheProvider.isMyPoll(pdu.GetTweetId())){
+			if(MemCacheProvider.isMyPoll(pdu.GetTargetMessageId())){
+				MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
+			}
+		}
+			
+		Intent intent = new Intent();
+		intent.setAction(Actions.POLL_VOTE);
+		intent.putExtra(Actions.POLL_VOTE_DATA, pdu.GetTweetId());
+		if (this.context != null) {
+			Log.i("DEBUG", "BroadCasting Message");
+			context.sendBroadcast(intent);
+		}
+	
 	}
 
 	@Override
@@ -48,7 +63,6 @@ public class PDUHandler extends PDUVisitor {
 			MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
 			this.context.sendBroadcast(intent);
 		}
-		
 	}
 
 	@Override

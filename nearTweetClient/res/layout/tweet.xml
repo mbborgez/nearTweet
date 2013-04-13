@@ -1,27 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/ListItem" >
-
+    
+    <ImageView
+        android:id="@+id/tweetImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:maxHeight="100dp"
+        android:maxWidth="100dp"
+        android:src="@drawable/menu_span" 
+        android:visibility="gone"/>
+    
     <TextView
         android:id="@+id/userName"
         style="@style/ListTitleText"
         android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/tweetImage"
         android:paddingBottom="5dp"
+        android:text="USERNAME"
+        android:textColor="@color/text_description"
         android:textIsSelectable="true"
         android:textSize="15sp"
-        android:textStyle="normal" />
+        android:textStyle="bold" 
+        android:layout_marginLeft="10dp"/>
+
 
     <TextView
         android:id="@+id/tweetMessage"
         style="@style/ListTitleText"
-        android:layout_alignLeft="@+id/userName"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/userName"
         android:lineSpacingExtra="3dp"
-        android:textIsSelectable="true"
         android:maxLines="3"
         android:paddingBottom="5dp"
-        android:textColor="@color/text_news_details"
+        android:text="TWEET_MESSAGE"
+        android:textColor="@color/text_description"
+        android:textIsSelectable="true"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="normal" 
+        android:layout_marginRight="10dp"/>
 
 </RelativeLayout>

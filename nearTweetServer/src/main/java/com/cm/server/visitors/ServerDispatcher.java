@@ -28,12 +28,18 @@ public class ServerDispatcher extends PDUVisitor {
 		
 		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
 		{
+			System.out.println("### PollVotePDU received - userExists " + pdu.GetUserId());
 			if(connectionHandler.memory.VerifyIfPollExists(pdu.GetTargetMessageId()))
 			{
+				System.out.println("### PollVotePDU received - poll " + pdu.GetTargetMessageId() + " exists ");
 				String pollOwnerUser = this.connectionHandler.memory.GetUserFromPollID(pdu.GetTargetMessageId());
+				System.out.println("### PollVotePDU received - poll " + pdu.GetTargetMessageId() + " owner is " + pollOwnerUser);
 				ObjectOutputStream userStream = connectionHandler.memory.GetUserStream(pollOwnerUser);
+				System.out.println("### PollVotePDU received - poll " + pdu.GetTargetMessageId() + " userStream is " + userStream);
 				if(userStream != null) {
+					System.out.println("### PollVotePDU received - poll sending directPDU to user - start ");
 					connectionHandler.sendDirectedPDU(pdu, userStream);
+					System.out.println("### PollVotePDU received - poll sending directPDU to user - end");
 				}
 				else {
 					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Poll owner isn't registered anymore!"), this.connectionHandler.connection);

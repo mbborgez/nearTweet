@@ -1,6 +1,5 @@
 package pt.utl.ist.cm.neartweetclient.sync;
 
-
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
 import android.content.Context;

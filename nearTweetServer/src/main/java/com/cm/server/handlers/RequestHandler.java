@@ -28,9 +28,10 @@ public class RequestHandler implements Runnable {
 	
 	public void sendDirectedPDU(PDU pdu, ObjectOutputStream stream) {
 		try {
+			System.out.println("[nearTweet Server] Sending pdu for user: " + this.memory.GetUserID(stream) + "start");
 			stream.writeObject(pdu);
 			stream.flush();
-			System.out.println("[nearTweet Server] Sending pdu for user: " + this.memory.GetUserID(stream));
+			System.out.println("[nearTweet Server] Sending pdu for user: " + this.memory.GetUserID(stream)+ "end");
 		} 
 		catch (IOException e) {
 			System.out.println("[nearTweet Server] Removing User: " + this.memory.GetUserID(this.connection));

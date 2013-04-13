@@ -4,17 +4,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
+import pt.utl.ist.cm.neartweetclient.core.PollContainer;
 
 public class MemCacheProvider {
 
 	private static HashMap<String, PDU> memcache = new HashMap<String, PDU>();
 	
+	private static PollContainer pollContainer = new PollContainer(); 
+	
 	public static void addTweet(String tweetID, PDU pdu) {
 		memcache.put(tweetID, pdu);
+		
+		if(pdu instanceof PollVotePDU){
+			pollContainer.registerPollVote((PollVotePDU) pdu);
+		} else if(pdu instanceof PublishPollPDU){
+			pollContainer.registerPoll((PublishPollPDU) pdu);
+		}
 	}
 	
+	public static boolean isMyPoll(String tweetId){
+		return pollContainer.hasPoll(tweetId);
+	}	
 	public static PDU getTweet(String tweetID) {
 		return memcache.get(tweetID);
+	}
+	
+	public static int getNumVotes(String tweetId, int optionId){
+		return pollContainer.getVotesFor(tweetId, optionId);
 	}
 	
 	public static ArrayList<PDU> toArrayList() {

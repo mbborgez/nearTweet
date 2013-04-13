@@ -27,11 +27,11 @@ public class Database
 		this.userSpamVotes = new HashMap<String, Integer>();
 	}
 	
-	public void InsertUser(String userId, ObjectOutputStream obj) {
+	public synchronized void InsertUser(String userId, ObjectOutputStream obj) {
 		listUsers.put(userId, obj);
 	}
 	
-	public void RemoveUser(ObjectOutputStream obj) {
+	public synchronized void RemoveUser(ObjectOutputStream obj) {
 		for(String user :  this.listUsers.keySet()){
 			if(this.listUsers.get(user) == obj)
 				this.listUsers.remove(user);

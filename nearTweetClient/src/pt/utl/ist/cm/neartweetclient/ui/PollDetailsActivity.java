@@ -61,7 +61,7 @@ public class PollDetailsActivity extends Activity {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     	String username = settings.getString("username", null);
     	int index = pdu.GetOptions().lastIndexOf(selectedPollVoteButton.getText().toString());
-		PollVoteService service = new PollVoteService(username,pdu.GetTweetId(), index);
+		PollVoteService service = new PollVoteService(username,pdu.GetTweetId(), index, this);
 		service.execute();
 		System.out.println(pdu.GetOptions().lastIndexOf(selectedPollVoteButton.getText().toString()) + "");
 		showText("Submitted: " + selectedPollVoteButton.getText().toString());
@@ -80,7 +80,8 @@ public class PollDetailsActivity extends Activity {
 	}
 
 	private void createPollVoteOptions(ArrayList<String> pollOptionsText) {
-		for (String pollOptionText : pollOptionsText) {
+		for (int i=0; i<pollOptionsText.size(); ++i){
+			String pollOptionText = pollOptionsText.get(i);
 			RadioButton radioButton = new RadioButton(this);
 			radioButton.setText(pollOptionText);
 			radioButton.setOnClickListener(new OnClickListener() {

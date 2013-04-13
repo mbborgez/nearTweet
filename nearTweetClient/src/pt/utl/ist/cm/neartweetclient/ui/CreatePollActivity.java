@@ -4,12 +4,16 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.CreatePollService;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,6 +23,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 public class CreatePollActivity extends Activity {
 
 	private static final int MAX_NUM_POLL_OPTIONS = 4;
@@ -125,12 +130,17 @@ public class CreatePollActivity extends Activity {
     	String text = pollDescription.getText().toString();
     	ArrayList<String> options = new ArrayList<String>();
     	for(int i = 0; i < pollOptions.getChildCount(); i++) {
-    		RadioButton option = (RadioButton) pollOptions.getChildAt(0);
+    		RadioButton option = (RadioButton) pollOptions.getChildAt(i);
     		options.add(option.getText().toString());
     		System.out.println(option.getText().toString());
     	}
+    	Log.i("DEBUG", " pollOptions - " + options);
 		CreatePollService service = new CreatePollService(username, text, options, this);
-		service.execute();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+			service.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+		} else {
+			service.execute();
+		}
 	}
 
 	private void removePollOption(RadioButton radioButton){

@@ -19,11 +19,25 @@
     <string name="pollDetailsTitle">Poll Details</string>
     <string name="title_activity_tweets_stream">TweetsStreamActivity</string>
     <string name="title_activity_tweet_details_acitivity">TweetDetailsAcitivity</string>
-    <string name ="reply_tweet_button">Reply</string>
-    <string name ="new_tweet_button">New Tweet</string>
-    <string name ="new_pool_button">New Pool</string>
-    <string name ="submit_tweet">Tweet</string>
-    <string name ="mark_as_spam">Spam</string>
-    <string name ="cancel">Cancel</string>
+    <string name="reply_tweet_button">Reply</string>
+    <string name="new_tweet_button">New Tweet</string>
+    <string name="new_pool_button">New Pool</string>
+    <string name="submit_tweet">Tweet</string>
+    <string name="mark_as_spam">Spam</string>
+    <string name="cancel">Cancel</string>
     <string name="welcome">Hello!</string>
+    <string name="createTweet">Tweet</string>
+    <string name="title_activity_multimedia">MultimediaActivity</string>
+    <string name="menu_settings">Settings</string>
+    <string name="createPoll">Poll</string>
+    <string name="title_activity_connect">ConnectActivity</string>
+    <string name="serverAddress_hint">Server Address</string>
+    <string name="connect">Connect</string>
+    <string name="serverPort_hint">Server Port</string>
+    <string name="reply">Reply</string>
+    <string name="tweet_image">Tweet Image</string>
+    <string name="tweet_details">Tweet Details</string>
+    <string name="reply_text_hint">Enter Reply Text</string>
+    <string name="disconnect">Disconnect</string>
+
 </resources>

@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/nearTweetEntities"/>
-	<classpathentry exported="true" kind="lib" path="../lib/junit-4.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="../lib/pdus.jar" />
+	<classpathentry kind="lib" path="/afs/ist.utl.pt/users/4/1/ist167041/workspace/nearTweet/lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="/afs/ist.utl.pt/users/4/1/ist167041/workspace/nearTweet/lib/pdus.jar"/>
 	<classpathentry kind="output" path="build/"/>
 </classpath>

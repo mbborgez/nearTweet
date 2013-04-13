@@ -15,22 +15,35 @@
   limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <ListView
-        android:id="@+id/tweetslist"
+        android:id="@android:id/list"
         style="@style/ListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:layout_width="fill_parent"
+        android:layout_height="400dp"
+        android:visibility="visible" />
 
-    <TextView
-        android:id="@android:id/empty"
-        style="@style/ListSubtitleText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone" />
+    <Button
+        android:id="@+id/createTweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@android:id/list"
+        android:text="@string/createTweet"
+        android:width="170dp" />
+
+    <Button
+        android:id="@+id/createPoll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/createTweet"
+        android:layout_toRightOf="@+id/createTweet"
+        android:text="@string/createPoll" />
 
 </RelativeLayout>
