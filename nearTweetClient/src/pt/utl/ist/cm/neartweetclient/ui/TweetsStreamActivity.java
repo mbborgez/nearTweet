@@ -8,7 +8,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.TweetAdapter;
-import pt.utl.ist.cm.neartweetclient.sync.StreamingHandler;
+import pt.utl.ist.cm.neartweetclient.sync.MessagesReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.ListActivity;
@@ -73,7 +73,8 @@ public class TweetsStreamActivity extends ListActivity {
         this.registerReceiver(this.tweetsReceiver,iff);
         
         // Start listening income tweets from current connection
-        new StreamingHandler(this.getApplicationContext()).execute();
+//        new StreamingHandler(this.getApplicationContext()).execute();
+        new Thread(new MessagesReceiverRunnable(getApplicationContext())).start();
         //new Thread(new StreamingHandler(this.getApplicationContext())).start();
         
         createTweetButton = (Button) findViewById(R.id.createTweet);

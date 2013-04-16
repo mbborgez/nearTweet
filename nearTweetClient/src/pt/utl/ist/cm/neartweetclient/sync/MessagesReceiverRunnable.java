@@ -3,34 +3,32 @@ package pt.utl.ist.cm.neartweetclient.sync;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
-public class StreamingHandler extends AsyncTask<Void, Void, Void> {
+public class MessagesReceiverRunnable implements Runnable {
 
 	private Context context;
 	private PDUVisitor visitor;
 
-	public StreamingHandler(Context context){
+	public MessagesReceiverRunnable(Context context){
 		this.context = context;
 		this.visitor = new PDUHandler(this.context);
 	}
 
 	@Override
-	protected Void doInBackground(Void... arg0) {
+	public void run() {
 		try {
-			PDU pdu;
+			PDU receivedPdu;
 			while(Connection.getInstance().isAlive()){
-				pdu = Connection.getInstance().receiveData();
-				if (pdu != null) {
-					Log.i("DEBUG", "PDU ARRIVED: " + pdu.getClass().getName());
-					pdu.accept(this.visitor);
+				receivedPdu = Connection.getInstance().receiveData();
+				if (receivedPdu != null) {
+					Log.i("DEBUG", "PDU ARRIVED: " + receivedPdu.getClass().getName());
+					receivedPdu.accept(this.visitor);
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
 	}
 
 }

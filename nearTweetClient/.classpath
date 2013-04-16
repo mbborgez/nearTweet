@@ -2,8 +2,9 @@
 <classpath>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/nearTweetEntities"/>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="/nearTweet/lib/pdus.jar"/>
+	<classpathentry exported="true" kind="lib" path="/nearTweet/lib/twitter4j-core-3.0.3.jar"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
