@@ -9,6 +9,7 @@ public class MessagesReceiverRunnable implements Runnable {
 
 	private Context context;
 	private PDUVisitor visitor;
+	private static boolean isAlive = false;
 
 	public MessagesReceiverRunnable(Context context){
 		this.context = context;
@@ -18,13 +19,20 @@ public class MessagesReceiverRunnable implements Runnable {
 	@Override
 	public void run() {
 		try {
-			PDU receivedPdu;
-			while(Connection.getInstance().isAlive()){
-				receivedPdu = Connection.getInstance().receiveData();
-				if (receivedPdu != null) {
-					Log.i("DEBUG", "PDU ARRIVED: " + receivedPdu.getClass().getName());
-					receivedPdu.accept(this.visitor);
+			if(!isAlive){
+				isAlive = true;
+				
+				PDU receivedPdu;
+				while(Connection.getInstance().isAlive()){
+					receivedPdu = Connection.getInstance().receiveData();
+					if (receivedPdu != null) {
+						Log.i("DEBUG", "PDU ARRIVED: " + receivedPdu.getClass().getName());
+						receivedPdu.accept(this.visitor);
+					}
 				}
+			}
+			else {
+				Log.i("DEBUG", "The messages receiver thread is allerady running.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

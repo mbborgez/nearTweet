@@ -1,9 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.ui.LoginActivity;
 import android.app.Activity;
@@ -30,10 +28,7 @@ public class RegisterUserService extends AsyncTask<String, Integer, Boolean> {
 
 			Log.i("DEBUG", "doInBackground - after sendPDU");
 
-		} catch (UnknownHostException e) {
-			Log.i("DEBUG", "doInBackground - false");
-			return false;
-		} catch (IOException e) {
+		} catch (NearTweetException e) {
 			Log.i("DEBUG", "doInBackground - false");
 			return false;
 		}

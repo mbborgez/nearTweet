@@ -25,7 +25,7 @@ public class PDUHandler extends PDUVisitor {
 	public void processGenericMessagePDU(GenericMessagePDU pdu) {
 		Intent intent = new Intent();
 		intent.setAction(Actions.REGISTER_CONFIRMATION);
-		intent.putExtra("successLogin", pdu.GetResponse());
+		intent.putExtra(Actions.SUCCESS_LOGIN, pdu.GetResponse());
 		if (this.context != null) {
 			Log.i("DEBUG", "BroadCasting Message");
 			context.sendBroadcast(intent);

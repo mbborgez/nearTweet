@@ -8,7 +8,6 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.TweetAdapter;
-import pt.utl.ist.cm.neartweetclient.sync.MessagesReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.ListActivity;
@@ -73,10 +72,6 @@ public class TweetsStreamActivity extends ListActivity {
         this.registerReceiver(this.tweetsReceiver,iff);
         
         // Start listening income tweets from current connection
-//        new StreamingHandler(this.getApplicationContext()).execute();
-        new Thread(new MessagesReceiverRunnable(getApplicationContext())).start();
-        //new Thread(new StreamingHandler(this.getApplicationContext())).start();
-        
         createTweetButton = (Button) findViewById(R.id.createTweet);
         createTweetButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -92,10 +87,12 @@ public class TweetsStreamActivity extends ListActivity {
 				startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
 			}
 		});
+        
 		ListView tweetsListView = getListView();
 		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Log.i("DEBUG", "TweetStreamActivity.clickItem!!!!");
 				showTweetDetails(list.get(position));
 			}
 		});

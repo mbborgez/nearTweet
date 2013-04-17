@@ -53,10 +53,7 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 			TweetPDU pdu = new TweetPDU(this.userName, tweetID, this.content, this.tweetImageBytes);
 			Connection.getInstance().sendPDU(pdu);
 			Actions.incrementTweetID(this.activity.getApplicationContext());
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (NearTweetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

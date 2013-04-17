@@ -1,8 +1,5 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
@@ -52,17 +49,13 @@ public class LoginActivity extends Activity {
 	 * the remaining entities on the network
 	 */
 	private void registerUser(final String username) {
-//		RegisterUserService service = new RegisterUserService(username, this);
 		try {
-//			service.execute();
 			new AsyncTask<String, Void, Boolean>() {
 				@Override
 				protected Boolean doInBackground(String... params) {
 					try {
 						Connection.getInstance().sendPDU(new RegisterPDU(username));
-					} catch (UnknownHostException e) {
-						return false;
-					} catch (IOException e) {
+					} catch (NearTweetException e) {
 						return false;
 					}
 					return true;
@@ -131,6 +124,7 @@ public class LoginActivity extends Activity {
 	public void loginResponseCallback(boolean authenticated) {
 		String name = userNameText.getText().toString();
 		if (authenticated) {
+			Connection.getInstance().startAsyncReceive(getApplicationContext());
 			createCookieSession(name);
 			nextScreen();
 		} else {
@@ -201,6 +195,8 @@ public class LoginActivity extends Activity {
 	private void waitForAuthenticationResponse() {
 		// Start listening the socket for authentication response
 		new AuthenticationHandler(this).execute();
+		
+		
 	}
 	 
 }

@@ -3,6 +3,7 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
+import pt.utl.ist.cm.neartweetclient.sync.MessagesReceiverRunnable;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -29,6 +30,7 @@ public class ConnectActivity extends Activity {
 		serverPortEditText = (EditText) findViewById(R.id.serverPortText);
 		connectButton = (Button) findViewById(R.id.connectButton);
 		disconnectButton = (Button) findViewById(R.id.disconnectButton);
+
 		
 		connectButton.setOnClickListener(new OnClickListener() {
 			@Override

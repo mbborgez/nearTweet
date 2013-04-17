@@ -9,6 +9,7 @@
         android:maxHeight="100dp"
         android:maxWidth="100dp"
         android:src="@drawable/menu_span" 
+        android:focusable="false"
         android:visibility="gone"/>
     
     <TextView
@@ -22,6 +23,7 @@
         android:textIsSelectable="true"
         android:textSize="15sp"
         android:textStyle="bold" 
+        android:focusable="false"
         android:layout_marginLeft="10dp"/>
 
 
@@ -38,6 +40,7 @@
         android:textIsSelectable="true"
         android:textSize="14sp"
         android:textStyle="normal" 
+        android:focusable="false"
         android:layout_marginRight="10dp"/>
 
 </RelativeLayout>
