@@ -1,6 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
@@ -182,6 +183,7 @@ public class LoginActivity extends Activity {
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("username", userName);
 		editor.commit();
+		MemCacheProvider.setUserName(userName);
 	}
 	
 	protected void verifyConnection() {

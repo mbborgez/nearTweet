@@ -20,8 +20,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PollDetailsActivity extends Activity {
+public class PollVoteActivity extends Activity {
 
+	public static final String TWEET_ID_EXTRA = "tweet_item";
 	private TextView pollDescriptionTextView;
 	private Button pollVoteButton;
 	private RadioGroup pollOptions;

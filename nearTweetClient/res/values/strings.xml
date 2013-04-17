@@ -39,5 +39,6 @@
     <string name="tweet_details">Tweet Details</string>
     <string name="reply_text_hint">Enter Reply Text</string>
     <string name="disconnect">Disconnect</string>
+    <string name="title_activity_poll_votes_details">PollVotesDetails</string>
 
 </resources>

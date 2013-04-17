@@ -6,11 +6,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".PollVoteActivity" >
+    tools:context=".PollVotesDetailsActivity" >
 
     <!-- Title -->
+
     <TextView
-        android:id="@+id/poll_detailsTitle_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/pollDetails_vote_options"
@@ -18,10 +18,10 @@
         android:text="@string/pollDetailsTitle"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-
     <!-- Description of the poll -->
+
     <TextView
-        android:id="@+id/poll_description_textView"
+        android:id="@+id/pollVotes_description_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/poll_detailsTitle_textView"
@@ -31,23 +31,14 @@
         android:text="@string/poll_description_text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <!-- Poll options in which the user can vote -->
-    <RadioGroup
-        android:id="@+id/pollDetails_vote_options"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/pollVotes_linearLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/poll_description_textView"
-        android:orientation="vertical" />
+        android:layout_below="@+id/pollVotes_description_textView"
+        android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <!-- Submit the vote of the user -->
+    </LinearLayout>
 
-	<Button
-	    android:id="@+id/poll_submitVote_button"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignLeft="@+id/pollDetails_vote_options"
-	    android:layout_alignParentBottom="true"
-	    android:layout_alignRight="@+id/poll_description_textView"
-	    android:text="@string/poll_submit_vote_button" />
-    
 </RelativeLayout>

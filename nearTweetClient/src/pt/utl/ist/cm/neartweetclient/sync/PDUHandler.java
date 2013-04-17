@@ -38,11 +38,7 @@ public class PDUHandler extends PDUVisitor {
 	public void processPollVotePDU(PollVotePDU pdu) {
 		Log.i("DEBUG", "received a pollVote [ userId: " + pdu.GetUserId() + ", option: " + pdu.GetOptionPosition() + "]" );
 		
-		if(MemCacheProvider.isMyPoll(pdu.GetTweetId())){
-			if(MemCacheProvider.isMyPoll(pdu.GetTargetMessageId())){
-				MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
-			}
-		}
+		MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
 			
 		Intent intent = new Intent();
 		intent.setAction(Actions.POLL_VOTE);
@@ -67,6 +63,7 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processRegisterPDU(RegisterPDU pdu) {
+		//do nothing
 	}
 
 	@Override

@@ -2,37 +2,52 @@ package pt.utl.ist.cm.neartweetclient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import android.R.string;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
-import pt.utl.ist.cm.neartweetclient.core.PollContainer;
-
 public class MemCacheProvider {
 
+	private static String userName;
+	
 	private static HashMap<String, PDU> memcache = new HashMap<String, PDU>();
 	
-	private static PollContainer pollContainer = new PollContainer(); 
+	private static HashMap<String, PollConversation> pollConversationContainer = new HashMap<String, PollConversation>();
+	
+
 	
 	public static void addTweet(String tweetID, PDU pdu) {
 		memcache.put(tweetID, pdu);
 		
 		if(pdu instanceof PollVotePDU){
-			pollContainer.registerPollVote((PollVotePDU) pdu);
+			PollVotePDU pollVotePdu = (PollVotePDU) pdu;
+			if(pollConversationContainer.containsKey(pollVotePdu.GetTargetMessageId())){
+				pollConversationContainer.get(pollVotePdu.GetTargetMessageId()).addVote(pollVotePdu);
+			}
 		} else if(pdu instanceof PublishPollPDU){
-			pollContainer.registerPoll((PublishPollPDU) pdu);
+			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
+			pollConversationContainer.put(publishPollPdu.GetTweetId(), new PollConversation(publishPollPdu));
 		}
 	}
 	
 	public static boolean isMyPoll(String tweetId){
-		return pollContainer.hasPoll(tweetId);
-	}	
+		if(pollConversationContainer.containsKey(tweetId)){
+			PublishPollPDU publishPdu = (PublishPollPDU) getTweet(tweetId);
+			return publishPdu.GetUserId().equals(getUserName());
+		}
+		return false;
+	}
 	public static PDU getTweet(String tweetID) {
 		return memcache.get(tweetID);
 	}
 	
-	public static int getNumVotes(String tweetId, int optionId){
-		return pollContainer.getVotesFor(tweetId, optionId);
+	public static Map<String, Integer> getVotesForPoll(String tweetId){
+		return isMyPoll(tweetId) ? pollConversationContainer.get(tweetId).getVotes() : null;
 	}
 	
 	public static ArrayList<PDU> toArrayList() {
@@ -45,5 +60,12 @@ public class MemCacheProvider {
 	
 	public static boolean isEmpty() {
 		return memcache.isEmpty();
+	}
+	
+	public static void setUserName(String username){
+		MemCacheProvider.userName = username;
+	}
+	public static String getUserName(){
+		return MemCacheProvider.userName;
 	}
 }

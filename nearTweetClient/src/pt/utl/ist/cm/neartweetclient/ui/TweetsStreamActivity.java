@@ -127,9 +127,16 @@ public class TweetsStreamActivity extends ListActivity {
     		tweetDetailsIntent.putExtra("tweet_item", ((TweetPDU) pdu).GetTweetId());
     		startActivity(tweetDetailsIntent);
     	} else if (pdu instanceof PublishPollPDU) {
-    		Intent tweetDetailsIntent = new Intent(this, PollDetailsActivity.class);
-    		tweetDetailsIntent.putExtra("tweet_item", ((PublishPollPDU) pdu).GetTweetId());
-    		startActivity(tweetDetailsIntent);
+    		PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
+    		if(!MemCacheProvider.isMyPoll(publishPollPdu.GetTweetId())){
+	    		Intent tweetDetailsIntent = new Intent(this, PollVoteActivity.class);
+	    		tweetDetailsIntent.putExtra(PollVoteActivity.TWEET_ID_EXTRA, ((PublishPollPDU) pdu).GetTweetId());
+	    		startActivity(tweetDetailsIntent);
+    		} else {
+	    		Intent tweetDetailsIntent = new Intent(this, PollVotesDetailsActivity.class);
+	    		tweetDetailsIntent.putExtra(PollVotesDetailsActivity.TWEET_ID_EXTRA, ((PublishPollPDU) pdu).GetTweetId());
+	    		startActivity(tweetDetailsIntent);
+    		}
     	}
 	}
 	

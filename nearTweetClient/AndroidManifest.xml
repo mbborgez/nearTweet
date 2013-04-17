@@ -32,7 +32,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="pt.utl.ist.cm.neartweetclient.ui.PollDetailsActivity"
+            android:name="pt.utl.ist.cm.neartweetclient.ui.PollVoteActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
@@ -59,6 +59,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="pt.utl.ist.cm.neartweetclient.ui.PollVotesDetailsActivity"
+            android:label="@string/title_activity_poll_votes_details" >
         </activity>
     </application>
 
