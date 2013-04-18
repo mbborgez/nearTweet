@@ -1,16 +1,16 @@
 package pt.utl.ist.cm.neartweetEntities.pdu;
 
 
-public class ReplyPDU extends PDU
-{
+public class ReplyPDU extends PDU {
 
 	private static final long serialVersionUID = 1L;
 	private String tweetId;
 	private String targetMessageId;
 	private String text;
 	private String addresse;
+	private Boolean isBroadcast;
 	
-	public ReplyPDU(String userId, String tweetId, String targetMessageId ,String text, String addresse) 
+	public ReplyPDU(String userId, String tweetId, String targetMessageId, String text, String addresse, Boolean isBroadcast) 
 	{
 		super(userId);
 		
@@ -18,6 +18,7 @@ public class ReplyPDU extends PDU
 		this.targetMessageId = targetMessageId;
 		this.text = text;
 		this.addresse = addresse;		
+		this.isBroadcast = isBroadcast;
 	}
 	
 	public String GetTweetId()
@@ -44,6 +45,14 @@ public class ReplyPDU extends PDU
 	public void accept(PDUVisitor visitor) 
 	{
 		visitor.processReplyPDU(this);
+	}
+
+	public Boolean getIsBroadcast() {
+		return isBroadcast;
+	}
+
+	public void setIsBroadcast(Boolean isBroadcast) {
+		this.isBroadcast = isBroadcast;
 	}
 
 }

@@ -15,8 +15,9 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 
 
 public class ServerDispatcher extends PDUVisitor {
+	private static final int SPAM_MAX = 1;
 	private RequestHandler connectionHandler;
-	
+
 	public ServerDispatcher(RequestHandler connectionHandler) {
 		this.connectionHandler = connectionHandler;
 	}
@@ -25,7 +26,7 @@ public class ServerDispatcher extends PDUVisitor {
 	public void processPollVotePDU(PollVotePDU pdu) 
 	{
 		System.out.println("### PollVotePDU received. Response selected: " + pdu.GetOptionPosition());
-		
+
 		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId()))
 		{
 			System.out.println("### PollVotePDU received - userExists " + pdu.GetUserId());
@@ -53,13 +54,13 @@ public class ServerDispatcher extends PDUVisitor {
 			connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You are not registered!"), this.connectionHandler.connection);
 			System.out.println("--- User doesn't exists!");
 		}
-		
+
 	}
 
 	@Override
 	public void processPublishPollPDU(PublishPollPDU pdu) {
 		System.out.println("### PublishPollPDU received. tweetId: " + pdu.GetTweetId());
-		
+
 		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
 			if(! connectionHandler.memory.VerifyIfPollExists(pdu.GetTweetId())) {
 				connectionHandler.memory.InsertPoll(pdu.GetUserId(), pdu.GetTweetId(), pdu.GetText(), pdu.GetOptions());
@@ -94,16 +95,20 @@ public class ServerDispatcher extends PDUVisitor {
 	@Override
 	public void processReplyPDU(ReplyPDU pdu) {
 		System.out.println("### ReplyPDU received. Response: " + pdu.GetText());
-		
+
 		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
 			if(connectionHandler.memory.VerifyIfTweetExists(pdu.GetTargetMessageId())) {
-				String tweetOwnerUser = this.connectionHandler.memory.GetUserFromTweetID(pdu.GetTargetMessageId());
-				ObjectOutputStream userStream = connectionHandler.memory.GetUserStream(tweetOwnerUser);
-				if(userStream != null) {
-					connectionHandler.sendDirectedPDU(pdu, userStream);
+				if(!pdu.getIsBroadcast()){
+					String tweetOwnerUser = this.connectionHandler.memory.GetUserFromTweetID(pdu.GetTargetMessageId());
+					ObjectOutputStream userStream = connectionHandler.memory.GetUserStream(tweetOwnerUser);
+					if(userStream != null) {
+						connectionHandler.sendDirectedPDU(pdu, userStream);
+					} else {
+						connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Tweet owner isn't registered!"), this.connectionHandler.connection);
+						System.out.println("--- Tweet owner isn't registered!");
+					}
 				} else {
-					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Tweet owner isn't registered!"), this.connectionHandler.connection);
-					System.out.println("--- Tweet owner isn't registered!");
+					connectionHandler.broadcastPDU(pdu);
 				}
 			} else {
 				connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Unrecognized target tweet ID!"), this.connectionHandler.connection);
@@ -119,17 +124,17 @@ public class ServerDispatcher extends PDUVisitor {
 	@Override
 	public void processSpamVotePDU(SpamVotePDU pdu) {
 		System.out.println("### SpamVotePDU received from userId: " + pdu.GetUserId());
-		
+
 		if(connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) {
 			String tweetId = pdu.GetTargetMessageId();
 			if(this.connectionHandler.memory.VerifyIfTweetExists(tweetId)) {
 				String userId = this.connectionHandler.memory.GetUserFromTweetID(tweetId);
-				if(this.connectionHandler.memory.UserSpamVote(userId) == 1) {
+				if(this.connectionHandler.memory.UserSpamVote(userId) == SPAM_MAX) {
 					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "You will be removed! Spam votes on your tweets reached the limit!!!"), this.connectionHandler.memory.GetUserStream(userId));
 					this.connectionHandler.memory.RemoveUser(this.connectionHandler.memory.GetUserStream(userId));
 					System.out.println("--- Removed user: " + userId);
 				}
-				if(this.connectionHandler.memory.TweetSpamVote(tweetId) == 1) {
+				if(this.connectionHandler.memory.TweetSpamVote(tweetId) == SPAM_MAX) {
 					connectionHandler.sendDirectedPDU(new GenericMessagePDU(pdu.GetUserId(), "Your tweet will be removed because Spam votes on it has reached the limit!!!"), this.connectionHandler.memory.GetUserStream(userId));
 					this.connectionHandler.memory.RemoveTweet(tweetId);
 					System.out.println("--- Removed tweet: " + tweetId);

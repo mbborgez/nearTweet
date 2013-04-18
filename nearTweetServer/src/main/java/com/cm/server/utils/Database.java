@@ -1,5 +1,6 @@
 package main.java.com.cm.server.utils;
 
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +34,15 @@ public class Database
 	
 	public synchronized void RemoveUser(ObjectOutputStream obj) {
 		for(String user :  this.listUsers.keySet()){
-			if(this.listUsers.get(user) == obj)
+			if(this.listUsers.get(user) == obj){
 				this.listUsers.remove(user);
+				try {
+					obj.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	

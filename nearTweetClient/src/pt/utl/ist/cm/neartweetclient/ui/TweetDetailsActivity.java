@@ -27,17 +27,15 @@ public class TweetDetailsActivity extends Activity {
 	private String tweetId;
 	private ImageView tweetImage;
 	
-//	private Button repplyButton;
-//	private Button cancelButton;
-	
+	private Button repplyButton;
+	private Button spamButton;
 	
 	private PDU pdu;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_tweet_details_acitivity);
-		
+		setContentView(R.layout.activity_tweet_details);
 		tweetId = getIntent().getStringExtra("tweet_item");
 		pdu = MemCacheProvider.getTweet(tweetId);
 		if(tweetId.length()>0){
@@ -60,22 +58,22 @@ public class TweetDetailsActivity extends Activity {
 			} 
 		}
 		
-//		repplyButton = (Button) findViewById(R.id.reply_tweet_button);
-//		cancelButton = (Button) findViewById(R.id.cancelReplyTweetButton);
+		repplyButton = (Button) findViewById(R.id.submitReplyTweetButton);
+		spamButton = (Button) findViewById(R.id.markSpamTweetButton);
 
-//		repplyButton.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				TODO
-//			}
-//		});
+		repplyButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				replyTweetScreen();
+			}
+		});
 		
-//		cancelButton.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				finish();
-//			}
-//		});
+		spamButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				markTweetAsSpam();
+			}
+		});
 	}
 
 	@Override

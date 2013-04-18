@@ -13,20 +13,22 @@ public class ReplyService extends NearTweetService {
 	private String text;
 	private String addresse;
 	private Context context;
+	private Boolean isBroadcast;
 	
-	public ReplyService(String userId, String targetMessageId, String text, String targetId, Context context) {
+	public ReplyService(String userId, String targetMessageId, String text, String targetId, Boolean isBroadcast,Context context) {
 		super(userId);
 		this.tweetId = userId + Actions.getLastTweet(context);
 		this.targetMessageId = targetMessageId;
 		this.text = text;
 		this.context = context;
 		this.addresse = targetId;
+		this.isBroadcast = isBroadcast;
 	}
 
 	@Override
 	protected boolean run() {
 		try {
-			ReplyPDU pdu = new ReplyPDU(this.userId, this.tweetId, this.targetMessageId, this.text, this.addresse);
+			ReplyPDU pdu = new ReplyPDU(this.userId, this.tweetId, this.targetMessageId, this.text, this.addresse, this.isBroadcast);
 			Connection.getInstance().sendPDU(pdu);
 			return true;
 		} catch (Exception e) {

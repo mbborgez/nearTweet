@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ public class ReplyActivity extends Activity {
 
 	private EditText tweet;
 	private String tweetId;
+	private CheckBox isBroadcastCheckBox;
 	private TweetPDU pdu;
 	
     public void onCreate(Bundle savedInstanceState) {
@@ -26,16 +28,14 @@ public class ReplyActivity extends Activity {
         setContentView(R.layout.reply_tweet);
         
         Button replyButton = (Button) findViewById(R.id.reply);
-        TextView targetUser = (TextView) findViewById(R.id.OriginUser);
-        TextView message = (TextView) findViewById(R.id.tweetContent);
         tweet = (EditText) findViewById(R.id.tweetReply);
         
         Bundle extras = getIntent().getExtras();
         this.tweetId = extras.getString("tweet_id");
 		this.pdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
-		targetUser.setText(this.pdu.GetUserId() + " said:");
-		message.setText(this.pdu.GetText());
         
+		isBroadcastCheckBox = (CheckBox) findViewById(R.id.isBroadcastCheckBox);
+		
         replyButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -59,7 +59,7 @@ public class ReplyActivity extends Activity {
     	if (username == null) {
     		errorMessage();
     	} else {
-    		ReplyService service = new ReplyService(username, this.pdu.GetTweetId(), text, this.pdu.GetUserId(), this.getApplicationContext());
+    		ReplyService service = new ReplyService(username, this.pdu.GetTweetId(), text, this.pdu.GetUserId(), isBroadcast(), this.getApplicationContext());
     		try {
     			service.execute();
     			nextScreen();
@@ -74,6 +74,9 @@ public class ReplyActivity extends Activity {
     	finish();
     }
     
+    private boolean isBroadcast(){
+    	return isBroadcastCheckBox.isChecked();
+    }
     
     public void errorMessage() {
     	Toast.makeText(this,"You cannot tweet an empty message", Toast.LENGTH_SHORT).show();

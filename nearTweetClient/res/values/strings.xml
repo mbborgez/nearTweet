@@ -40,5 +40,7 @@
     <string name="reply_text_hint">Enter Reply Text</string>
     <string name="disconnect">Disconnect</string>
     <string name="title_activity_poll_votes_details">PollVotesDetails</string>
+    <string name="broadcast_reply">Broadcast Reply</string>
+    <string name="spam">Spam</string>
 
 </resources>
