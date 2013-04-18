@@ -62,7 +62,7 @@ public class TweetsStreamActivity extends ListActivity {
 		greetingUser();
 		
 		list = new ArrayList<PDU>();
-		tweetAdapter = new TweetAdapter(this.getApplicationContext(), R.layout.tweet, list);
+		tweetAdapter = new TweetAdapter(this.getApplicationContext(), R.layout.tweet_layout, list);
 	    setListAdapter(this.tweetAdapter);
 		
 		IntentFilter iff = new IntentFilter();
@@ -76,7 +76,7 @@ public class TweetsStreamActivity extends ListActivity {
         createTweetButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-					startActivity(new Intent(getApplicationContext(), NewTweet.class));
+					startActivity(new Intent(getApplicationContext(), NewTweetActivity.class));
 			}
 		});
         
@@ -110,7 +110,7 @@ public class TweetsStreamActivity extends ListActivity {
         //Update all the PDUS on the Adapter
         if (!MemCacheProvider.isEmpty()) {
 	        list = MemCacheProvider.toArrayList();
-	        tweetAdapter = new TweetAdapter(this, R.layout.tweet, list);
+	        tweetAdapter = new TweetAdapter(this, R.layout.tweet_layout, list);
 	        setListAdapter(tweetAdapter);
         }
         
@@ -172,7 +172,7 @@ public class TweetsStreamActivity extends ListActivity {
 	}
 	
 	private void showTweetScreen() {
-		startActivity(new Intent(this, NewTweet.class));
+		startActivity(new Intent(this, NewTweetActivity.class));
 	}
 	
 	private void showPollScreen() {
@@ -181,7 +181,7 @@ public class TweetsStreamActivity extends ListActivity {
 	
 	public void updateList(String newTweet) {
 		list.add(0, MemCacheProvider.getTweet(newTweet));
-		tweetAdapter = new TweetAdapter(this, R.layout.tweet, list);
+		tweetAdapter = new TweetAdapter(getApplicationContext(), R.layout.tweet_layout, list);
         setListAdapter(tweetAdapter);
 	}
 }

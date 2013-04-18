@@ -27,7 +27,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="pt.utl.ist.cm.neartweetclient.ui.NewTweet"
+            android:name="pt.utl.ist.cm.neartweetclient.ui.NewTweetActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>

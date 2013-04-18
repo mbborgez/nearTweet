@@ -5,14 +5,21 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
+import pt.utl.ist.cm.neartweetclient.core.TweetConversationAdapter;
 import pt.utl.ist.cm.neartweetclient.services.CreateSpamService;
-import android.app.Activity;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import android.app.ListActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +28,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class TweetDetailsActivity extends Activity {
+public class TweetDetailsActivity extends ListActivity {
 	
 	private TextView tweetDetailsTextView;
 	private String tweetId;
@@ -74,7 +81,16 @@ public class TweetDetailsActivity extends Activity {
 				markTweetAsSpam();
 			}
 		});
+		
+		updateTweetConversation();
+	    
+		// Put whatever message you want to receive as the action
+		IntentFilter iff = new IntentFilter();
+        iff.addAction(Actions.BROADCAST_TWEET);
+        this.registerReceiver(this.repliesReceiver,iff);
+	    
 	}
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -97,7 +113,6 @@ public class TweetDetailsActivity extends Activity {
 		return true;
 	}
 	
-	
 	private void replyTweetScreen() {
 		Intent intent = new Intent(this, ReplyActivity.class);
 		intent.putExtra("tweet_id", this.tweetId);
@@ -110,4 +125,22 @@ public class TweetDetailsActivity extends Activity {
 		new CreateSpamService(user,this.tweetId).execute();
 		finish();
 	}
+	
+	private BroadcastReceiver repliesReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.i("DEGUB", "RECEIVED SOMETHING");
+			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
+					updateTweetConversation();
+			}
+		}
+    };
+    
+	private void updateTweetConversation() {
+		TweetConversation tweetConversation = MemCacheProvider.getTweetConversation(tweetId);
+		TweetConversationAdapter tweetConversationAdapter = 
+				new TweetConversationAdapter(this.getApplicationContext(), R.layout.tweet_layout, tweetConversation);
+	    setListAdapter(tweetConversationAdapter);
+	}
+
 }

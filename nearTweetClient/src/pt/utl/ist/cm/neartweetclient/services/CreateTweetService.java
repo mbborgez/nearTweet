@@ -1,12 +1,9 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
-import pt.utl.ist.cm.neartweetclient.ui.NewTweet;
+import pt.utl.ist.cm.neartweetclient.ui.NewTweetActivity;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -39,7 +36,7 @@ public class CreateTweetService extends AsyncTask<String, Integer, Boolean> {
 	
 	@Override
 	 protected void onPostExecute(Boolean result) {
-        NewTweet act = (NewTweet) this.activity;
+		NewTweetActivity act = (NewTweetActivity) this.activity;
         if (result) {
        	 act.nextScreen(); 
         } else {

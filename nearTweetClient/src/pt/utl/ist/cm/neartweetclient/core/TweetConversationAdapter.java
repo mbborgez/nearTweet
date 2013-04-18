@@ -1,5 +1,6 @@
 package pt.utl.ist.cm.neartweetclient.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
@@ -16,14 +17,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class TweetDetailsAdapter extends ArrayAdapter<ReplyPDU> {
+public class TweetConversationAdapter extends ArrayAdapter<ReplyPDU> {
 
-	private List<ReplyPDU> pdus;
+	private List<PDU> pdus;
 	private Context context;
 
-	public TweetDetailsAdapter(Context context, int textViewResourceId, List<ReplyPDU> list) {
-		super(context, textViewResourceId, list);
-		this.pdus = list;
+	public TweetConversationAdapter(Context context, int textViewResourceId, TweetConversation tweetConversation) {
+		super(context, textViewResourceId, tweetConversation.getConversation());
+		this.pdus = new ArrayList<PDU>(tweetConversation.getConversation());
+		this.pdus.add(tweetConversation.getMainMessage());
 		this.context = context;
 	}
 
@@ -31,7 +33,7 @@ public class TweetDetailsAdapter extends ArrayAdapter<ReplyPDU> {
 		View view = convertView;
 		if (view == null) {
 			LayoutInflater viewInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			view = viewInflater.inflate(R.layout.tweet, null);
+			view = viewInflater.inflate(R.layout.tweet_layout, null);
 		}
 
 		PDU pdu = pdus.get(position);

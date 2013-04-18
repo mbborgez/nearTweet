@@ -5,7 +5,10 @@ import java.util.Map;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.R.color;
 import android.app.Activity;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.DropBoxManager.Entry;
 import android.view.Menu;
@@ -39,7 +42,7 @@ public class PollVotesDetailsActivity extends Activity {
 	private void populateVotes(Map<String, Integer> votes){
 		for(java.util.Map.Entry<String, Integer> voteEntry : votes.entrySet()){
 			TextView pollVoteTextLine = new EditText(getApplicationContext());
-			pollVoteTextLine.setTextColor(R.color.text);
+			pollVoteTextLine.setTextColor(Color.BLACK);
 			pollVoteTextLine.setText(voteEntry.getKey() + " - " + voteEntry.getValue());
 			votesLinearLayout.addView(pollVoteTextLine);
 		}

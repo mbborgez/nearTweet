@@ -25,7 +25,7 @@ public class ReplyActivity extends Activity {
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.reply_tweet);
+        setContentView(R.layout.activity_reply_tweet);
         
         Button replyButton = (Button) findViewById(R.id.reply);
         tweet = (EditText) findViewById(R.id.tweetReply);

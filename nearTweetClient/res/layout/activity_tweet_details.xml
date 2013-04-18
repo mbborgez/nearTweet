@@ -1,39 +1,54 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".TweetDetailsActivity" >
 
-    <ImageView
-        android:id="@+id/tweet_details_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:contentDescription="@string/tweet_image"
-        android:maxHeight="100dp"
-        android:maxWidth="100dp"
-        android:src="@drawable/menu_span" />
-
-    <TextView
-        android:id="@+id/tweet_details_text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/tweet_details_image"
-        android:maxLines="3"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:text="@string/tweet_details"
-        android:textColor="@color/text_description"
-        android:textSize="14sp" />
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/tweet_details_image"
+            android:layout_width="68dp"
+            android:layout_height="70dp"
+            android:contentDescription="@string/tweet_image"
+            android:maxHeight="100dp"
+            android:maxWidth="100dp"
+            android:src="@drawable/menu_span" />
+
+        <TextView
+            android:id="@+id/tweet_details_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+             android:layout_marginLeft="10dp"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:text="@string/tweet_details"
+            android:textColor="@color/text_description"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        style="@style/ListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2.32"
+         android:layout_marginLeft="10dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tweet_details_image"
-        android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
 
         <Button
@@ -48,12 +63,9 @@
         <Button
             android:id="@+id/markSpamTweetButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/submitReplyTweetButton"
-            android:layout_alignBottom="@+id/submitReplyTweetButton"
-            android:layout_alignLeft="@+id/tweet_details_image"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/spam" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

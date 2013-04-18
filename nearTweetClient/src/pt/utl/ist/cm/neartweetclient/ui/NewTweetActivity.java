@@ -27,7 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class NewTweet extends Activity {
+public class NewTweetActivity extends Activity {
 
 	protected static final int TAKE_PHOTO_ACTION = 1234;
 	EditText tweet;
@@ -42,7 +42,7 @@ public class NewTweet extends Activity {
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.new_tweet);
+		setContentView(R.layout.activity_new_tweet);
 
 		cancelButton = (Button) findViewById(R.id.cancelTweet);
 		submitButton = (Button) findViewById(R.id.submitTweet);

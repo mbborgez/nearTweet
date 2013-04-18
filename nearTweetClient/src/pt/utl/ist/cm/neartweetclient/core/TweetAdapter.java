@@ -32,7 +32,7 @@ public class TweetAdapter extends ArrayAdapter<PDU> {
 		View view = convertView;
 		if (view == null) {
 			LayoutInflater viewInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			view = viewInflater.inflate(R.layout.tweet, null);
+			view = viewInflater.inflate(R.layout.tweet_layout, null);
 		}
 
 		PDU pdu = pdus.get(position);
