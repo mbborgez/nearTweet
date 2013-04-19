@@ -58,7 +58,7 @@ public class ReplyActivity extends Activity {
 	private class SubmitRetweetTask extends AsyncTask<String, Integer, Boolean> {
 		@Override
 		protected Boolean doInBackground(String... params) {
-			return (new ReplyService(originalTweetPdu.GetTweetId(), getReplyText(), getIsBroadcast(), getApplicationContext())).execute();
+			return (new ReplyService(originalTweetPdu.GetTweetId(), originalTweetPdu.GetUserId(), getReplyText(), getIsBroadcast(), getApplicationContext())).execute();
 		}
 		
 		@Override

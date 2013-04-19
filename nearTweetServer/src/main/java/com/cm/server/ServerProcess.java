@@ -39,19 +39,20 @@ public class ServerProcess
 			startingMessage();	
 			while(true) {
 				try {
-				Socket socket = this.serverSocket.accept();
-				handler = new RequestHandler(socket, this.memory);
-				t = new Thread(handler);
-				handler.setContextThread(t);
-				t.start();
+					Socket socket = this.serverSocket.accept();
+					handler = new RequestHandler(socket, this.memory);
+					t = new Thread(handler);
+					handler.setContextThread(t);
+					t.start();
 				} catch(Exception e) {
-					System.err.println("Something went wrong with this connection: " + e.getClass());
+					System.err.println("[nearTweet Server]" + " Something went wrong with this connection: " + e.getClass());
 					continue;
 				}
 			}
 		}
 		catch (IOException e) {
 			System.err.println("Fatal error ocurred: " + e);
+			close();
 		}
 	}
 	

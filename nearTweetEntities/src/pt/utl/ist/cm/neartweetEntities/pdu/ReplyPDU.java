@@ -10,6 +10,10 @@ public class ReplyPDU extends PDU {
 	private String addresse;
 	private Boolean isBroadcast;
 	
+	
+	//TODO:
+	//CHANGE THE NAME OF THE "addresse" PROPERTY
+	
 	public ReplyPDU(String userId, String tweetId, String targetMessageId, String text, String addresse, Boolean isBroadcast) 
 	{
 		super(userId);
