@@ -6,39 +6,35 @@ import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 
-public class ReplyService extends NearTweetService {
+public class ReplyService implements INearTweetService {
 
-	private String tweetId;
 	private String targetMessageId;
 	private String text;
-	private String addresse;
+	private String address;
 	private Context context;
 	private Boolean isBroadcast;
 	
-	public ReplyService(String userId, String targetMessageId, String text, String targetId, Boolean isBroadcast,Context context) {
-		super(userId);
-		this.tweetId = userId + Actions.getLastTweet(context);
+	public ReplyService(String targetMessageId, String text, Boolean isBroadcast, Context context) {
 		this.targetMessageId = targetMessageId;
 		this.text = text;
 		this.context = context;
-		this.addresse = targetId;
 		this.isBroadcast = isBroadcast;
 	}
 
 	@Override
-	protected boolean run() {
+	public boolean execute() {
 		try {
-			ReplyPDU pdu = new ReplyPDU(this.userId, this.tweetId, this.targetMessageId, this.text, this.addresse, this.isBroadcast);
+			String userId = Actions.getUserId(context);
+			String tweetId = userId + Actions.getLastTweet(context);
+			ReplyPDU pdu = new ReplyPDU(userId, tweetId, targetMessageId, text, address, isBroadcast);
+			
 			Connection.getInstance().sendPDU(pdu);
+			
+			Actions.incrementTweetID(context);
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
-	}
-
-	@Override
-	protected void afterRun() {
-		Actions.incrementTweetID(this.context);
 	}
 
 }

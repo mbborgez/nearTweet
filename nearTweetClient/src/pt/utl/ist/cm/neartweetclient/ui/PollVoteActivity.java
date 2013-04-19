@@ -6,11 +6,9 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.PollVoteService;
-
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.Activity;
-import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,80 +25,105 @@ public class PollVoteActivity extends Activity {
 	private Button pollVoteButton;
 	private RadioGroup pollOptions;
 	private RadioButton selectedPollVoteButton;
-	private PublishPollPDU pdu;
+	private PublishPollPDU pollPdu;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_poll_details);
-
-		ArrayList<String> pollOptionsTexts = null;
-		String descriptionText = null;
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
-			pdu = (PublishPollPDU) MemCacheProvider.getTweet(extras.getString("tweet_item"));
-			descriptionText = pdu.GetText();
-			pollOptionsTexts = pdu.GetOptions();
-		}
 
 		pollDescriptionTextView = (TextView) findViewById(R.id.poll_description_textView);
 		pollVoteButton = (Button) findViewById(R.id.poll_submitVote_button);
 		pollOptions = (RadioGroup) findViewById(R.id.pollDetails_vote_options);
 
-		pollDescriptionTextView.setText(descriptionText);
-		createPollVoteOptions(pollOptionsTexts);
-		pollVoteButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				submitVote(selectedPollVoteButton);
+		pollPdu = (PublishPollPDU) MemCacheProvider.getTweet(getIntent().getExtras().getString(TWEET_ID_EXTRA));
+
+		pollDescriptionTextView.setText(pollPdu.GetText());
+		pollVoteButton.setOnClickListener(submitPollVoteClickListener);
+		
+		populatePollVoteOptions(pollPdu.GetOptions());
+
+	}
+	
+	private void populatePollVoteOptions(ArrayList<String> pollOptionsText) {
+		for (int voteIndex=0; voteIndex<pollOptionsText.size(); ++voteIndex){
+			RadioButton radioButton = new RadioButton(getApplicationContext());
+			radioButton.setText(pollOptionsText.get(voteIndex));
+
+			radioButton.setOnClickListener(pollSelectionClickListener);
+			pollOptions.addView(radioButton);
+		}
+		pollOptions.setSelected(false);
+		pollVoteButton.setEnabled(false);
+	}
+	
+	/*****************************************************************************
+	 ***************************** Click Listeners *******************************
+	 *****************************************************************************/
+	
+	private final OnClickListener submitPollVoteClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			(new SubmitPollVoteTask(pollPdu.GetOptions().lastIndexOf(getSelectedPollVoteText()))).execute();
+		}
+	};
+	
+	private final OnClickListener pollSelectionClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			selectedPollVoteButton = ((RadioButton) v);
+			pollVoteButton.setEnabled(true);
+		}
+	};
+
+
+	
+	/*****************************************************************************
+	 ******************************** Async Tasks ********************************
+	 *****************************************************************************/
+	private class SubmitPollVoteTask extends AsyncTask<String, Void, Boolean> {
+		private int pollVoteIndex;
+		
+		public SubmitPollVoteTask(int pollVoteIndex){
+			this.pollVoteIndex = pollVoteIndex;
+		}
+		
+		@Override
+		protected Boolean doInBackground(String... params) {
+			return (new PollVoteService(pollPdu.GetTweetId(), pollVoteIndex, getApplicationContext())).execute();
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if(result){
+				showSuccessMessage();
+				finish();
+			} else {
+				showErrorMessage();
 			}
-		});
-
+		}
 	}
-
-	protected void submitVote(RadioButton selectedPollVoteButton) {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	String username = settings.getString("username", null);
-    	int index = pdu.GetOptions().lastIndexOf(selectedPollVoteButton.getText().toString());
-		PollVoteService service = new PollVoteService(username,pdu.GetTweetId(), index, this);
-		service.execute();
-		System.out.println(pdu.GetOptions().lastIndexOf(selectedPollVoteButton.getText().toString()) + "");
-		showText("Submitted: " + selectedPollVoteButton.getText().toString());
-		finish();
-	}
-
-	public void showText(String text) {
-		Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.poll_details, menu);
 		return true;
 	}
-
-	private void createPollVoteOptions(ArrayList<String> pollOptionsText) {
-		for (int i=0; i<pollOptionsText.size(); ++i){
-			String pollOptionText = pollOptionsText.get(i);
-			RadioButton radioButton = new RadioButton(this);
-			radioButton.setText(pollOptionText);
-			radioButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					onPollOptionSelected((RadioButton) v);
-				}
-
-			});
-			pollOptions.addView(radioButton);
-		}
-		pollOptions.setSelected(false);
-		pollVoteButton.setEnabled(false);
+	
+	/*****************************************************************************
+	 ********************************* Messages **********************************
+	 *****************************************************************************/
+	private void showSuccessMessage() {
+		Toast.makeText(this, "Submitted: " + selectedPollVoteButton.getText().toString(), Toast.LENGTH_LONG).show();
 	}
-
-	private void onPollOptionSelected(RadioButton v) {
-		selectedPollVoteButton = v;
-		pollVoteButton.setEnabled(true);
+	
+	public void showErrorMessage() {
+		Toast.makeText(getApplicationContext(), "Error sending poll vote", Toast.LENGTH_SHORT).show();
 	}
-
+	
+	private String getSelectedPollVoteText() {
+		return selectedPollVoteButton.getText().toString();
+	}
 }

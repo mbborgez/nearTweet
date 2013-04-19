@@ -4,16 +4,10 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.CreatePollService;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,7 +17,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-@SuppressLint("NewApi")
 public class CreatePollActivity extends Activity {
 
 	private static final int MAX_NUM_POLL_OPTIONS = 4;
@@ -33,6 +26,7 @@ public class CreatePollActivity extends Activity {
 	private RadioGroup pollOptions;
 	private Button addPollOptionButton;
 	private EditText newPollOptionEditText;
+	private EditText pollDescription;
 	private Button removePollOptionButton;
 	private Button startPollButton;
 	private RadioButton selectedPollOption;
@@ -40,6 +34,7 @@ public class CreatePollActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_create_poll);
 
@@ -49,98 +44,111 @@ public class CreatePollActivity extends Activity {
 		removePollOptionButton = (Button) findViewById(R.id.poll_removeOption_button);
 		newPollOptionEditText = (EditText) findViewById(R.id.poll_newOption_text);
 		startPollButton = (Button) findViewById(R.id.poll_startNewPoll);
-		
-		newPollOptionEditText.addTextChangedListener(new TextWatcher() {
-			
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				numberOfWords = count;
-				addPollOptionButton.setEnabled(numberOfWords > 0);
-				updateWordCounter(numberOfWords);
-			}
-			
+		pollDescription = (EditText) findViewById(R.id.poll_newDescription_text);
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				// DO NOTHING
-			}
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				// DO NOTHING
-			}
-		});
-		
+		newPollOptionEditText.addTextChangedListener(textWatcher);
 		addPollOptionButton.setEnabled(false);
-		addPollOptionButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(newPollOptionEditText.getText().toString().length()>0){
-					String newPollOptionText = newPollOptionEditText.getText().toString();
-					addPollOption(newPollOptionText);
-				} else {
-					showEnterPollOptionError();
-				}
-			}
-		});
-		
+		addPollOptionButton.setOnClickListener(addPollClickListener);
 		removePollOptionButton.setEnabled(false);
-		removePollOptionButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(selectedPollOption!=null){
-					removePollOption((RadioButton) selectedPollOption);
-				}
-			}
-		});
-		
-		startPollButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(pollOptions.getChildCount()>MIN_NUM_POLL_OPTIONS){
-					startPoll();
-					finish();
-				} else {
-					showEnterPollOptionsError();
-				}
-			}
-		});
+		removePollOptionButton.setOnClickListener(removePollClickListener);
+		startPollButton.setOnClickListener(startPollClickListener);
 	}
 	
-	private void addPollOption(String pollOptionText){
-		RadioButton radioButton = new RadioButton(this);
-		radioButton.setText(pollOptionText);
-		radioButton.setOnClickListener(new OnClickListener() {
+	private final TextWatcher textWatcher = new TextWatcher() {
+		
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+			numberOfWords = count;
+			addPollOptionButton.setEnabled(numberOfWords > 0);
+			updateWordCounter(numberOfWords);
+		}
+		
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) { /* DO NOTHING */ }
+		
+		@Override
+		public void afterTextChanged(Editable s) { /* DO NOTHING */ }
+	};
+	
+	/*************************************************************************************************
+	 **************************************** Click Listeners ****************************************
+	 *************************************************************************************************/
+	
+	private final OnClickListener addPollClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if(newPollOptionEditText.getText().toString().length()>0){
+				String newPollOptionText = newPollOptionEditText.getText().toString();
+				addPollOption(newPollOptionText);
+			} else {
+				showEnterPollOptionError();
+			}
+		}
+	};
+	
+	private final OnClickListener removePollClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if(selectedPollOption!=null){
+				removePollOption((RadioButton) selectedPollOption);
+			}
+		}
+	};
+	
+	private final OnClickListener startPollClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if(pollOptions.getChildCount()>MIN_NUM_POLL_OPTIONS){
+				startPoll();
+				finish();
+			} else {
+				showEnterPollOptionsError();
+			}
+		}
+	};
+	
+	private OnClickListener createRadioPollOption() {
+		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onPollOptionSelected( (RadioButton) v );
 			}
-		});
+		};
+	}
+	
+	/*************************************************************************************************
+	 ***************************************** Functionality *****************************************
+	 *************************************************************************************************/
+	
+	private void addPollOption(String pollOptionText){
+		RadioButton radioButton = new RadioButton(this);
+		radioButton.setText(pollOptionText);
+		radioButton.setOnClickListener(createRadioPollOption());
 		pollOptions.addView(radioButton);
 
 		numberOfWords = 0;
 		newPollOptionEditText.setText("");
 		addPollOptionButton.setEnabled(numberOfWords > 0 && pollOptions.getChildCount()<MAX_NUM_POLL_OPTIONS);
 	}
+
+
 	
 	private void startPoll() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	String username = settings.getString("username", null);
-    	EditText pollDescription = (EditText) (findViewById(R.id.poll_newDescription_text));
-    	String text = pollDescription.getText().toString();
-    	ArrayList<String> options = new ArrayList<String>();
+		(new CreatePollService(getPollDescriptionText(), getPollOptionsAsArray(), this)).execute();
+	}
+
+	private String getPollDescriptionText() {
+		return pollDescription.getText().toString();
+	}
+
+	private ArrayList<String> getPollOptionsAsArray() {
+		ArrayList<String> options = new ArrayList<String>();
     	for(int i = 0; i < pollOptions.getChildCount(); i++) {
     		RadioButton option = (RadioButton) pollOptions.getChildAt(i);
     		options.add(option.getText().toString());
     		System.out.println(option.getText().toString());
     	}
-    	Log.i("DEBUG", " pollOptions - " + options);
-		CreatePollService service = new CreatePollService(username, text, options, this);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-			service.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
-		} else {
-			service.execute();
-		}
+    	return options;
 	}
 
 	private void removePollOption(RadioButton radioButton){

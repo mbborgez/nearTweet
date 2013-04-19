@@ -1,9 +1,9 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
-import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
 import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
@@ -40,7 +40,6 @@ public class LoginActivity extends Activity {
 		//arming listeners
 	    userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
-		
 	}
 	
 	/**
@@ -54,12 +53,7 @@ public class LoginActivity extends Activity {
 			new AsyncTask<String, Void, Boolean>() {
 				@Override
 				protected Boolean doInBackground(String... params) {
-					try {
-						Connection.getInstance().sendPDU(new RegisterPDU(username));
-					} catch (NearTweetException e) {
-						return false;
-					}
-					return true;
+					return new RegisterUserService(username).execute();
 				}
 
 				@Override
@@ -197,7 +191,6 @@ public class LoginActivity extends Activity {
 	private void waitForAuthenticationResponse() {
 		// Start listening the socket for authentication response
 		new AuthenticationHandler(this).execute();
-		
 		
 	}
 	 

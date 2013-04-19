@@ -1,13 +1,11 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
-import java.util.ArrayList;
-
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.core.TweetAdapter;
+import pt.utl.ist.cm.neartweetclient.core.TweetStreamAdapter;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.ListActivity;
@@ -15,10 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,88 +26,50 @@ import android.widget.Toast;
 
 public class TweetsStreamActivity extends ListActivity {
 	
-	private TweetAdapter tweetAdapter;
-	private ArrayList<PDU> list;
-	Button createTweetButton;
-	Button createPollButton;
+	private Button createTweetButton;
+	private Button createPollButton;
 	
-	BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.i("DEGUB", "RECEIVED SOMETHING");
-			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
-				Log.i("DEBUG", "New Tweet");
-				String tweet = intent.getStringExtra(Actions.TWEET_DATA);
-				updateList(tweet);
-			}
-			if (intent.getAction().equals(Actions.POLL_VOTE)) {
-				Log.i("DEBUG", "NEW VOTE");
-				Toast.makeText(getApplicationContext(), "NEW VOTE ", Toast.LENGTH_LONG).show();
-			}
-			
-		}
-    };
-    
+	private TweetStreamAdapter tweetStreamAdapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.activity_tweets_stream);
 		
-		greetingUser();
+		showGreetingUser();
 		
-		list = new ArrayList<PDU>();
-		tweetAdapter = new TweetAdapter(this.getApplicationContext(), R.layout.tweet_layout, list);
-	    setListAdapter(this.tweetAdapter);
+		tweetStreamAdapter = new TweetStreamAdapter(getApplicationContext(), R.layout.tweet_layout, MemCacheProvider.getTweetsStream());
+        setListAdapter(tweetStreamAdapter);
 		
+        createTweetButton = (Button) findViewById(R.id.createTweet);
+        createPollButton = (Button) findViewById(R.id.createPoll);
+
+        createTweetButton.setOnClickListener(createTweetClickListener);
+		createPollButton.setOnClickListener(createPollClickListener);
+	    
+		ListView tweetsListView = getListView();
+		tweetsListView.setOnItemClickListener(tweetsStreamItemClickListener);
+		
+		
+	    // Put whatever message you want to receive as the action
 		IntentFilter iff = new IntentFilter();
         iff.addAction(Actions.BROADCAST_TWEET);
         iff.addAction(Actions.POLL_VOTE);
-        // Put whatever message you want to receive as the action
-        this.registerReceiver(this.tweetsReceiver,iff);
-        
-        // Start listening income tweets from current connection
-        createTweetButton = (Button) findViewById(R.id.createTweet);
-        createTweetButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-					startActivity(new Intent(getApplicationContext(), NewTweetActivity.class));
-			}
-		});
-        
-        createPollButton = (Button) findViewById(R.id.createPoll);
-        createPollButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
-			}
-		});
-        
-		ListView tweetsListView = getListView();
-		tweetsListView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Log.i("DEBUG", "TweetStreamActivity.clickItem!!!!");
-				showTweetDetails(list.get(position));
-			}
-		});
+        this.registerReceiver(tweetsReceiver, iff);
 	}
-	
+
 	@Override
     public void onResume() {
         super.onResume();
+
+        // Put whatever message you want to receive as the action
         IntentFilter iff = new IntentFilter();
         iff.addAction(Actions.BROADCAST_TWEET);
         iff.addAction(Actions.POLL_VOTE);
-        // Put whatever message you want to receive as the action
         this.registerReceiver(this.tweetsReceiver,iff);
         
         //Update all the PDUS on the Adapter
-        if (!MemCacheProvider.isEmpty()) {
-	        list = MemCacheProvider.toArrayList();
-	        tweetAdapter = new TweetAdapter(this, R.layout.tweet_layout, list);
-	        setListAdapter(tweetAdapter);
-        }
+        tweetStreamAdapter.notifyDataSetChanged();
         
     }
     @Override
@@ -123,36 +80,53 @@ public class TweetsStreamActivity extends ListActivity {
     
     protected void showTweetDetails(PDU pdu) {
     	if (pdu instanceof TweetPDU) {
-    		Intent tweetDetailsIntent = new Intent(this, TweetDetailsActivity.class);
-    		tweetDetailsIntent.putExtra("tweet_item", ((TweetPDU) pdu).GetTweetId());
-    		startActivity(tweetDetailsIntent);
+    		showTweetDetailsScreen((TweetPDU) pdu);
     	} else if (pdu instanceof PublishPollPDU) {
     		PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
     		if(!MemCacheProvider.isMyPoll(publishPollPdu.GetTweetId())){
-	    		Intent tweetDetailsIntent = new Intent(this, PollVoteActivity.class);
-	    		tweetDetailsIntent.putExtra(PollVoteActivity.TWEET_ID_EXTRA, ((PublishPollPDU) pdu).GetTweetId());
-	    		startActivity(tweetDetailsIntent);
+	    		showPollVoteScreen(publishPollPdu);
     		} else {
-	    		Intent tweetDetailsIntent = new Intent(this, PollVotesDetailsActivity.class);
-	    		tweetDetailsIntent.putExtra(PollVotesDetailsActivity.TWEET_ID_EXTRA, ((PublishPollPDU) pdu).GetTweetId());
-	    		startActivity(tweetDetailsIntent);
+	    		showPollDetailsScreen(publishPollPdu);
     		}
     	}
+	}
+
+	private void showTweetDetailsScreen(TweetPDU pdu) {
+		Intent tweetDetailsIntent = new Intent(this, TweetDetailsActivity.class);
+		tweetDetailsIntent.putExtra(TweetDetailsActivity.TWEET_ID_EXTRA, pdu.GetTweetId());
+		startActivity(tweetDetailsIntent);
+	}
+
+	private void showPollDetailsScreen(PublishPollPDU pdu) {
+		Intent tweetDetailsIntent = new Intent(this, PollVotesDetailsActivity.class);
+		tweetDetailsIntent.putExtra(PollVotesDetailsActivity.TWEET_ID_EXTRA,  pdu.GetTweetId());
+		startActivity(tweetDetailsIntent);
+	}
+
+	private void showPollVoteScreen(PublishPollPDU pdu) {
+		Intent tweetDetailsIntent = new Intent(this, PollVoteActivity.class);
+		tweetDetailsIntent.putExtra(PollVoteActivity.TWEET_ID_EXTRA,  pdu.GetTweetId());
+		startActivity(tweetDetailsIntent);
 	}
 	
 	/**
 	 * After User Login the system should greeting him with a Toast Message!
 	 */
-	private void greetingUser() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		String greeting = String.format(UiMessages.WELCOME_MESSAGE,settings.getString("username", null));
+	private void showGreetingUser() {
+		String greeting = String.format(UiMessages.WELCOME_MESSAGE, Actions.getUserId(getApplicationContext()));
     	Toast.makeText(this, greeting, Toast.LENGTH_LONG).show();
 	}
-
-
+	
+	private void showNewTweetScreen() {
+		startActivity(new Intent(this, NewTweetActivity.class));
+	}
+	
+	private void showCreatePollScreen() {
+		startActivity(new Intent(this, CreatePollActivity.class));
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.tweets_stream, menu);
 		return true;
 	}
@@ -161,27 +135,52 @@ public class TweetsStreamActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	        case R.id.new_tweet_button:
-	            showTweetScreen();
+	            showNewTweetScreen();
 	            return true;
 	        case R.id.new_pool_button:
-	            showPollScreen();
+	            showCreatePollScreen();
 	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
 	
-	private void showTweetScreen() {
-		startActivity(new Intent(this, NewTweetActivity.class));
-	}
+	/****************************************************************************
+	 *************************** Click Listeners ********************************
+	 ****************************************************************************/
+
+    private final OnClickListener createTweetClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), NewTweetActivity.class));
+		}
+	};
 	
-	private void showPollScreen() {
-		startActivity(new Intent(this, CreatePollActivity.class));
-	}
+	private final OnClickListener createPollClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
+		}
+	};
 	
-	public void updateList(String newTweet) {
-		list.add(0, MemCacheProvider.getTweet(newTweet));
-		tweetAdapter = new TweetAdapter(getApplicationContext(), R.layout.tweet_layout, list);
-        setListAdapter(tweetAdapter);
-	}
+	private final OnItemClickListener tweetsStreamItemClickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			showTweetDetails(MemCacheProvider.getTweetsStream().get(position));
+		}
+	};
+	
+	private final BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
+				tweetStreamAdapter.notifyDataSetChanged();	
+				Toast.makeText(getApplicationContext(), "Received a tweet", Toast.LENGTH_SHORT).show();
+			}
+			if (intent.getAction().equals(Actions.POLL_VOTE)) {
+				Toast.makeText(getApplicationContext(), "Received a new Vote", Toast.LENGTH_SHORT).show();
+			}
+			
+		}
+    };
 }

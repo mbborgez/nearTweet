@@ -5,78 +5,83 @@ import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.ReplyService;
 import android.app.Activity;
-import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class ReplyActivity extends Activity {
 
-	private EditText tweet;
+	public static final String TWEET_ID_EXTRA = "tweet_id";
+	private EditText tweetEditText;
 	private String tweetId;
 	private CheckBox isBroadcastCheckBox;
-	private TweetPDU pdu;
+	private TweetPDU originalTweetPdu;
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reply_tweet);
         
         Button replyButton = (Button) findViewById(R.id.reply);
-        tweet = (EditText) findViewById(R.id.tweetReply);
+        isBroadcastCheckBox = (CheckBox) findViewById(R.id.isBroadcastCheckBox);
+        tweetEditText = (EditText) findViewById(R.id.tweetReply);
         
-        Bundle extras = getIntent().getExtras();
-        this.tweetId = extras.getString("tweet_id");
-		this.pdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
+        this.tweetId = getIntent().getExtras().getString(TWEET_ID_EXTRA);
+		this.originalTweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
         
-		isBroadcastCheckBox = (CheckBox) findViewById(R.id.isBroadcastCheckBox);
-		
-        replyButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if (tweet.getText().toString().length() > 0) {
-					submitTweet(tweet.getText().toString());
-				} else {
-					errorMessage();
-				}
-				
-			}
-		});
+		replyButton.setOnClickListener(submitReplyClickListener);
     }
     
-    private void submitTweet(String text) {
-    	/**
-    	 * it should call the service layer
-    	 */
-    	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	String username = settings.getString("username", null);
-    	if (username == null) {
-    		errorMessage();
-    	} else {
-    		ReplyService service = new ReplyService(username, this.pdu.GetTweetId(), text, this.pdu.GetUserId(), isBroadcast(), this.getApplicationContext());
-    		try {
-    			service.execute();
-    			nextScreen();
-    		} catch(Exception e) {
-    			errorMessage();
-    			finish();
-    		}
-    	}
-    }
+	/*****************************************************************************
+	 ****************************** Click Listeners ******************************
+	 *****************************************************************************/
+    
+	private final OnClickListener submitReplyClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if (getReplyText().length() > 0) {
+				(new SubmitRetweetTask()).execute();
+			} else {
+				errorMessage();
+			}
+		}
+	};
+    
+	/*****************************************************************************
+	 ******************************** Async Tasks ********************************
+	 *****************************************************************************/
+	
+	private class SubmitRetweetTask extends AsyncTask<String, Integer, Boolean> {
+		@Override
+		protected Boolean doInBackground(String... params) {
+			return (new ReplyService(originalTweetPdu.GetTweetId(), getReplyText(), getIsBroadcast(), getApplicationContext())).execute();
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if(result){
+				nextScreen();
+			} else {
+				errorMessage();
+			}
+		}
+	}
     
     public void nextScreen() {
     	finish();
     }
     
-    private boolean isBroadcast(){
+    private boolean getIsBroadcast(){
     	return isBroadcastCheckBox.isChecked();
     }
+    
+	private String getReplyText() {
+		return tweetEditText.getText().toString();
+	}
     
     public void errorMessage() {
     	Toast.makeText(this,"You cannot tweet an empty message", Toast.LENGTH_SHORT).show();

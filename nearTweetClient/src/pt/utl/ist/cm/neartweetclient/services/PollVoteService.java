@@ -3,30 +3,29 @@ package pt.utl.ist.cm.neartweetclient.services;
 import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
-import android.app.Activity;
+import android.content.Context;
 
-public class PollVoteService extends NearTweetService {
+public class PollVoteService implements INearTweetService {
 	
 	private String targetMessageId;
 	private int optionPosition;
-	private Activity activity;
+	private Context context;
 	
-	public PollVoteService(String userID, String targetMessageID, int optionPosition, Activity activity) {
-		super(userID);
+	public PollVoteService(String targetMessageID, int optionPosition, Context context) {
 		this.targetMessageId = targetMessageID;
 		this.optionPosition = optionPosition;
-		this.activity = activity;
+		this.context = context;
 	}
 
 	@Override
-	protected boolean run() {
+	public boolean execute() {
 		try {
-			String tweetId = this.userId + Actions.getLastTweet(this.activity.getApplicationContext());
+			String tweetId = Actions.getUserId(context) + Actions.getLastTweet(context);
+			PollVotePDU pdu = new PollVotePDU(Actions.getUserId(context), tweetId, targetMessageId, optionPosition);
 			
-			PollVotePDU pdu = new PollVotePDU(this.userId, tweetId, this.targetMessageId, this.optionPosition);
 			Connection.getInstance().sendPDU(pdu);
 
-			Actions.incrementTweetID(this.activity.getApplicationContext());
+			Actions.incrementTweetID(context);
 			return true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -34,6 +33,4 @@ public class PollVoteService extends NearTweetService {
 		}
 	}
 
-	@Override
-	protected void afterRun() {}
 }

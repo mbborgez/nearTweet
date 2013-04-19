@@ -10,7 +10,6 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
-import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
 public class MemCacheProvider {
 
 	private static String userName;
@@ -21,11 +20,14 @@ public class MemCacheProvider {
 
 	private static HashMap<String, TweetConversation> tweetConversationContainer = new HashMap<String, TweetConversation>();
 	
+	private static ArrayList<PDU> tweetsStream = new ArrayList<PDU>();
+	
 	public static void addTweet(String tweetID, PDU pdu) {
 		memcache.put(tweetID, pdu);
 		
 		if(pdu instanceof TweetPDU){
 			TweetPDU tweetPdu = (TweetPDU) pdu;
+			tweetsStream.add(tweetPdu);
 			tweetConversationContainer.put(tweetPdu.GetTweetId(), new TweetConversation(tweetPdu));
 		} else if(pdu instanceof ReplyPDU){
 			ReplyPDU replyPdu = (ReplyPDU) pdu;
@@ -39,6 +41,7 @@ public class MemCacheProvider {
 			}
 		} else if(pdu instanceof PublishPollPDU){
 			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
+			tweetsStream.add(publishPollPdu);
 			pollConversationContainer.put(publishPollPdu.GetTweetId(), new PollConversation(publishPollPdu));
 		}
 	}
@@ -62,12 +65,8 @@ public class MemCacheProvider {
 		return tweetConversationContainer.containsKey(tweetId) ? tweetConversationContainer.get(tweetId) : null;
 	}
 	
-	public static ArrayList<PDU> toArrayList() {
-		ArrayList<PDU> list = new ArrayList<PDU>();
-		for(PDU pdu : memcache.values()) {
-			list.add(0, pdu);
-		}
-		return list;
+	public static ArrayList<PDU> getTweetsStream() {
+		return tweetsStream;
 	}
 	
 	public static boolean isEmpty() {

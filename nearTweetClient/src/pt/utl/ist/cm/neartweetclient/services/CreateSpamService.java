@@ -5,19 +5,20 @@ import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import android.util.Log;
 
-public class CreateSpamService extends NearTweetService {
+public class CreateSpamService implements INearTweetService {
 	
+	private String userId;
 	private String targetMessageId;
 	
-	public CreateSpamService(String userID, String targetMessageID) {
-		super(userID);
+	public CreateSpamService(String userId, String targetMessageID) {
+		this.userId = userId;
 		this.targetMessageId = targetMessageID;
 	}
 
 	@Override
-	protected boolean run() {
+	public boolean execute() {
 		try {
-			SpamVotePDU pdu = new SpamVotePDU(this.userId, this.targetMessageId);
+			SpamVotePDU pdu = new SpamVotePDU(userId, targetMessageId);
 			Connection.getInstance().sendPDU(pdu);
 			return true;
 		} catch(Exception e) {
@@ -25,8 +26,5 @@ public class CreateSpamService extends NearTweetService {
 			return false;
 		}
 	}
-
-	@Override
-	protected void afterRun() {}
 
 }

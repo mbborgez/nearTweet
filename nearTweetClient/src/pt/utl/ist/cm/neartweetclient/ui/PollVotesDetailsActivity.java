@@ -21,11 +21,8 @@ import android.widget.TextView;
 public class PollVotesDetailsActivity extends Activity {
 
 	public static final String TWEET_ID_EXTRA = "tweet_id";
-
 	private LinearLayout votesLinearLayout;
-
 	TextView pollDetailsEditText;
-
 	private String tweetId;
 
 	@Override
@@ -54,13 +51,6 @@ public class PollVotesDetailsActivity extends Activity {
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.poll_votes_details, menu);
-		return true;
-	}
-
 	private BroadcastReceiver repliesReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -70,5 +60,12 @@ public class PollVotesDetailsActivity extends Activity {
 			}
 		}
 	};
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.poll_votes_details, menu);
+		return true;
+	}
 
 }
