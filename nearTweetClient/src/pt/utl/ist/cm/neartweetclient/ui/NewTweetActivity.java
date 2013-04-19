@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -26,7 +27,7 @@ public class NewTweetActivity extends Activity {
 
 	private static final String DATA_EXTRA = "data";
 	private static final String DEFAULT_URL = "http://upload.wikimedia.org/wikipedia/pt/e/ed/IST_Logo.png";
-	protected static final int TAKE_PHOTO_ACTION = 1234;
+	protected static final int TAKE_PHOTO_ACTION = 1337;
 	EditText tweet;
 	Button cancelButton;
 	Button submitButton;
@@ -49,10 +50,11 @@ public class NewTweetActivity extends Activity {
 		tweetImagePreview = (ImageView) findViewById(R.id.tweetImagePreview);
 		multimediaLinkEditText = (EditText) findViewById(R.id.multimediaLink);
 		tweet = (EditText) findViewById(R.id.tweetText);
-		
+
 		cancelButton.setOnClickListener(cancelClickListener);
 		submitButton.setOnClickListener(submitTweetClickListener);
 		multimediaLinkEditText.setText(DEFAULT_URL);
+		Log.i("DEBUG", "onCreate");
 		takePhotoButton.setOnClickListener(takePhotoClickListener);
 		addMultimediaButton.setOnClickListener(downloadImageClickListener);
 
@@ -61,7 +63,7 @@ public class NewTweetActivity extends Activity {
 	/************************************************************************
 	 ************************* Click Listeners ******************************
 	 ************************************************************************/
-	
+
 	private final OnClickListener cancelClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -83,33 +85,37 @@ public class NewTweetActivity extends Activity {
 	private final OnClickListener downloadImageClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			new PhotoDownloaderTask(tweetImagePreview).execute(getImageLink());
+			new PhotoDownloaderTask().execute(getImageLink());
 		}
 	};
 
 	private final OnClickListener takePhotoClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
+			Log.i("DEBUG", "takePhotoClickListener");
 			dispatchTakePictureIntent(TAKE_PHOTO_ACTION);
 		}
 	};
-	
+
 	/************************************************************************
 	 ************************* Camera Activities ****************************
 	 ************************************************************************/
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		if(requestCode == TAKE_PHOTO_ACTION){
+		if(requestCode == TAKE_PHOTO_ACTION && resultCode == RESULT_OK){
 			handleSmallCameraPhoto(data);
 		}
 	}
 
 	private void dispatchTakePictureIntent(int actionCode) {
+		Log.i("DEBUG", "dispatchTakePictureIntent");
 		if(isIntentAvailable(getApplicationContext(), MediaStore.ACTION_IMAGE_CAPTURE)){
+			Log.i("DEBUG", "dispatchTakePictureIntent - intent is available");
 			Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			startActivityForResult(takePictureIntent, actionCode);
 		} else {
+			Log.i("DEBUG", "dispatchTakePictureIntent - intent is NOOOOT available");
 			Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -121,15 +127,42 @@ public class NewTweetActivity extends Activity {
 		return list.size() > 0;
 	}
 
-	private void handleSmallCameraPhoto(Intent intent) {
-		Bundle extras = intent.getExtras();
-		if(extras!=null && extras.containsKey(DATA_EXTRA) && extras.get(DATA_EXTRA)!=null){
-			Bitmap photoBitmap = (Bitmap) extras.get(DATA_EXTRA);
-			tweetImagePreview.setImageBitmap(photoBitmap);
-			tweetImageBytes = compressBitmapImage(photoBitmap);
-		} else { 
-			errorTakingPhoto();
-		}
+	private void handleSmallCameraPhoto(final Intent intent) {
+		
+		new AsyncTask<Void, Void, Boolean>(){
+			Bitmap photoBitmap;
+			byte[] photoBytes;
+			
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				Bundle extras = intent.getExtras();
+				Log.i("DEBUG", "handleSmallCameraPhoto - extras: " + extras);
+				if(extras!=null && extras.containsKey(DATA_EXTRA) && extras.get(DATA_EXTRA)!=null){
+					try{
+						photoBitmap = (Bitmap) extras.get(DATA_EXTRA);
+						Log.i("DEBUG", "handleSmallCameraPhoto - photoBitmap: " + photoBitmap);
+						photoBytes = compressBitmapImage(photoBitmap);
+						Log.i("DEBUG", "handleSmallCameraPhoto - tweetImageBytes: " + tweetImageBytes);
+						return true;
+					} catch(Exception e){
+						e.printStackTrace();
+						return false;
+					}
+				}
+				return false;
+			}
+			
+			@Override
+			protected void onPostExecute(Boolean result){
+				if(result){
+					tweetImagePreview.setImageBitmap(photoBitmap);
+					tweetImageBytes = photoBytes;
+				} else {
+					errorTakingPhoto();
+				}
+			}
+		}.execute();
+
 	}
 
 	private byte[] compressBitmapImage(Bitmap bitmap){
@@ -137,11 +170,11 @@ public class NewTweetActivity extends Activity {
 		bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 		return stream.toByteArray();
 	}
-	
+
 	/************************************************************************
 	 **************************** Async Tasks *******************************
 	 ************************************************************************/
-	
+
 	private class SubmitTweetTask extends AsyncTask<String, Void, Boolean> {
 
 		private byte[] tweetImageBytes;
@@ -168,12 +201,7 @@ public class NewTweetActivity extends Activity {
 	}
 
 	private class PhotoDownloaderTask extends AsyncTask<String, Void, Bitmap> {
-		private ImageView imageView;
 		private NetworkDownloadService service;
-
-		public PhotoDownloaderTask(ImageView imageView){
-			this.imageView = imageView;
-		}
 
 		@Override
 		protected Bitmap doInBackground(String... urls) {
@@ -188,14 +216,14 @@ public class NewTweetActivity extends Activity {
 
 		protected void onPostExecute(Bitmap bitmap) {
 			if(bitmap!=null && service.getBitmap()!=null && service.getBitmapBytes()!=null){
-				imageView.setImageBitmap(service.getBitmap());
+				tweetImagePreview.setImageBitmap(service.getBitmap());
 				tweetImageBytes = service.getBitmapBytes();
 			} else {
 				errorLoadingImageFromNetwork();
 			}
 		}
 	}
-	
+
 	private String getImageLink() {
 		return multimediaLinkEditText.getText().toString();
 	}
