@@ -12,21 +12,21 @@ import java.util.Enumeration;
 import main.java.com.cm.server.handlers.RequestHandler;
 import main.java.com.cm.server.utils.Database;
 
-public class ServerProcess 
+public class ServerProcess
 {
 	private int port;
     private String server;
     private Database memory;
     private ServerSocket serverSocket;
-	
+
 	public ServerProcess(String serverName, int port) {
 		this.memory = new Database();
 		this.server = serverName;
 		this.port = port;
-	}	
-	
+	}
+
 	/**
-	 * make all the surround procedures to push 
+	 * make all the surround procedures to push
 	 * the server up running.
 	 * For Each connection is created a new Thread
 	 * with a Request Handler on it
@@ -35,8 +35,8 @@ public class ServerProcess
 		Thread t;
 		RequestHandler handler;
 		try {
-			this.serverSocket = new ServerSocket(this.port);
-			startingMessage();	
+			this.serverSocket = new ServerSocket(this.port, 300, findEthernetIP());
+			startingMessage();
 			while(true) {
 				try {
 					Socket socket = this.serverSocket.accept();
@@ -55,7 +55,7 @@ public class ServerProcess
 			close();
 		}
 	}
-	
+
 	/**
 	 * Close all connections and shutdown the server
 	 */
@@ -66,7 +66,7 @@ public class ServerProcess
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Logging Message
 	 */
@@ -78,7 +78,7 @@ public class ServerProcess
         System.out.println("########## HostAddress: "+ this.serverSocket.getInetAddress().getHostAddress());
 		System.out.println("############# Server Ready #############");
 	}
-	
+
 	/**
 	 * Not the beautiful method to get our IP Address [We Accept suggestions to improve it]
 	 * @return

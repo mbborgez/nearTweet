@@ -14,7 +14,7 @@ import android.util.Log;
 public class Connection {
 
 	// Network configurations
-	public final String DEFAULT_IP_ADDRESS = "10.0.2.2";
+	public final String DEFAULT_IP_ADDRESS = "192.168.1.65";
 	public final int DEFAULT_PORT = 8004;
 
 	public static Connection currentConnection;
@@ -65,7 +65,7 @@ public class Connection {
 				} catch (Exception e) { obj = null; }
 			}
 		}
-		return pdu;		
+		return pdu;
 	}
 
 	public boolean isAlive() {
@@ -76,8 +76,8 @@ public class Connection {
 		try {
 			Log.i("DEBUG", "STARTING CONNECTION");
 			this.socket = new Socket(serverAddress, serverPort);
-
 			Log.i("DEBUG", "CONNECTION STARTED SUCCESSFULL");
+			
 			this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 			this.inputStream  = new ObjectInputStream(socket.getInputStream());
 		} catch (UnknownHostException e) {
