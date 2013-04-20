@@ -9,14 +9,17 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 public class TweetConversation {
 	private TweetPDU mainMessage;
 	private List<ReplyPDU> conversation;
-
+	private boolean hasUnreadMessages;
+	
 	public TweetConversation(TweetPDU mainMessage){
 		this.mainMessage = mainMessage;
 		this.conversation = new ArrayList<ReplyPDU>();
+		this.hasUnreadMessages = false;
 	}
 
 	public void addMessage(ReplyPDU newMessage){
 		conversation.add(newMessage);
+		this.hasUnreadMessages = true;
 	}
 
 	public void removeMessage(String tweetId){
@@ -44,5 +47,13 @@ public class TweetConversation {
 
 	public void setConversation(List<ReplyPDU> conversation) {
 		this.conversation = conversation;
+	}
+
+	public boolean isHasUnreadMessages() {
+		return hasUnreadMessages;
+	}
+
+	public void setHasUnreadMessages(boolean hasUnreadMessages) {
+		this.hasUnreadMessages = hasUnreadMessages;
 	}
 }

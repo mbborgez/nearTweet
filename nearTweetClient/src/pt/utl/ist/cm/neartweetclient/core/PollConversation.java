@@ -12,11 +12,12 @@ public class PollConversation {
 	private PublishPollPDU mainMessage;
 	private List<PollVotePDU> conversation;
 	private Map<String, Integer> votes;
+	private boolean hasUnreadMessages;
 
 	public PollConversation(PublishPollPDU mainMessage){
 		this.mainMessage = mainMessage;
 		this.conversation = new ArrayList<PollVotePDU>();
-		
+		this.hasUnreadMessages = false;
 		initVotes(mainMessage);
 	}
 
@@ -35,6 +36,7 @@ public class PollConversation {
 			numVotes = votes.get(selectedVote);
 			votes.remove(selectedVote);
 		}
+		hasUnreadMessages = true;
 		votes.put(selectedVote, numVotes + 1);
 	}
 
@@ -67,5 +69,13 @@ public class PollConversation {
 
 	public void setConversation(List<PollVotePDU> conversation) {
 		this.conversation = conversation;
+	}
+
+	public boolean isHasUnreadMessages() {
+		return hasUnreadMessages;
+	}
+
+	public void setHasUnreadMessages(boolean hasUnreadMessages) {
+		this.hasUnreadMessages = hasUnreadMessages;
 	}
 }

@@ -1,6 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.content.Context;
@@ -25,7 +26,7 @@ public class PollVoteService implements INearTweetService {
 			PollVotePDU pdu = new PollVotePDU(Actions.getUserId(context), tweetId, targetMessageId, optionPosition, originalUserId);
 			
 			Connection.getInstance().sendPDU(pdu);
-
+			
 			Actions.incrementTweetID(context);
 			return true;
 		} catch(Exception e) {

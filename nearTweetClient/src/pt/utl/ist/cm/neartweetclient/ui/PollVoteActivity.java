@@ -39,6 +39,7 @@ public class PollVoteActivity extends ListActivity {
 		pollDescriptionTextView.setText(pollPdu.GetText());
 		pollVoteButton.setOnClickListener(createSubmitPollVoteClickListener());
 		setListAdapter(new PollVotesAdapter(getApplicationContext(),  R.layout.poll_option_layout, pollPdu.GetOptions()));
+		MemCacheProvider.getPollConversation(pollPdu.GetTweetId()).setHasUnreadMessages(false);
 	}
 	
 	/*****************************************************************************

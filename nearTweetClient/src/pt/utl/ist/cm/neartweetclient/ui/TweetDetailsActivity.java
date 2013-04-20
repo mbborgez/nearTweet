@@ -116,6 +116,7 @@ public class TweetDetailsActivity extends ListActivity {
 		TweetConversationAdapter tweetConversationAdapter = 
 				new TweetConversationAdapter(this.getApplicationContext(), R.layout.tweet_layout, tweetConversation);
 		setListAdapter(tweetConversationAdapter);
+		MemCacheProvider.getTweetConversation(tweetId).setHasUnreadMessages(false);
 	}
 
 	private class SubmitSpamVoteTask extends AsyncTask<String, Integer, Boolean> {

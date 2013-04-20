@@ -67,6 +67,7 @@ public class PollVotesDetailsActivity extends Activity {
 			pollVoteTextLine.setText(voteEntry.getKey() + " - " + voteEntry.getValue());
 			votesLinearLayout.addView(pollVoteTextLine);
 		}
+		MemCacheProvider.getPollConversation(tweetId).setHasUnreadMessages(false);
 	}
 
 	private BroadcastReceiver repliesReceiver = new BroadcastReceiver() {

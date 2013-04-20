@@ -1,6 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.core;
 
 import java.util.ArrayList;
+
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
@@ -8,6 +9,7 @@ import pt.utl.ist.cm.neartweetclient.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,11 +43,11 @@ public class TweetStreamAdapter extends ArrayAdapter<PDU> {
 
 		if (pdu != null) {
 			if (pdu instanceof TweetPDU) {
-				populateTweetItem(name, message, image, (TweetPDU) pdu);
+				TweetPDU tweetPdu = (TweetPDU) pdu;
+				populateTweetItem(name, message, image, tweetPdu);
 			} else if(pdu instanceof PublishPollPDU) {
-				populatePollItem(name, message, (PublishPollPDU) pdu);
-			} else {
-				return null;
+				PublishPollPDU pollPdu = (PublishPollPDU) pdu;
+				populatePollItem(name, message, pollPdu);
 			}
 		}
 		
@@ -53,23 +55,31 @@ public class TweetStreamAdapter extends ArrayAdapter<PDU> {
 	}
 
 	private void populatePollItem(TextView name, TextView message, PublishPollPDU publishPDU) {
+		boolean hasunreadMessages = MemCacheProvider.getPollConversation(publishPDU.GetTweetId()).isHasUnreadMessages();
 		Log.i("DEBUG", "populatePollItem" + publishPDU.GetTweetId());
 		if (name != null) {
 			name.setText(publishPDU.GetTweetId());
+			name.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 		if (message != null) {
 			message.setText("POLL MESSAGE: " + publishPDU.GetText());
+			message.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 	}
 
 	private void populateTweetItem(TextView name, TextView message, ImageView image, TweetPDU tweetPDU) {
 		Log.i("DEBUG", "populateTweetItem" + tweetPDU.GetTweetId());
+		
+		boolean hasunreadMessages = MemCacheProvider.getTweetConversation(tweetPDU.GetTweetId()).isHasUnreadMessages();
+		
 		if (name != null) {
 			name.setText(tweetPDU.GetTweetId());
+			name.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 		
 		if (message != null) {
 			message.setText(tweetPDU.GetText());
+			message.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 		
 		if(tweetPDU.GetMediaObject()!=null && tweetPDU.GetMediaObject().length>0){

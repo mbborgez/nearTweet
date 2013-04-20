@@ -62,6 +62,10 @@ public class MemCacheProvider {
 		return isMyPoll(tweetId) ? pollConversationContainer.get(tweetId).getVotes() : null;
 	}
 	
+	public static PollConversation getPollConversation(String tweetId){
+		return pollConversationContainer.containsKey(tweetId) ? pollConversationContainer.get(tweetId) : null;
+	}
+	
 	public static TweetConversation getTweetConversation(String tweetId){
 		return tweetConversationContainer.containsKey(tweetId) ? tweetConversationContainer.get(tweetId) : null;
 	}
