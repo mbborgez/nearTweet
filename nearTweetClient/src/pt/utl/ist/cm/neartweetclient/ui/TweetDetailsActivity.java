@@ -4,7 +4,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
-import pt.utl.ist.cm.neartweetclient.core.TweetConversationAdapter;
+import pt.utl.ist.cm.neartweetclient.core.listAdapters.TweetConversationAdapter;
 import pt.utl.ist.cm.neartweetclient.services.SpamVoteService;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.ListActivity;

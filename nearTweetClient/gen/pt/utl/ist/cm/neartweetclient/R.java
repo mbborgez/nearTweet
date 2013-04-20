@@ -93,7 +93,7 @@ public final class R {
     }
     public static final class id {
         public static final int TakePhotoButton=0x7f090021;
-        public static final int action_settings=0x7f090032;
+        public static final int action_settings=0x7f090033;
         public static final int addMultimediaTweet=0x7f090013;
         public static final int cancelTweet=0x7f090010;
         public static final int checkBox1=0x7f09001f;
@@ -102,17 +102,17 @@ public final class R {
         public static final int createTweet=0x7f090026;
         public static final int disconnectButton=0x7f090003;
         public static final int isBroadcastCheckBox=0x7f09001d;
-        public static final int item_bg=0x7f090030;
-        public static final int item_inner=0x7f09002f;
-        public static final int item_inner_layer=0x7f09002e;
-        public static final int item_outer=0x7f09002d;
-        public static final int item_outer_layer=0x7f09002c;
+        public static final int item_bg=0x7f090031;
+        public static final int item_inner=0x7f090030;
+        public static final int item_inner_layer=0x7f09002f;
+        public static final int item_outer=0x7f09002e;
+        public static final int item_outer_layer=0x7f09002d;
         public static final int loginButton=0x7f09000c;
         public static final int markSpamTweetButton=0x7f090025;
-        public static final int menu_settings=0x7f090031;
+        public static final int menu_settings=0x7f090032;
         public static final int multimediaLink=0x7f090012;
-        public static final int new_pool_button=0x7f090036;
-        public static final int new_tweet_button=0x7f090035;
+        public static final int new_pool_button=0x7f090037;
+        public static final int new_tweet_button=0x7f090036;
         public static final int picture=0x7f090020;
         public static final int pollDetails_vote_options=0x7f090018;
         public static final int pollOption_description=0x7f090028;
@@ -130,10 +130,10 @@ public final class R {
         public static final int poll_startNewPoll=0x7f09000b;
         public static final int poll_submitVote_button=0x7f090017;
         public static final int reply=0x7f09001e;
-        public static final int reply_tweet_button=0x7f090033;
+        public static final int reply_tweet_button=0x7f090034;
         public static final int serverAddressText=0x7f090001;
         public static final int serverPortText=0x7f090002;
-        public static final int spam_button=0x7f090034;
+        public static final int spam_button=0x7f090035;
         public static final int submitReplyTweetButton=0x7f090024;
         public static final int submitTweet=0x7f090011;
         public static final int takePhotoButton=0x7f090014;
@@ -146,7 +146,9 @@ public final class R {
         public static final int tweet_details_image=0x7f090022;
         public static final int tweet_details_text=0x7f090023;
         public static final int userName=0x7f09002a;
+        public static final int user_name=0x7f09002c;
         public static final int usernameText=0x7f09000d;
+        public static final int users_button=0x7f090038;
     }
     public static final class layout {
         public static final int activity_connect=0x7f030000;
@@ -160,8 +162,10 @@ public final class R {
         public static final int activity_take_photo=0x7f030008;
         public static final int activity_tweet_details=0x7f030009;
         public static final int activity_tweets_stream=0x7f03000a;
-        public static final int poll_option_layout=0x7f03000b;
-        public static final int tweet_layout=0x7f03000c;
+        public static final int activity_users=0x7f03000b;
+        public static final int poll_option_layout=0x7f03000c;
+        public static final int tweet_layout=0x7f03000d;
+        public static final int user_layout=0x7f03000e;
     }
     public static final class menu {
         public static final int activity_connect=0x7f080000;
@@ -172,6 +176,7 @@ public final class R {
         public static final int take_photo=0x7f080005;
         public static final int tweet_details_acitivity=0x7f080006;
         public static final int tweets_stream=0x7f080007;
+        public static final int users=0x7f080008;
     }
     public static final class string {
         public static final int action_settings=0x7f060001;
@@ -212,8 +217,10 @@ public final class R {
         public static final int title_activity_poll_votes_details=0x7f060026;
         public static final int title_activity_tweet_details_acitivity=0x7f060011;
         public static final int title_activity_tweets_stream=0x7f060010;
+        public static final int title_activity_users=0x7f060029;
         public static final int tweet_details=0x7f060023;
         public static final int tweet_image=0x7f060022;
+        public static final int users=0x7f06002a;
         public static final int welcome=0x7f060018;
     }
     public static final class style {

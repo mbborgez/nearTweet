@@ -3,6 +3,7 @@ package main.java.com.cm.server.utils;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
@@ -30,6 +31,10 @@ public class Database
 	
 	public synchronized void InsertUser(String userId, ObjectOutputStream obj) {
 		listUsers.put(userId, obj);
+	}
+	
+	public synchronized Collection<String> getUsers() {
+		return listUsers.keySet();
 	}
 	
 	public synchronized void RemoveUser(ObjectOutputStream obj) {

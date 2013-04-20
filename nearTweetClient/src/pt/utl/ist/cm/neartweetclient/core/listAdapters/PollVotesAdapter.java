@@ -1,4 +1,4 @@
-package pt.utl.ist.cm.neartweetclient.core;
+package pt.utl.ist.cm.neartweetclient.core.listAdapters;
 
 import java.util.ArrayList;
 import java.util.List;

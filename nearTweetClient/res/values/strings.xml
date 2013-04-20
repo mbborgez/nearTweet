@@ -42,5 +42,7 @@
     <string name="title_activity_poll_votes_details">PollVotesDetails</string>
     <string name="broadcast_reply">Broadcast Reply</string>
     <string name="spam">Spam</string>
+    <string name="title_activity_users">UsersActivity</string>
+    <string name="users">Users</string>
 
 </resources>

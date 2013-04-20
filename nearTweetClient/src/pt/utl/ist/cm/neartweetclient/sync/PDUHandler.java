@@ -8,6 +8,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
+import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.SpamManager;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
@@ -67,7 +68,11 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processRegisterPDU(RegisterPDU pdu) {
-		//do nothing
+		ClientsManager.registerUser(pdu.GetUserId());
+		Intent intent = new Intent();
+		intent.setAction(Actions.BROADCAST_NEW_USER);
+		intent.putExtra(Actions.NEW_USER_DATA, pdu.GetUserId());
+		this.context.sendBroadcast(intent);
 	}
 
 	@Override

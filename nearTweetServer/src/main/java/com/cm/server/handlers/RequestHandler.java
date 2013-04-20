@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 import main.java.com.cm.server.utils.Database;
 import main.java.com.cm.server.visitors.SlimServerDispatcher;
@@ -62,6 +63,12 @@ public class RequestHandler implements Runnable {
 				abortThread();
 			}
 		} 
+	}
+	
+	public void sendDirectedPDU(PDU pdu, List<String> users) {
+		for(String userId : users) {
+			sendDirectedPDU(pdu, userId);
+		}
 	}
 	
 	public void setContextThread(Thread context) {

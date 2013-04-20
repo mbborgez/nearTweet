@@ -5,7 +5,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
-import pt.utl.ist.cm.neartweetclient.core.TweetStreamAdapter;
+import pt.utl.ist.cm.neartweetclient.core.listAdapters.TweetStreamAdapter;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.ListActivity;
@@ -126,6 +126,10 @@ public class TweetsStreamActivity extends ListActivity {
 		startActivity(new Intent(this, CreatePollActivity.class));
 	}
 	
+	private void showUsersScreen() {
+		startActivity(new Intent(this, UsersActivity.class));
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.tweets_stream, menu);
@@ -141,11 +145,16 @@ public class TweetsStreamActivity extends ListActivity {
 	        case R.id.new_pool_button:
 	            showCreatePollScreen();
 	            return true;
+	        case R.id.users_button:
+	            showUsersScreen();
+	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
 	
+
+
 	/****************************************************************************
 	 *************************** Click Listeners ********************************
 	 ****************************************************************************/

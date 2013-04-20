@@ -1,4 +1,4 @@
-package pt.utl.ist.cm.neartweetclient.core;
+package pt.utl.ist.cm.neartweetclient.core.listAdapters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

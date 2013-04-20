@@ -1,5 +1,8 @@
 package main.java.com.cm.server.visitors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import main.java.com.cm.server.handlers.RequestHandler;
 import pt.utl.ist.cm.neartweetEntities.pdu.GenericMessagePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
@@ -36,6 +39,10 @@ public class SlimServerDispatcher extends PDUVisitor {
 		if(!connectionHandler.memory.VerifyIfUserExists(pdu.GetUserId())) { 
 			connectionHandler.memory.InsertUser(pdu.GetUserId(), this.connectionHandler.connection);
 			
+			List<String> usersExceptMe = new ArrayList<String>(connectionHandler.memory.getUsers());
+			usersExceptMe.remove(pdu.GetUserId());
+			
+			connectionHandler.sendDirectedPDU(pdu, usersExceptMe);
 			connectionHandler.broadcastPDU(new GenericMessagePDU(pdu.GetUserId(), "User " + pdu.GetUserId() + " enter on the network", true));
 			System.out.println("[nearTweet Server] - User "  + pdu.GetUserId() + " has been registered on the Server!");
 		} else {

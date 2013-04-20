@@ -13,6 +13,8 @@ public class Actions {
 	public static final String SUCCESS_LOGIN = "successLogin";
 	public static final String BROADCAST_SPAMMER_BLOCKED = "pt.utl.ist.cm.neartweetclient.BROADCAST_SPAMMER_BLOCKED";
 	public static final String SPAMMER_ID_DATA = "pt.utl.ist.cm.neartweetclient.SPAMMER_ID_DATA";
+	public static final String BROADCAST_NEW_USER = "pt.utl.ist.cm.neartweetclient.BROADCAST_NEW_USER";
+	public static final String NEW_USER_DATA = "pt.utl.ist.cm.neartweetclient.NEW_USER_DATA";
 	public static String BROADCAST_TWEET = "pt.utl.ist.cm.neartweetclient.BC_TWEET";
 	public static String REGISTER_CONFIRMATION = "pt.utl.ist.cm.neartweetclient.REGISTER";
 	public static String TWEET_DATA = "TWEET";
