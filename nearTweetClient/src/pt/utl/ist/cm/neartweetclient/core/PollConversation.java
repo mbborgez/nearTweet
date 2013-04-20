@@ -1,4 +1,4 @@
-package pt.utl.ist.cm.neartweetclient;
+package pt.utl.ist.cm.neartweetclient.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;

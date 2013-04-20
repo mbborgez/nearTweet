@@ -48,7 +48,7 @@ public class SlimServerDispatcher extends PDUVisitor {
 	@Override
 	public void processReplyPDU(ReplyPDU pdu) {
 		if(!pdu.getIsBroadcast()){
-			connectionHandler.sendDirectedPDU(pdu, pdu.GetAddresse());
+			connectionHandler.sendDirectedPDU(pdu, pdu.getTargetUserId());
 		} else {
 			connectionHandler.broadcastPDU(pdu);
 		}

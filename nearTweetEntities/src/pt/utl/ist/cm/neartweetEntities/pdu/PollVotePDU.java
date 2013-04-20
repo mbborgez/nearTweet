@@ -9,6 +9,13 @@ public class PollVotePDU extends PDU
 	private String tweetId;
 	private String originalUserId;
 	
+	/**
+	 * @param userId
+	 * @param tweetId
+	 * @param targetMessageId
+	 * @param optionPosition
+	 * @param originalUserId
+	 */
 	public PollVotePDU(String userId, String tweetId, String targetMessageId, int optionPosition, String originalUserId) 
 	{
 		super(userId);
@@ -19,11 +26,18 @@ public class PollVotePDU extends PDU
 		this.originalUserId = originalUserId;
 	}
 
+	/**
+	 * @return the ID of the user who should receive this message. 
+	 * The target should be the ID of the user who created the original Poll
+	 */
 	public String GetTargetMessageId()
 	{
 		return this.targetMessageId;
 	}
 
+	/**
+	 * @return ID of the vote
+	 */
 	public int GetOptionPosition()
 	{
 		return this.optionPosition;

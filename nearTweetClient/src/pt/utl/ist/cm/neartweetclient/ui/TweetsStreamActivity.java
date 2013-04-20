@@ -3,8 +3,8 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
-import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.TweetStreamAdapter;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
@@ -55,6 +55,7 @@ public class TweetsStreamActivity extends ListActivity {
 		IntentFilter iff = new IntentFilter();
         iff.addAction(Actions.BROADCAST_TWEET);
         iff.addAction(Actions.POLL_VOTE);
+        iff.addAction(Actions.BROADCAST_SPAMMER_BLOCKED);
         this.registerReceiver(tweetsReceiver, iff);
 	}
 
@@ -175,12 +176,15 @@ public class TweetsStreamActivity extends ListActivity {
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
 				tweetStreamAdapter.notifyDataSetChanged();	
-				Toast.makeText(getApplicationContext(), "Received a tweet", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Received a new tweet", Toast.LENGTH_SHORT).show();
 			}
 			if (intent.getAction().equals(Actions.POLL_VOTE)) {
 				Toast.makeText(getApplicationContext(), "Received a new Vote", Toast.LENGTH_SHORT).show();
 			}
-			
+			if (intent.getAction().equals(Actions.BROADCAST_SPAMMER_BLOCKED)) {
+				String spammerId = intent.getExtras().getString(Actions.SPAMMER_ID_DATA);
+				Toast.makeText(getApplicationContext(), "The spammer " + spammerId + " is now blocked", Toast.LENGTH_SHORT).show();
+			}
 		}
     };
 }

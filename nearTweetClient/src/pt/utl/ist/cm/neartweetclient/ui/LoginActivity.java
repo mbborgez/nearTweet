@@ -1,7 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
-import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
 import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;

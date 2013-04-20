@@ -1,8 +1,8 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
-import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.PollVotesAdapter;
 import pt.utl.ist.cm.neartweetclient.services.PollVoteService;
 import android.app.ListActivity;
