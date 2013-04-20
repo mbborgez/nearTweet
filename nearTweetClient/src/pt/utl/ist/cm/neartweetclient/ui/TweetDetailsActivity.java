@@ -1,11 +1,11 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
-import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
 import pt.utl.ist.cm.neartweetclient.core.TweetConversationAdapter;
-import pt.utl.ist.cm.neartweetclient.services.CreateSpamService;
+import pt.utl.ist.cm.neartweetclient.services.SpamVoteService;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -56,12 +56,23 @@ public class TweetDetailsActivity extends ListActivity {
 		populateTweetDetails();
 		updateTweetConversation();
 
-		// Put whatever message you want to receive as the action
-		IntentFilter iff = new IntentFilter();
-		iff.addAction(Actions.BROADCAST_TWEET);
-		registerReceiver(repliesReceiver,iff);
-
+		registerConversationListener();
 	}
+
+	@Override
+    public void onResume() {
+        super.onResume();
+
+        registerConversationListener();
+		updateTweetConversation();
+        
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.unregisterReceiver(repliesReceiver);
+    }
+	
 	
 	private void populateTweetDetails() {
 		tweetDetailsTextView.setText(tweetPdu.GetText());
@@ -110,7 +121,7 @@ public class TweetDetailsActivity extends ListActivity {
 	private class SubmitSpamVoteTask extends AsyncTask<String, Integer, Boolean> {
 		@Override
 		protected Boolean doInBackground(String... params) {
-			return new CreateSpamService(Actions.getUserId(getApplicationContext()), tweetId).execute();
+			return new SpamVoteService(Actions.getUserId(getApplicationContext()), tweetId, tweetPdu.GetUserId()).execute();
 		}
 		@Override
 		protected void onPostExecute(Boolean result) {
@@ -148,5 +159,10 @@ public class TweetDetailsActivity extends ListActivity {
 	private void showErrorSendingSpamMessage() {
 		Toast.makeText(getApplicationContext(), "Error sending spam vorte", Toast.LENGTH_SHORT).show();
 	}
-
+	
+	private void registerConversationListener() {
+		IntentFilter iff = new IntentFilter();
+		iff.addAction(Actions.BROADCAST_TWEET);
+		registerReceiver(repliesReceiver,iff);
+	}
 }

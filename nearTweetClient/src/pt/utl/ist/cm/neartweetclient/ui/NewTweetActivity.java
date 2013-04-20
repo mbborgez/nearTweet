@@ -28,15 +28,15 @@ public class NewTweetActivity extends Activity {
 	private static final String DATA_EXTRA = "data";
 	private static final String DEFAULT_URL = "http://upload.wikimedia.org/wikipedia/pt/e/ed/IST_Logo.png";
 	protected static final int TAKE_PHOTO_ACTION = 1337;
-	EditText tweet;
-	Button cancelButton;
-	Button submitButton;
-
-	Button takePhotoButton;
-	Button addMultimediaButton;
-	EditText multimediaLinkEditText;
-	ImageView tweetImagePreview;
-	byte[] tweetImageBytes;
+	private byte[] tweetImageBytes;
+	
+	private EditText tweet;
+	private Button cancelButton;
+	private Button submitButton;
+	private Button takePhotoButton;
+	private Button addMultimediaButton;
+	private EditText multimediaLinkEditText;
+	private ImageView tweetImagePreview;
 
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -92,7 +92,6 @@ public class NewTweetActivity extends Activity {
 	private final OnClickListener takePhotoClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			Log.i("DEBUG", "takePhotoClickListener");
 			dispatchTakePictureIntent(TAKE_PHOTO_ACTION);
 		}
 	};
@@ -109,13 +108,10 @@ public class NewTweetActivity extends Activity {
 	}
 
 	private void dispatchTakePictureIntent(int actionCode) {
-		Log.i("DEBUG", "dispatchTakePictureIntent");
 		if(isIntentAvailable(getApplicationContext(), MediaStore.ACTION_IMAGE_CAPTURE)){
-			Log.i("DEBUG", "dispatchTakePictureIntent - intent is available");
 			Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			startActivityForResult(takePictureIntent, actionCode);
 		} else {
-			Log.i("DEBUG", "dispatchTakePictureIntent - intent is NOOOOT available");
 			Toast.makeText(getApplicationContext(), "Not available", Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -140,9 +136,7 @@ public class NewTweetActivity extends Activity {
 				if(extras!=null && extras.containsKey(DATA_EXTRA) && extras.get(DATA_EXTRA)!=null){
 					try{
 						photoBitmap = (Bitmap) extras.get(DATA_EXTRA);
-						Log.i("DEBUG", "handleSmallCameraPhoto - photoBitmap: " + photoBitmap);
 						photoBytes = compressBitmapImage(photoBitmap);
-						Log.i("DEBUG", "handleSmallCameraPhoto - tweetImageBytes: " + tweetImageBytes);
 						return true;
 					} catch(Exception e){
 						e.printStackTrace();

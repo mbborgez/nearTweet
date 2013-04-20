@@ -10,11 +10,12 @@ public class ReplyService implements INearTweetService {
 
 	private String targetMessageId;
 	private String text;
-	private String address;
 	private Context context;
 	private Boolean isBroadcast;
+	private String targetUserId;
 	
-	public ReplyService(String targetMessageId, String text, Boolean isBroadcast, Context context) {
+	public ReplyService(String targetMessageId, String targetUserId, String text, Boolean isBroadcast, Context context) {
+		this.targetUserId = targetUserId;
 		this.targetMessageId = targetMessageId;
 		this.text = text;
 		this.context = context;
@@ -26,7 +27,7 @@ public class ReplyService implements INearTweetService {
 		try {
 			String userId = Actions.getUserId(context);
 			String tweetId = userId + Actions.getLastTweet(context);
-			ReplyPDU pdu = new ReplyPDU(userId, tweetId, targetMessageId, text, address, isBroadcast);
+			ReplyPDU pdu = new ReplyPDU(userId, tweetId, targetMessageId, text, targetUserId, isBroadcast);
 			
 			Connection.getInstance().sendPDU(pdu);
 			

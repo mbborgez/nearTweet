@@ -6,12 +6,13 @@ import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.content.Context;
 
 public class PollVoteService implements INearTweetService {
-	
+	private String originalUserId;
 	private String targetMessageId;
 	private int optionPosition;
 	private Context context;
 	
-	public PollVoteService(String targetMessageID, int optionPosition, Context context) {
+	public PollVoteService(String originalUserId, String targetMessageID, int optionPosition, Context context) {
+		this.originalUserId = originalUserId;
 		this.targetMessageId = targetMessageID;
 		this.optionPosition = optionPosition;
 		this.context = context;
@@ -21,7 +22,7 @@ public class PollVoteService implements INearTweetService {
 	public boolean execute() {
 		try {
 			String tweetId = Actions.getUserId(context) + Actions.getLastTweet(context);
-			PollVotePDU pdu = new PollVotePDU(Actions.getUserId(context), tweetId, targetMessageId, optionPosition);
+			PollVotePDU pdu = new PollVotePDU(Actions.getUserId(context), tweetId, targetMessageId, optionPosition, originalUserId);
 			
 			Connection.getInstance().sendPDU(pdu);
 

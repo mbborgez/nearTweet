@@ -2,8 +2,8 @@ package pt.utl.ist.cm.neartweetclient.ui;
 
 import java.util.Map;
 
-import pt.utl.ist.cm.neartweetclient.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -37,10 +37,28 @@ public class PollVotesDetailsActivity extends Activity {
 
 		populateVotes(MemCacheProvider.getVotesForPoll(tweetId));
 
+		registerConversationListener();
+	}
+
+	private void registerConversationListener() {
 		IntentFilter iff = new IntentFilter();
 		iff.addAction(Actions.BROADCAST_TWEET);
 		this.registerReceiver(this.repliesReceiver,iff);
 	}
+	
+	@Override
+    public void onResume() {
+        super.onResume();
+
+        registerConversationListener();
+        populateVotes(MemCacheProvider.getVotesForPoll(tweetId));
+    }
+	
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.unregisterReceiver(repliesReceiver);
+    }
 
 	private void populateVotes(Map<String, Integer> votes){
 		for(java.util.Map.Entry<String, Integer> voteEntry : votes.entrySet()){
@@ -55,7 +73,7 @@ public class PollVotesDetailsActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.i("DEGUB", "RECEIVED SOMETHING");
-			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
+			if (intent.getAction().equals(Actions.POLL_VOTE)) {
 				populateVotes(MemCacheProvider.getVotesForPoll(tweetId));
 			}
 		}

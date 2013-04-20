@@ -6,23 +6,21 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import main.java.com.cm.server.utils.Database;
-import main.java.com.cm.server.visitors.ServerDispatcher;
-
+import main.java.com.cm.server.visitors.SlimServerDispatcher;
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
-
 
 public class RequestHandler implements Runnable {
 	
 	public Socket socket;
 	public Database memory;
-	private ServerDispatcher dispatcher;
+	private SlimServerDispatcher dispatcher;
 	public ObjectOutputStream connection;
 	private Thread currentContext;
 
 	public RequestHandler(Socket socket, Database memory) throws IOException {
 		this.socket = socket;
 		this.memory = memory;
-		this.dispatcher = new ServerDispatcher(this);
+		this.dispatcher = new SlimServerDispatcher(this);
 		this.connection = new ObjectOutputStream(socket.getOutputStream());
 	}
 	
@@ -39,6 +37,19 @@ public class RequestHandler implements Runnable {
 		}
 	}
 	
+	public void sendToConnectedUser(PDU pdu) {
+		sendDirectedPDU(pdu, this.connection);
+	}
+	
+	public void sendDirectedPDU(PDU pdu, String userId) {
+		if(memory.VerifyIfUserExists(userId) && memory.GetUserStream(userId)!=null){
+			ObjectOutputStream userStream = memory.GetUserStream(userId);
+			sendDirectedPDU(pdu, userStream);
+		} else {
+			System.err.println("[nearTweet Server] Error Sending directPdu because the user " + userId + " is not registered in the server.");
+		}
+	}
+	
 	public void broadcastPDU(PDU pdu) {
 		for(ObjectOutputStream obj : memory.listUsers.values()) {
 			try {
@@ -48,7 +59,7 @@ public class RequestHandler implements Runnable {
 			}
 			catch (IOException e) {
 				System.out.println("[nearTweet Server] Removing User: " + this.memory.GetUserID(this.connection));
-				this.memory.RemoveUser(obj);
+				abortThread();
 			}
 		} 
 	}
