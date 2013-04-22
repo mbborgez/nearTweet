@@ -14,17 +14,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class TweetsStreamActivity extends ListActivity {
+public class TweetsStreamActivity extends ListActivity implements OnItemLongClickListener {
 	
 	private Button createTweetButton;
 	private Button createPollButton;
@@ -48,8 +52,8 @@ public class TweetsStreamActivity extends ListActivity {
 		createPollButton.setOnClickListener(createPollClickListener);
 	    
 		ListView tweetsListView = getListView();
-		tweetsListView.setOnItemClickListener(tweetsStreamItemClickListener);
-		
+		this.registerForContextMenu(tweetsListView);
+		tweetsListView.setOnItemLongClickListener(this);
 		
 	    // Put whatever message you want to receive as the action
 		IntentFilter iff = new IntentFilter();
@@ -79,6 +83,35 @@ public class TweetsStreamActivity extends ListActivity {
         this.unregisterReceiver(this.tweetsReceiver);
     }
     
+    @Override  
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {  
+    	super.onCreateContextMenu(menu, v, menuInfo);  
+		menu.setHeaderTitle("Options");
+		
+		// Get the info on which item was selected
+	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+
+	    //TODO: if the tweet is a instance of poll then the retweet does not make any sense
+	    menu.add(0, info.position, 0, "Retweet");  
+		menu.add(0, info.position, 1, "Details");
+    }
+    
+    @Override
+	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		// do nothing here
+		return false;
+	}
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {  
+        if (item.getOrder() == 0) { 
+        	makeRetweetRequest(MemCacheProvider.getTweetsStream().get(item.getItemId()));
+        } else {
+        	showTweetDetails(MemCacheProvider.getTweetsStream().get(item.getItemId()));
+        }
+        return true;  
+    } 
+    
     protected void showTweetDetails(PDU pdu) {
     	if (pdu instanceof TweetPDU) {
     		showTweetDetailsScreen((TweetPDU) pdu);
@@ -96,6 +129,12 @@ public class TweetsStreamActivity extends ListActivity {
 		Intent tweetDetailsIntent = new Intent(this, TweetDetailsActivity.class);
 		tweetDetailsIntent.putExtra(TweetDetailsActivity.TWEET_ID_EXTRA, pdu.GetTweetId());
 		startActivity(tweetDetailsIntent);
+	}
+	
+	private void makeRetweetRequest(PDU pdu) {
+		Intent retweetIntent = new Intent(this, RetweetActivity.class);
+		retweetIntent.putExtra(RetweetActivity.TWEET_ID_EXTRA,  ((TweetPDU) pdu).GetTweetId());
+		startActivity(retweetIntent);
 	}
 
 	private void showPollDetailsScreen(PublishPollPDU pdu) {
@@ -173,10 +212,20 @@ public class TweetsStreamActivity extends ListActivity {
 		}
 	};
 	
+	@SuppressWarnings("unused")
 	private final OnItemClickListener tweetsStreamItemClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			showTweetDetails(MemCacheProvider.getTweetsStream().get(position));
+		}
+	};
+	
+	@SuppressWarnings("unused")
+	private final OnItemLongClickListener tweetsStreamItemLOngClickListener = new OnItemLongClickListener() {
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			makeRetweetRequest(MemCacheProvider.getTweetsStream().get(position));
+			return true;
 		}
 	};
 	

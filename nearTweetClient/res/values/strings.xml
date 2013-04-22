@@ -24,6 +24,8 @@
     <string name="new_pool_button">New Pool</string>
     <string name="submit_tweet">Tweet</string>
     <string name="mark_as_spam">Spam</string>
+    <string name="retweet">Retweet</string>
+    <string name="retweet_details">Check Status before Sharing</string>
     <string name="cancel">Cancel</string>
     <string name="welcome">Hello!</string>
     <string name="createTweet">Tweet</string>

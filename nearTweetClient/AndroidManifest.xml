@@ -50,6 +50,10 @@
             android:label="@string/title_activity_tweet_details_acitivity" >
         </activity>
         <activity
+            android:name="pt.utl.ist.cm.neartweetclient.ui.RetweetActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
             android:name="pt.utl.ist.cm.neartweetclient.ui.MultimediaActivity"
             android:label="@string/title_activity_multimedia" >
         </activity>

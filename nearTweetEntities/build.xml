@@ -9,7 +9,7 @@
   <property name="java.file.encoding" value="UTF-8" />
   <!-- 	Directories -->
   <property name="build.base" value="build/" />
-  <property name="libs.base" value="../lib/" />
+  <property name="libs.base" value="../nearTweetClient/libs" />
   <property name="bin.base"   value="bin/"/>
   <property name="src.base"   value="src/" />
   <!-- PDU's Jar NAME  -->
