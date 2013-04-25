@@ -8,13 +8,10 @@ import android.util.Log;
 
 public class MessagesSenderRunnable implements Runnable {
 
-	private Context context;
 
 	private static LinkedBlockingQueue<PDU> sendQueue = new LinkedBlockingQueue<PDU>();
 
-	public MessagesSenderRunnable(Context context){
-		this.context = context;
-	}
+	public MessagesSenderRunnable(Context context){}
 
 	@Override
 	public void run() {
