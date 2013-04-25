@@ -55,23 +55,10 @@ public class RetweetActivity extends ListActivity {
 			tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
 			populateView();
 		} else if (service.intentFromOAuthCallback(getIntent())) {
-			System.out.println("Handle Callback!");
-			service.handleOAuthCallback(getIntent().getData());
 			populateView();
+			new HandleOAuthProtocol().execute();
 		} else {
-			System.out.println("Send Request Callback!");
-			try {
-				service.setRequestToken();
-				tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
-				startActivity(new Intent(Intent.ACTION_VIEW, 
-						Uri.parse(service.getAuthenticationUrl())));
-			} catch (Exception e) {
-				e.printStackTrace();
-				Toast.makeText(getApplicationContext(), 
-						"Something went wrong during the Request!", 
-						Toast.LENGTH_LONG).show();
-				finish();
-			}
+			new RequestOAuthProtocol().execute();
 		}
 	}
 	
@@ -105,6 +92,47 @@ public class RetweetActivity extends ListActivity {
 			new SendMessageToTwitter().execute(message);
 		}
 	};
+	
+	private void startRequestIntent() {
+		startActivity(new Intent(Intent.ACTION_VIEW, 
+				Uri.parse(service.getAuthenticationUrl())));
+	}
+	
+	/**
+	 * Task handler of OAuth Requests asynchronously
+	 */
+	class RequestOAuthProtocol extends AsyncTask<Void, Void, Void> {
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				service.setRequestToken();
+				tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+				startRequestIntent();
+			} catch (Exception e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), 
+						"Something went wrong during the Request!", 
+						Toast.LENGTH_LONG).show();
+				finish();
+			}
+			return null;
+		}
+		
+	}
+	
+	/**
+	 * Task handler of OAuth Callbacks asynchronously
+	 */
+	class HandleOAuthProtocol extends AsyncTask<Void, Void, Void> {
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			service.handleOAuthCallback(getIntent().getData());
+			return null;
+		}
+		
+	}
 	
 	/**
 	 * Async Task responsible to call the service

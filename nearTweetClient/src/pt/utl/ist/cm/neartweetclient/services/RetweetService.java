@@ -81,11 +81,8 @@ public class RetweetService implements INearTweetService {
 			this.accessToken = new AccessToken(this.getPublicToken(), this.getSecretToken());
 		}
 		
-		if (this.twitter == null) {
-			this.twitter = new TwitterFactory(this.configRequest).getInstance(this.accessToken);
-		}
-		
 		try {
+			this.twitter = new TwitterFactory(this.configRequest).getInstance(this.accessToken);
 			twitter4j.Status response = twitter.updateStatus(this.message);
 			return (response != null);
 		} catch (TwitterException e) {
