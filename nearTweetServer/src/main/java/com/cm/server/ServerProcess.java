@@ -35,7 +35,7 @@ public class ServerProcess
 		Thread t;
 		RequestHandler handler;
 		try {
-			this.serverSocket = new ServerSocket(this.port, 300, findEthernetIP());
+			this.serverSocket = new ServerSocket(this.port);
 			startingMessage();
 			while(true) {
 				try {

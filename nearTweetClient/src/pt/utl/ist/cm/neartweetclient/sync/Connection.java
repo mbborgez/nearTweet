@@ -14,7 +14,7 @@ import android.util.Log;
 public class Connection {
 
 	// Network configurations
-	public final String DEFAULT_IP_ADDRESS = "192.168.1.65";
+	public final String DEFAULT_IP_ADDRESS = "10.0.2.2";
 	public final int DEFAULT_PORT = 8004;
 
 	public static Connection currentConnection;

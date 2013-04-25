@@ -4,7 +4,7 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/home/alexandre/labs/nearTweet/lib/pdus.jar"/>
-	<classpathentry kind="lib" path="/home/alexandre/labs/nearTweet/lib/twitter4j-core-3.0.3.jar"/>
+	<classpathentry kind="lib" path="/home/alexandre/labs/nearTweet/nearTweetClient/libs/pdus.jar"/>
+	<classpathentry kind="lib" path="/home/alexandre/Downloads/AndroidTwitterConnect/libs/twitter4j-core-android-2.2.6.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -3,15 +3,23 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
+import pt.utl.ist.cm.neartweetclient.services.RetweetService;
+import pt.utl.ist.cm.neartweetclient.sync.HTTPConnection;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RetweetActivity extends ListActivity {
 	
@@ -21,26 +29,61 @@ public class RetweetActivity extends ListActivity {
 
 	private Button retweetButton;
 
-	private String tweetId;
+	// do not change tweetId to not static -  when the callback (OAuth) happens
+	// if tweetId has not static properties we receive null instead
+	private static String tweetId;
 	private TweetPDU tweetPdu;
+	private RetweetService service;
+	ProgressDialog progressDialog;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_retweet);
 		
+		String userId = Actions.getUserId(getApplicationContext());
+		service = new RetweetService(userId,getApplicationContext());
+		
+		if (!HTTPConnection.isConnectingToInternet(getApplicationContext())) {
+			Toast.makeText(getApplicationContext(), 
+					"There are no internet connection. We cannot Continue!",
+					Toast.LENGTH_LONG).show();
+			finish();
+		}
+		
+		if(service.userAlreadyLoggedIn()) {
+			System.out.println("User already logged once!");
+			tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+			populateView();
+		} else if (service.intentFromOAuthCallback(getIntent())) {
+			System.out.println("Handle Callback!");
+			service.handleOAuthCallback(getIntent().getData());
+			populateView();
+		} else {
+			System.out.println("Send Request Callback!");
+			try {
+				service.setRequestToken();
+				tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+				startActivity(new Intent(Intent.ACTION_VIEW, 
+						Uri.parse(service.getAuthenticationUrl())));
+			} catch (Exception e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), 
+						"Something went wrong during the Request!", 
+						Toast.LENGTH_LONG).show();
+				finish();
+			}
+		}
+	}
+	
+	/**
+	 * populates the view when needed
+	 */
+	private void populateView() {
 		tweetDetailsTextView = (TextView) findViewById(R.id.retweet_details_text);
 		tweetImage = (ImageView) findViewById(R.id.retweet_details_image);
 		retweetButton = (Button) findViewById(R.id.submitRetweetButton);
-
 		retweetButton.setOnClickListener(retweetClickListener);
-
-		tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
 		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
-
-		populateTweetDetails();
-	}
-	
-	private void populateTweetDetails() {
 		tweetDetailsTextView.setText(tweetPdu.GetText());
 		if(tweetPdu.GetMediaObject()!=null && tweetPdu.GetMediaObject().length>0){
 			Bitmap bitmap = BitmapFactory.decodeByteArray(tweetPdu.GetMediaObject(), 0, tweetPdu.GetMediaObject().length);
@@ -51,10 +94,63 @@ public class RetweetActivity extends ListActivity {
 		}
 	}
 	
+	/**
+	 * Handler responsible to take the message from the PDU and dispatch it 
+	 * to the Async Task
+	 */
 	private final OnClickListener retweetClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			System.out.println("I Will implement Tweet feature tomorrow :)!"); 
+			String message = tweetPdu.GetText();
+			new SendMessageToTwitter().execute(message);
 		}
 	};
+	
+	/**
+	 * Async Task responsible to call the service
+	 */
+	class SendMessageToTwitter extends AsyncTask<String, Boolean, Boolean> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progressDialog = new ProgressDialog(RetweetActivity.this);
+			progressDialog.setMessage("Sending Message...");
+			progressDialog.setIndeterminate(false);
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
+
+		@Override
+		protected Boolean doInBackground(String... args) {
+			String message = args[0];
+			service.setMessage(message);
+			return service.execute();
+		}
+
+		/**
+		 * After completing background task Dismiss the progress dialog and show
+		 * the data in UI Always use runOnUiThread(new Runnable()) to update UI
+		 * from background thread, otherwise you will get error
+		 * **/
+		protected void onPostExecute(final Boolean requestWellHandled) {
+			progressDialog.dismiss();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (requestWellHandled) {
+						Toast.makeText(getApplicationContext(),
+								"Status Tweeted successfully", Toast.LENGTH_SHORT)
+								.show();
+					} else {
+						Toast.makeText(getApplicationContext(),
+								"Tweet cannot be sent!", Toast.LENGTH_LONG)
+								.show();
+					}
+					finish();
+
+				}
+			});
+		}
+	}
 }
