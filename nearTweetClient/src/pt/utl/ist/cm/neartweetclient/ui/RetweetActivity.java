@@ -6,15 +6,13 @@ import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.services.RetweetService;
 import pt.utl.ist.cm.neartweetclient.sync.HTTPConnection;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,13 +32,14 @@ public class RetweetActivity extends ListActivity {
 	private String tweetId;
 	private TweetPDU tweetPdu;
 	private RetweetService service;
+	ProgressDialog progressDialog;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_retweet);
 		
-		service = new RetweetService(Actions.getUserId(getApplicationContext()), 
-				getApplicationContext());
+		String userId = Actions.getUserId(getApplicationContext());
+		service = new RetweetService(userId,getApplicationContext());
 		
 		HTTPConnection connection = new HTTPConnection(getApplicationContext());
 		if (!connection.isConnectingToInternet()) {
@@ -52,20 +51,22 @@ public class RetweetActivity extends ListActivity {
 		
 		// first check if the user have already token to log on
 		
-		
-		if (service.intentFromOAuthCallback(getIntent())) {
+		if(service.userAlreadyLoggedIn()) {
+			System.out.println("User logged in");
+			tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+			populateView();
+		} else if (service.intentFromOAuthCallback(getIntent())) {
+			System.out.println("Handle Callback");
 			service.handleOAuthCallback(getIntent().getData());
 			populateView();
-			
-		} if(service.userAlreadyLoggedIn()) {
-			populateView();
 		} else {
+			System.out.println("Start Request OAuth");
 			try {
 				service.setRequestToken();
 				service.cacheTweetId(getIntent().getStringExtra(TWEET_ID_EXTRA));
 				startActivity(new Intent(Intent.ACTION_VIEW, 
 						Uri.parse(service.getAuthenticationUrl())));
-			} catch (TwitterException e) {
+			} catch (Exception e) {
 				Toast.makeText(getApplicationContext(), 
 						"Something went wrond during the connection", 
 						Toast.LENGTH_LONG).show();
@@ -79,7 +80,9 @@ public class RetweetActivity extends ListActivity {
 		tweetImage = (ImageView) findViewById(R.id.retweet_details_image);
 		retweetButton = (Button) findViewById(R.id.submitRetweetButton);
 		retweetButton.setOnClickListener(retweetClickListener);
-		tweetId = service.takeFromCacheStoredTweet();
+		if (tweetId == null) {
+			tweetId = service.takeFromCacheStoredTweet();
+		}
 		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
 		populateTweetDetails();
 	}
@@ -98,7 +101,55 @@ public class RetweetActivity extends ListActivity {
 	private final OnClickListener retweetClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			System.out.println("I Will implement Tweet feature tomorrow :)!"); 
+			String message = tweetPdu.GetText();
+			new SendMessageToTwitter().execute(message);
 		}
 	};
+	
+	class SendMessageToTwitter extends AsyncTask<String, Boolean, Boolean> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progressDialog = new ProgressDialog(RetweetActivity.this);
+			progressDialog.setMessage("Sending Message...");
+			progressDialog.setIndeterminate(false);
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
+
+		@Override
+		protected Boolean doInBackground(String... args) {
+			String message = args[0];
+			service.setMessage(message);
+			return service.sendTweet(message);
+		}
+
+		/**
+		 * After completing background task Dismiss the progress dialog and show
+		 * the data in UI Always use runOnUiThread(new Runnable()) to update UI
+		 * from background thread, otherwise you will get error
+		 * **/
+		protected void onPostExecute(final Boolean requestWellHandled) {
+			// dismiss the dialog after getting all products
+			progressDialog.dismiss();
+			// updating UI from Background Thread
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (requestWellHandled) {
+						Toast.makeText(getApplicationContext(),
+								"Status tweeted successfully", Toast.LENGTH_SHORT)
+								.show();
+					} else {
+						Toast.makeText(getApplicationContext(),
+								"Tweet cannot be sent", Toast.LENGTH_SHORT)
+								.show();
+					}
+					finish();
+
+				}
+			});
+		}
+	}
 }

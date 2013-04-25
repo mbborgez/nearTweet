@@ -1,6 +1,5 @@
 package pt.utl.ist.cm.neartweetclient.services;
 
-import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,7 +37,7 @@ public class RetweetService implements INearTweetService {
 	
 	// Services attributes
 	private Twitter twitter;
-	private RequestToken requestToken;
+	private static RequestToken requestToken;
 	private AccessToken accessToken;
 	private String message;
 	private String userId;
@@ -55,7 +54,7 @@ public class RetweetService implements INearTweetService {
 		this.configRequest = builder.build();
 		
 		TwitterFactory factory = new TwitterFactory(configRequest);
-		twitter = factory.getInstance();
+		this.twitter = factory.getInstance();
 	}
 	
 	public boolean intentFromOAuthCallback(Intent intent) {
@@ -75,17 +74,17 @@ public class RetweetService implements INearTweetService {
 		return requestToken.getToken();
 	}
 	
-	public void setRequestToken() throws TwitterException {
-		this.requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
+	public void setRequestToken() {
+		try {
+			requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public String getPublicToken() {
-    	String pair = this.settings.getString(OAUTH_KEY + this.userId, null);
-    	if (pair != null) {
-    		return pair.split("|")[0];
-    	} else {
-    		return null;
-    	}
+		return this.settings.getString(OAUTH_KEY + this.userId + "_public", null);
 	}
 	
 	public void cacheTweetId(String tweetId) {
@@ -99,17 +98,16 @@ public class RetweetService implements INearTweetService {
 	}
 	
 	public String getSecretToken() {
-    	String pair = this.settings.getString(OAUTH_KEY + this.userId, null);
-    	if (pair != null) {
-    		return pair.split("|")[1];
-    	} else {
-    		return null;
-    	}
+    	return this.settings.getString(OAUTH_KEY + this.userId + "_private", null);
+    	
 	}
 	
 	private void setAuthToken(String newPublicToken, String newSecretToken) {
 		Editor editor = this.settings.edit();
-		editor.putString(OAUTH_KEY + this.userId, newPublicToken + "|" + newSecretToken);
+		System.out.println(newPublicToken);
+		System.out.println(newSecretToken);
+		editor.putString(OAUTH_KEY + this.userId + "_public", newPublicToken);
+		editor.putString(OAUTH_KEY + this.userId + "_private",newSecretToken);
 		editor.commit();
 	}
 	
@@ -124,7 +122,6 @@ public class RetweetService implements INearTweetService {
 		
 		if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
 			try {
-				requestToken = twitter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
 				String verifier = uri.getQueryParameter(URL_TWITTER_OAUTH_VERIFIER);
 				this.accessToken = twitter.getOAuthAccessToken(requestToken, verifier);
 				setAuthToken(accessToken.getToken(), accessToken.getTokenSecret());
@@ -138,6 +135,25 @@ public class RetweetService implements INearTweetService {
 	
 	public String getAuthenticationUrl() {
 		return requestToken.getAuthenticationURL();
+	}
+	
+	public boolean sendTweet(String message) {
+		try {
+			if (!this.userAlreadyLoggedIn()) {
+				return false;
+			} else if(accessToken == null) {
+				this.accessToken = new AccessToken(this.getPublicToken(), this.getSecretToken());
+			}
+			ConfigurationBuilder builder = new ConfigurationBuilder();
+			builder.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
+			builder.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
+			this.twitter = new TwitterFactory(this.configRequest).getInstance(this.accessToken);
+			this.twitter.updateStatus(message);
+			return true;
+		} catch (TwitterException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
