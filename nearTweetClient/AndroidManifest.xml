@@ -53,7 +53,7 @@
             android:name="pt.utl.ist.cm.neartweetclient.ui.RetweetActivity"
             android:label="@string/app_name" >
 	        <intent-filter>
-	        	<action android:name="android.intent.action.VIEW" />
+	            <action android:name="android.intent.action.VIEW" />
 	            <category android:name="android.intent.category.DEFAULT" />
 	            <category android:name="android.intent.category.BROWSABLE" />
 	            <data android:scheme="oauth" android:host="nearTweet"/>
