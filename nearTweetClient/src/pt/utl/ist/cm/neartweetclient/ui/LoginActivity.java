@@ -7,8 +7,12 @@ import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
 import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import pt.utl.ist.cm.neartweetclient.SimWifiP2pBroadcastReceiver;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
+import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +30,7 @@ public class LoginActivity extends Activity {
 	private Button loginButton;
 	private EditText userNameText;
 	private boolean connectionError;
+	private SimWifiP2pBroadcastReceiver receiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,18 @@ public class LoginActivity extends Activity {
 		//arming listeners
 	    userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
+		
+		// initialize the WDSim API
+		SimWifiP2pSocketManager.Init(getApplicationContext());
+
+		// register broadcast receiver
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+		receiver = new SimWifiP2pBroadcastReceiver(this);
+		registerReceiver(receiver, filter);
 	}
 	
 	/**
