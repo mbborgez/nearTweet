@@ -2,14 +2,10 @@ package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
-import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
-import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
-import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.sync.ConnectionsReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import pt.utl.ist.cm.neartweetclient.SimWifiP2pBroadcastReceiver;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
-import pt.utl.ist.cmov.wifidirect.SimWifiP2pDevice;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pDeviceList;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pInfo;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager;
@@ -18,15 +14,12 @@ import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.GroupInfoListener;
 import pt.utl.ist.cmov.wifidirect.service.SimWifiP2pService;
 import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
@@ -38,13 +31,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class LoginActivity extends Activity implements GroupInfoListener {
 	
 	private Button loginButton;
 	private EditText userNameText;
-	private boolean connectionError;
 	private SimWifiP2pBroadcastReceiver receiver;
 	private SimWifiP2pManager mManager = null;
 	private Messenger mService = null;
@@ -55,7 +46,6 @@ public class LoginActivity extends Activity implements GroupInfoListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		
-		this.connectionError = false;
 		// referencing objects
 		loginButton = (Button) findViewById(R.id.loginButton);
 		userNameText = (EditText) findViewById(R.id.usernameText);
@@ -138,31 +128,9 @@ public class LoginActivity extends Activity implements GroupInfoListener {
 		
 	@Override
 	public void onGroupInfoAvailable(SimWifiP2pDeviceList devices, SimWifiP2pInfo groupInfo) {
-
+		
 		createCookieSession(groupInfo.getDeviceName());
-		
-//		String clientStr = "I'm client - GOs List: " + groupInfo.getHomeGroups();
-//		String goStr = "I'm GO - Clients List: " + groupInfo.getGroupClients();
-//		Toast.makeText(getApplicationContext(), groupInfo.askIsGO() ? clientStr : goStr, Toast.LENGTH_SHORT).show();
-
-		// compile list of network members
-//		StringBuilder peersStr = new StringBuilder();
-//		for (String deviceName : groupInfo.getDevicesInNetwork()) {
-//			SimWifiP2pDevice device = devices.getByName(deviceName);
-//			String devstr = "" + deviceName + " (" + ((device == null) ? "??" : device.getVirtIp()) + ")\n";
-//			peersStr.append(devstr);
-//		}
-//
-//		// display list of network members
-//		new AlertDialog.Builder(this)
-//		.setTitle("Devices in WiFi Network")
-//		.setMessage(peersStr.toString())
-//		.setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-//							public void onClick(DialogInterface dialog, int which) {
-//						}}).show();
-		
 		receiver.setGroupInfo(groupInfo);
-//		receiver.updateNetworkInfo();
 		nextScreen();
 	}
 	
@@ -186,7 +154,7 @@ public class LoginActivity extends Activity implements GroupInfoListener {
 	 * createCookieSession - it should only be activated when 
 	 * the server responds with void (meaning that everything went ok)
 	 */
-	protected void createCookieSession(String userName) {
+	public void createCookieSession(String userName) {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("username", userName);

@@ -9,8 +9,8 @@ import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
-import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
-import pt.utl.ist.cm.neartweetclient.core.PollConversation;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import android.util.Log;
 public class MemCacheProvider {
 
 	private static String userName;
@@ -43,17 +43,23 @@ public class MemCacheProvider {
 		} else if(pdu instanceof PublishPollPDU){
 			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
 			tweetsStream.add(publishPollPdu);
+			Log.i(UiMessages.NEARTWEET_TAG, "publish pdu: " + publishPollPdu);
 			pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
 		}
 	}
 	
 	public static boolean isMyPoll(String tweetId){
+		Log.i(UiMessages.NEARTWEET_TAG, "isMyPoll? " + tweetId);
 		if(pollConversationContainer.containsKey(tweetId)){
+
 			PublishPollPDU publishPdu = (PublishPollPDU) getTweet(tweetId);
+			Log.i(UiMessages.NEARTWEET_TAG, "isMyPoll? " + tweetId + " yes");
+			Log.i(UiMessages.NEARTWEET_TAG, "username: " + getUserName() + ", pdu-user: " + publishPdu.getUserId());
 			return publishPdu.getUserId().equals(getUserName());
 		}
 		return false;
 	}
+	
 	public static PDU getTweet(String tweetID) {
 		return memcache.get(tweetID);
 	}

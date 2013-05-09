@@ -25,7 +25,9 @@ public class MessagesReceiverRunnable implements Runnable {
 		PDU receivedMessage;
 
 		try {
-			peer.sendPDU(new RegisterPDU(Actions.createUniqueID(context), Actions.getUserId(context)));
+			PDU registerPDU = new RegisterPDU(Actions.createUniqueID(context), Actions.getUserId(context));
+			peer.sendPDU(registerPDU);
+			MemCacheProvider.addTweet(registerPDU.getId(), registerPDU);
 			while (true) {
 				Log.i(UiMessages.NEARTWEET_TAG, "waiting receive");
 				receivedMessage = peer.receivePDU();
@@ -55,7 +57,7 @@ public class MessagesReceiverRunnable implements Runnable {
 	}
 
 	protected void checkReceivedMessage(PDU message) {
-		if(MemCacheProvider.hasMessage(message.getId())){
+		if(!MemCacheProvider.hasMessage(message.getId())){
 			Log.i("NEARTWEET-RECEIVE", "I do not have this message -> i will broadcast it");
 			message.accept(visitor);
 			Connection.getInstance().broadcastPDU(message);

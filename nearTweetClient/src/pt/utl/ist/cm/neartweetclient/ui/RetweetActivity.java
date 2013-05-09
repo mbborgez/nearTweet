@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,9 +51,10 @@ public class RetweetActivity extends ListActivity {
 			finish();
 		}
 		
+		tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+
 		if(service.userAlreadyLoggedIn()) {
 			System.out.println("User already logged once!");
-			tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
 			populateView();
 		} else if (service.intentFromOAuthCallback(getIntent())) {
 			populateView();
@@ -70,8 +72,12 @@ public class RetweetActivity extends ListActivity {
 		tweetImage = (ImageView) findViewById(R.id.retweet_details_image);
 		retweetButton = (Button) findViewById(R.id.submitRetweetButton);
 		retweetButton.setOnClickListener(retweetClickListener);
+		Log.i("POPULATEVIEW", "Before get PDU");
 		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
+		Log.i("POPULATEVIEW", "After get PDU");
+		Log.i("POPULATEVIEW", "PDU: " + tweetPdu);
 		tweetDetailsTextView.setText(tweetPdu.GetText());
+		Log.i("POPULATEVIEW", "After set text");
 		if(tweetPdu.GetMediaObject()!=null && tweetPdu.GetMediaObject().length>0){
 			Bitmap bitmap = BitmapFactory.decodeByteArray(tweetPdu.GetMediaObject(), 0, tweetPdu.GetMediaObject().length);
 			tweetImage.setImageBitmap(bitmap);

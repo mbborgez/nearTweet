@@ -104,10 +104,11 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {  
-        if (item.getOrder() == 0) { 
-        	makeRetweetRequest(MemCacheProvider.getTweetsStream().get(item.getItemId()));
+    	PDU pdu = MemCacheProvider.getTweetsStream().get(item.getItemId());
+        if (item.getOrder() == 0 && pdu instanceof TweetPDU) { 
+        	makeRetweetRequest(pdu);
         } else {
-        	showTweetDetails(MemCacheProvider.getTweetsStream().get(item.getItemId()));
+        	showTweetDetails(pdu);
         }
         return true;  
     } 
@@ -117,7 +118,7 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
     		showTweetDetailsScreen((TweetPDU) pdu);
     	} else if (pdu instanceof PublishPollPDU) {
     		PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
-    		if(!MemCacheProvider.isMyPoll(publishPollPdu.getId())){
+    		if(!MemCacheProvider.isMyPoll(publishPollPdu.getId())) {
 	    		showPollVoteScreen(publishPollPdu);
     		} else {
 	    		showPollDetailsScreen(publishPollPdu);

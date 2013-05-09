@@ -2,6 +2,7 @@ package pt.utl.ist.cm.neartweetclient;
 
 import java.util.Collection;
 
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.Peer;
 import pt.utl.ist.cm.neartweetclient.sync.*;
 import pt.utl.ist.cm.neartweetclient.utils.Constants;
@@ -68,6 +69,8 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
 			groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
 					SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			
+			updateUserID(groupInfo.getDeviceName());
 
 			groupInfo.print();
 			Toast.makeText(mActivity, "Network membership changed",
@@ -79,6 +82,9 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
 			groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
 					SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			
+			updateUserID(groupInfo.getDeviceName());
+			
 			groupInfo.print();
 
 			Toast.makeText(mActivity, "Group ownership changed",
@@ -88,6 +94,11 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 		}
 	}
 
+	private void updateUserID(String userId){
+		MemCacheProvider.setUserName(userId);
+		Log.i(UiMessages.NEARTWEET_TAG, "# Device name: " + userId);
+	}
+	
 	public void updateNetworkInfo() {
 		Log.i("NearTweet", "before");
 
@@ -104,7 +115,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 					Log.i("NearTweet-UPDATE",
 							"Need to perform a new conenction to GO named "
 									+ groupOwner);
-					new ConnectTask(groupOwner, getDeviceAddress(groupOwner), mActivity);
+					new Thread(new ConnectTask(groupOwner, getDeviceAddress(groupOwner), mActivity)).start();
 				}
 			}
 

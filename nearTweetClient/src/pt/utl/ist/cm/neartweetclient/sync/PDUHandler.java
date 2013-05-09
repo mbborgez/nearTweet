@@ -70,6 +70,10 @@ public class PDUHandler extends PDUVisitor {
 	public void processRegisterPDU(RegisterPDU pdu) {
 		ClientsManager.registerUser(pdu.getUserId());
 		Intent intent = new Intent();
+		if (this.context != null) {
+			MemCacheProvider.addTweet(pdu.getId(), pdu);
+			this.context.sendBroadcast(intent);
+		}
 		intent.setAction(Actions.BROADCAST_NEW_USER);
 		intent.putExtra(Actions.NEW_USER_DATA, pdu.getUserId());
 		this.context.sendBroadcast(intent);
