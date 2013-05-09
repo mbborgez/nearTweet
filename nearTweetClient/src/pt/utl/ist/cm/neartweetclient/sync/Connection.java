@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.UUID;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
@@ -107,5 +108,9 @@ public class Connection {
 			e.printStackTrace();
 			throw new NearTweetException(e.getMessage());
 		}
+	}
+	
+	public static String createUniqueID(String deviceName) {
+		return deviceName + UUID.randomUUID();
 	}
 }

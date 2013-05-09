@@ -22,7 +22,7 @@ public class AuthenticationHandler extends AsyncTask<Void, Void, Boolean> {
 			Log.i("DEBUG", "PDU ARRIVED: " + pdu.getClass().getName());
 			if (pdu != null && pdu instanceof GenericMessagePDU) {
 				GenericMessagePDU response = (GenericMessagePDU) pdu;
-				return response.GetResponse();
+				return response.getResponse();
 			}
 			return false;
 		} catch (Exception e) {

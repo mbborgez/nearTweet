@@ -117,7 +117,7 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
     		showTweetDetailsScreen((TweetPDU) pdu);
     	} else if (pdu instanceof PublishPollPDU) {
     		PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
-    		if(!MemCacheProvider.isMyPoll(publishPollPdu.GetTweetId())){
+    		if(!MemCacheProvider.isMyPoll(publishPollPdu.getId())){
 	    		showPollVoteScreen(publishPollPdu);
     		} else {
 	    		showPollDetailsScreen(publishPollPdu);
@@ -127,25 +127,25 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
 
 	private void showTweetDetailsScreen(TweetPDU pdu) {
 		Intent tweetDetailsIntent = new Intent(this, TweetDetailsActivity.class);
-		tweetDetailsIntent.putExtra(TweetDetailsActivity.TWEET_ID_EXTRA, pdu.GetTweetId());
+		tweetDetailsIntent.putExtra(TweetDetailsActivity.TWEET_ID_EXTRA, pdu.getId());
 		startActivity(tweetDetailsIntent);
 	}
 	
 	private void makeRetweetRequest(PDU pdu) {
 		Intent retweetIntent = new Intent(this, RetweetActivity.class);
-		retweetIntent.putExtra(RetweetActivity.TWEET_ID_EXTRA,  ((TweetPDU) pdu).GetTweetId());
+		retweetIntent.putExtra(RetweetActivity.TWEET_ID_EXTRA,  ((TweetPDU) pdu).getId());
 		startActivity(retweetIntent);
 	}
 
 	private void showPollDetailsScreen(PublishPollPDU pdu) {
 		Intent tweetDetailsIntent = new Intent(this, PollVotesDetailsActivity.class);
-		tweetDetailsIntent.putExtra(PollVotesDetailsActivity.TWEET_ID_EXTRA,  pdu.GetTweetId());
+		tweetDetailsIntent.putExtra(PollVotesDetailsActivity.TWEET_ID_EXTRA,  pdu.getId());
 		startActivity(tweetDetailsIntent);
 	}
 
 	private void showPollVoteScreen(PublishPollPDU pdu) {
 		Intent tweetDetailsIntent = new Intent(this, PollVoteActivity.class);
-		tweetDetailsIntent.putExtra(PollVoteActivity.TWEET_ID_EXTRA,  pdu.GetTweetId());
+		tweetDetailsIntent.putExtra(PollVoteActivity.TWEET_ID_EXTRA,  pdu.getId());
 		startActivity(tweetDetailsIntent);
 	}
 	

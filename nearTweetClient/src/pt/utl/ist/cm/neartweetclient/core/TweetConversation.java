@@ -23,9 +23,9 @@ public class TweetConversation {
 	}
 
 	public void removeMessage(String tweetId){
-		if(!mainMessage.GetTweetId().equals(tweetId)){
+		if(!mainMessage.getId().equals(tweetId)){
 			for(int i=0; i<conversation.size();++i){
-				if(conversation.get(i).GetTweetId().equals(tweetId)){
+				if(conversation.get(i).getId().equals(tweetId)){
 					conversation.remove(i);
 					return;
 				}

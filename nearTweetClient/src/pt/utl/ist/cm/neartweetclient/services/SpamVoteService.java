@@ -22,7 +22,7 @@ public class SpamVoteService implements INearTweetService {
 		try {
 			Log.i("DEBUG", "SpamVoteService - sending spamVote [userId: " + userId + ", targetMessageId: " + targetMessageId + ", targetUserId: " + targetUserId);
 			
-			SpamVotePDU pdu = new SpamVotePDU(userId, targetMessageId, targetUserId);
+			SpamVotePDU pdu = new SpamVotePDU(Connection.createUniqueID(userId), userId, targetMessageId, targetUserId);
 			Connection.getInstance().sendPDU(pdu);
 			return true;
 		} catch(Exception e) {

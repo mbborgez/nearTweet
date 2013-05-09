@@ -26,7 +26,7 @@ public class PDUHandler extends PDUVisitor {
 	public void processGenericMessagePDU(GenericMessagePDU pdu) {
 		Intent intent = new Intent();
 		intent.setAction(Actions.REGISTER_CONFIRMATION);
-		intent.putExtra(Actions.SUCCESS_LOGIN, pdu.GetResponse());
+		intent.putExtra(Actions.SUCCESS_LOGIN, pdu.getResponse());
 		if (this.context != null) {
 			Log.i("DEBUG", "BroadCasting Message");
 			context.sendBroadcast(intent);
@@ -37,14 +37,14 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processPollVotePDU(PollVotePDU pdu) {
-		Log.i("DEBUG", "received a pollVote [ userId: " + pdu.GetUserId() + ", option: " + pdu.GetOptionPosition() + "]" );
+		Log.i("DEBUG", "received a pollVote [ userId: " + pdu.getUserId() + ", option: " + pdu.getOptionPosition() + "]" );
 
-		if(!SpamManager.isBlocked(pdu.GetUserId())){
-			MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
+		if(!SpamManager.isBlocked(pdu.getUserId())){
+			MemCacheProvider.addTweet(pdu.getId(), pdu);
 
 			Intent intent = new Intent();
 			intent.setAction(Actions.POLL_VOTE);
-			intent.putExtra(Actions.POLL_VOTE_DATA, pdu.GetTweetId());
+			intent.putExtra(Actions.POLL_VOTE_DATA, pdu.getId());
 			if (this.context != null) {
 				Log.i("DEBUG", "BroadCasting Message");
 				context.sendBroadcast(intent);
@@ -55,12 +55,12 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processPublishPollPDU(PublishPollPDU pdu) {
-		if(!SpamManager.isBlocked(pdu.GetUserId())){
+		if(!SpamManager.isBlocked(pdu.getUserId())){
 			Intent intent = new Intent();
 			intent.setAction(Actions.BROADCAST_TWEET);
-			intent.putExtra(Actions.TWEET_DATA, pdu.GetTweetId());
+			intent.putExtra(Actions.TWEET_DATA, pdu.getId());
 			if (this.context != null) {
-				MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
+				MemCacheProvider.addTweet(pdu.getId(), pdu);
 				this.context.sendBroadcast(intent);
 			}
 		}
@@ -68,21 +68,21 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processRegisterPDU(RegisterPDU pdu) {
-		ClientsManager.registerUser(pdu.GetUserId());
+		ClientsManager.registerUser(pdu.getUserId());
 		Intent intent = new Intent();
 		intent.setAction(Actions.BROADCAST_NEW_USER);
-		intent.putExtra(Actions.NEW_USER_DATA, pdu.GetUserId());
+		intent.putExtra(Actions.NEW_USER_DATA, pdu.getUserId());
 		this.context.sendBroadcast(intent);
 	}
 
 	@Override
 	public void processReplyPDU(ReplyPDU pdu) {
-		if(!SpamManager.isBlocked(pdu.GetUserId())){
+		if(!SpamManager.isBlocked(pdu.getUserId())){
 			Intent intent = new Intent();
 			intent.setAction(Actions.BROADCAST_TWEET);
-			intent.putExtra(Actions.TWEET_DATA, pdu.GetTweetId());
+			intent.putExtra(Actions.TWEET_DATA, pdu.getId());
 			if (this.context != null) {
-				MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
+				MemCacheProvider.addTweet(pdu.getId(), pdu);
 				this.context.sendBroadcast(intent);
 			}
 		}
@@ -91,8 +91,8 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processSpamVotePDU(SpamVotePDU pdu) {
-		if(!SpamManager.isBlocked(pdu.GetUserId())){
-			Log.i("DEBUG", "New SPAM VOTE FOR USER " + pdu.GetUserId());
+		if(!SpamManager.isBlocked(pdu.getUserId())){
+			Log.i("DEBUG", "New SPAM VOTE FOR USER " + pdu.getUserId());
 			SpamManager.registerSpamVote(pdu);
 			if(SpamManager.isBlocked(pdu.getTargetUserId())) {
 				Intent intent = new Intent();
@@ -105,12 +105,12 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processTweetPDU(TweetPDU pdu) {
-		if(!SpamManager.isBlocked(pdu.GetUserId())){
+		if(!SpamManager.isBlocked(pdu.getUserId())){
 			Intent intent = new Intent();
 			intent.setAction(Actions.BROADCAST_TWEET);
-			intent.putExtra(Actions.TWEET_DATA, pdu.GetTweetId());
+			intent.putExtra(Actions.TWEET_DATA, pdu.getId());
 			if (this.context != null) {
-				MemCacheProvider.addTweet(pdu.GetTweetId(), pdu);
+				MemCacheProvider.addTweet(pdu.getId(), pdu);
 				this.context.sendBroadcast(intent);
 			}
 		}

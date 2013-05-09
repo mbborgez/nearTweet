@@ -4,7 +4,6 @@ package pt.utl.ist.cm.neartweetEntities.pdu;
 public class ReplyPDU extends PDU {
 
 	private static final long serialVersionUID = 1L;
-	private String tweetId;
 	private String targetMessageId;
 	private String text;
 	private String targetUserId;
@@ -21,9 +20,8 @@ public class ReplyPDU extends PDU {
 	 */
 	public ReplyPDU(String userId, String tweetId, String targetMessageId, String text, String targetUserId, Boolean isBroadcast) 
 	{
-		super(userId);
+		super(tweetId, userId, targetUserId);
 		
-		this.tweetId = tweetId;
 		this.targetMessageId = targetMessageId;
 		this.text = text;
 		this.targetUserId = targetUserId;		
@@ -32,17 +30,9 @@ public class ReplyPDU extends PDU {
 	
 	/**
 	 * 
-	 * @return unique id of this message
-	 */
-	public String GetTweetId()
-	{
-		return this.tweetId;
-	}
-	/**
-	 * 
 	 * @return ID of the message to which we are replying
 	 */
-	public String GetTargetMessageId()
+	public String getTargetMessageId()
 	{
 		return this.targetMessageId;
 	}
@@ -51,7 +41,7 @@ public class ReplyPDU extends PDU {
 	 * 
 	 * @return content of the reply message
 	 */
-	public String GetText()
+	public String getText()
 	{
 		return this.text;
 	}

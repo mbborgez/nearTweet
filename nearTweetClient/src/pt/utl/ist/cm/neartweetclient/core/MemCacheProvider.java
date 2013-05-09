@@ -29,28 +29,28 @@ public class MemCacheProvider {
 		if(pdu instanceof TweetPDU){
 			TweetPDU tweetPdu = (TweetPDU) pdu;
 			tweetsStream.add(tweetPdu);
-			tweetConversationContainer.put(tweetPdu.GetTweetId(), new TweetConversation(tweetPdu));
+			tweetConversationContainer.put(tweetPdu.getId(), new TweetConversation(tweetPdu));
 		} else if(pdu instanceof ReplyPDU){
 			ReplyPDU replyPdu = (ReplyPDU) pdu;
-			if(tweetConversationContainer.containsKey(replyPdu.GetTargetMessageId())){
-				tweetConversationContainer.get(replyPdu.GetTargetMessageId()).addMessage(replyPdu);
+			if(tweetConversationContainer.containsKey(replyPdu.getTargetMessageId())){
+				tweetConversationContainer.get(replyPdu.getTargetMessageId()).addMessage(replyPdu);
 			}
 		} else if(pdu instanceof PollVotePDU){
 			PollVotePDU pollVotePdu = (PollVotePDU) pdu;
-			if(pollConversationContainer.containsKey(pollVotePdu.GetTargetMessageId())){
-				pollConversationContainer.get(pollVotePdu.GetTargetMessageId()).addVote(pollVotePdu);
+			if(pollConversationContainer.containsKey(pollVotePdu.getTargetMessageId())){
+				pollConversationContainer.get(pollVotePdu.getTargetMessageId()).addVote(pollVotePdu);
 			}
 		} else if(pdu instanceof PublishPollPDU){
 			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
 			tweetsStream.add(publishPollPdu);
-			pollConversationContainer.put(publishPollPdu.GetTweetId(), new PollConversation(publishPollPdu));
+			pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
 		}
 	}
 	
 	public static boolean isMyPoll(String tweetId){
 		if(pollConversationContainer.containsKey(tweetId)){
 			PublishPollPDU publishPdu = (PublishPollPDU) getTweet(tweetId);
-			return publishPdu.GetUserId().equals(getUserName());
+			return publishPdu.getUserId().equals(getUserName());
 		}
 		return false;
 	}

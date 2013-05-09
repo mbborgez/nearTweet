@@ -16,7 +16,7 @@ public class SpamManager {
 	private static List<String> blockedUsers = new ArrayList<String>();
 	
 	public static void registerSpamVote(SpamVotePDU pdu) {
-		Log.i("DEBUG", "registerSpamVote - [targetMessageId: " + pdu.GetTargetMessageId() + ", userTargetId: " + pdu.getTargetUserId());
+		Log.i("DEBUG", "registerSpamVote - [targetMessageId: " + pdu.getTargetMessageId() + ", userTargetId: " + pdu.getTargetUserId());
 		List<SpamVotePDU> userSpamVotes = spamVotes.containsKey(pdu.getTargetUserId()) ? 
 											spamVotes.get(pdu.getTargetUserId()) : new ArrayList<SpamVotePDU>();
 		userSpamVotes.add(pdu);
