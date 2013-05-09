@@ -4,8 +4,9 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="C:/Users/joaquim/Documents/Workspace_Eclipse/nearTweet/lib/pdus.jar"/>
 	<classpathentry kind="lib" path="C:/Users/joaquim/Documents/Workspace_Eclipse/nearTweet/lib/twitter4j-core-android-2.2.6.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CMov-SimWifiP2P-API"/>
+	<classpathentry kind="lib" path="/CMov-SimWifiP2P-API/bin/cmov-simwifip2p-api.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CMov-SimWifiP2P-API"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

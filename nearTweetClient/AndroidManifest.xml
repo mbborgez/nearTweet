@@ -86,6 +86,9 @@
             android:name="pt.utl.ist.cm.neartweetclient.ui.UsersActivity"
             android:label="@string/title_activity_users" >
         </activity>
+        
+        <service android:name="pt.utl.ist.cmov.wifidirect.service.SimWifiP2pService" />
+        
     </application>
 
 </manifest>
