@@ -11,7 +11,7 @@ public class Server
 		} else {
 			serverName = args[0];
 		}
-		ServerProcess server = new ServerProcess(serverName, 8004);
+		ServerProcess server = new ServerProcess(serverName, 8008);
 		server.run();
 	}
 }

@@ -16,7 +16,7 @@ public class Connection {
 
 	// Network configurations
 	public final String DEFAULT_IP_ADDRESS = "10.0.2.2";
-	public final int DEFAULT_PORT = 8004;
+	public final int DEFAULT_PORT = 8008;
 
 	public static Connection currentConnection;
 	private ObjectOutputStream outputStream;
