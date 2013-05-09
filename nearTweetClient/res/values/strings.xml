@@ -47,5 +47,6 @@
     <string name="spam">Spam</string>
     <string name="title_activity_users">UsersActivity</string>
     <string name="users">Users</string>
+    <string name="port">1001</string>
 
 </resources>

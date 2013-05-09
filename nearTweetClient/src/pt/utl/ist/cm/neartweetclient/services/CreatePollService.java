@@ -28,10 +28,10 @@ public class CreatePollService implements INearTweetService {
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 	    	String userId = settings.getString("username", null);
 	    	
-			String tweetId = Connection.createUniqueID(userId);
+			String tweetId = Actions.createUniqueID(context);
 			PublishPollPDU publishPdu = new PublishPollPDU(userId,	tweetId, tweetMessage,pollOptions);
 			
-			Connection.getInstance().sendPDU(publishPdu);
+			Connection.getInstance().broadcastPDU(publishPdu);
 			return true;
 		} catch (Exception e) {
 			Log.i("DEGUB", e.getMessage());

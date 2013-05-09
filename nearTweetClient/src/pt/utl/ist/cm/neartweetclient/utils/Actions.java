@@ -1,5 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.utils;
 
+import java.util.UUID;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -37,4 +39,7 @@ public class Actions {
 		editor.commit();
 	}
 
+	public static String createUniqueID(Context context) {
+		return getUserId(context) + UUID.randomUUID();
+	}
 }

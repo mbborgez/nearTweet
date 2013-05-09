@@ -30,6 +30,8 @@ public class Constants {
 	
 	public static final String SERVER_ADDRESS = "10.0.2.2";
 	
-	public static final Integer SERVER_PORT = 8000; 
+	public static final Integer SERVER_PORT = 8000;
+	
+	public static final Integer CONNECTION_LISTENER_PORT = 10001;
 
 }

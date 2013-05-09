@@ -208,6 +208,7 @@ public final class R {
         public static final int poll_removeOption_button=0x7f060009;
         public static final int poll_startPoll=0x7f06000a;
         public static final int poll_submit_vote_button=0x7f06000e;
+        public static final int port=0x7f06002e;
         public static final int reply=0x7f060024;
         public static final int reply_text_hint=0x7f060027;
         public static final int reply_tweet_button=0x7f060012;

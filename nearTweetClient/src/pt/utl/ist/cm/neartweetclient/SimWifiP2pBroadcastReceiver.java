@@ -2,6 +2,10 @@ package pt.utl.ist.cm.neartweetclient;
 
 import java.util.Collection;
 
+import pt.utl.ist.cm.neartweetclient.core.Peer;
+import pt.utl.ist.cm.neartweetclient.sync.*;
+import pt.utl.ist.cm.neartweetclient.utils.Constants;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pDeviceList;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pInfo;
@@ -14,77 +18,77 @@ import android.widget.Toast;
 
 public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
-    private Activity mActivity;
-    
-    private SimWifiP2pDeviceList deviceList;
-    private SimWifiP2pInfo groupInfo;
+	private Activity mActivity;
 
-    public SimWifiP2pBroadcastReceiver(Activity activity) {
-        super();
-        this.mActivity = activity;
-        deviceList = null;
-        groupInfo = null;
-    }
+	private SimWifiP2pDeviceList deviceList;
+	private SimWifiP2pInfo groupInfo;
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        if (SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
+	public SimWifiP2pBroadcastReceiver(Activity activity) {
+		super();
+		this.mActivity = activity;
+		deviceList = null;
+		groupInfo = null;
+	}
 
-        	// This action is triggered when the WDSim service changes state:
-        	// - creating the service generates the WIFI_P2P_STATE_ENABLED event
-        	// - destroying the service generates the WIFI_P2P_STATE_DISABLED event
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		String action = intent.getAction();
+		if (SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 
-            int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE, -1);
-            if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED) {
-        		Toast.makeText(mActivity, "WiFi Direct enabled",
-        				Toast.LENGTH_SHORT).show();
-            } else {
-        		Toast.makeText(mActivity, "WiFi Direct disabled",
-        				Toast.LENGTH_SHORT).show();
-            }
+			// This action is triggered when the WDSim service changes state:
+			// - creating the service generates the WIFI_P2P_STATE_ENABLED event
+			// - destroying the service generates the WIFI_P2P_STATE_DISABLED event
 
-        } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+			int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE, -1);
+			if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED) {
+				Toast.makeText(mActivity, "WiFi Direct enabled",
+						Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(mActivity, "WiFi Direct disabled",
+						Toast.LENGTH_SHORT).show();
+			}
 
-            // Request available peers from the wifi p2p manager. This is an
-            // asynchronous call and the calling activity is notified with a
-            // callback on PeerListListener.onPeersAvailable()
-        	
-        	deviceList = (SimWifiP2pDeviceList) intent.getSerializableExtra(
-            		SimWifiP2pBroadcast.EXTRA_DEVICE_LIST);
+		} else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
-        	Log.i("DEVICES_LIST", deviceList.getDeviceList().toString());
-        	
-        	Toast.makeText(mActivity, "Peer list changed: " + deviceList.getDeviceList().toString(),
-    				Toast.LENGTH_SHORT).show();
-        	
-    		updateNetworkInfo();
-        	
-        } else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
+			// Request available peers from the wifi p2p manager. This is an
+			// asynchronous call and the calling activity is notified with a
+			// callback on PeerListListener.onPeersAvailable()
 
-        	groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
-        			SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
-        	
-        	groupInfo.print();
-    		Toast.makeText(mActivity, "Network membership changed",
-    				Toast.LENGTH_SHORT).show();
+			deviceList = (SimWifiP2pDeviceList) intent.getSerializableExtra(
+					SimWifiP2pBroadcast.EXTRA_DEVICE_LIST);
 
-    		updateNetworkInfo();
+			Log.i("DEVICES_LIST", deviceList.getDeviceList().toString());
 
-        } else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
+			Toast.makeText(mActivity, "Peer list changed: " + deviceList.getDeviceList().toString(),
+					Toast.LENGTH_SHORT).show();
 
-        	groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
-        			SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
-        	groupInfo.print();
+			updateNetworkInfo();
 
-        	Toast.makeText(mActivity, "Group ownership changed",
-    				Toast.LENGTH_SHORT).show();
-    		updateNetworkInfo();
-    		
-        }
-    }
-//TODO
-	private void updateNetworkInfo() {
+		} else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
+
+			groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
+					SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+
+			groupInfo.print();
+			Toast.makeText(mActivity, "Network membership changed",
+					Toast.LENGTH_SHORT).show();
+
+			updateNetworkInfo();
+
+		} else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
+
+			groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
+					SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			groupInfo.print();
+
+			Toast.makeText(mActivity, "Group ownership changed",
+					Toast.LENGTH_SHORT).show();
+			updateNetworkInfo();
+
+		}
+	}
+
+	public void updateNetworkInfo() {
 		Log.i("NearTweet", "before");
 
 		if (this.getGroupInfo() != null) {
@@ -95,24 +99,23 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 			Collection<String> groupOwners = this.getGroupInfo().getHomeGroups();
 
 			for (String groupOwner : groupOwners) {
-				//				if (!receiver.getGroupInfo().getDeviceName().equals(groupOwner) && !clientsSockets.containsKey(groupOwner)) {
-				if (!this.getGroupInfo().getDeviceName().equals(groupOwner) /*&& !Connection.getInstance().hasPeer(groupOwner)*/) {
+				if (!this.getGroupInfo().getDeviceName().equals(groupOwner) && !Connection.getInstance().hasPeer(groupOwner)) {
 
 					Log.i("NearTweet-UPDATE",
 							"Need to perform a new conenction to GO named "
 									+ groupOwner);
-					//new ConnectTask().execute(groupOwner);
+					new ConnectTask(groupOwner, getDeviceAddress(groupOwner), mActivity);
 				}
 			}
 
 		}
 	}
-	
+
 	public String getDeviceAddress(String deviceName){
 		if(getDeviceList()!=null && getDeviceList().getByName(deviceName)!=null){
 			return getDeviceList().getByName(deviceName).getVirtIp();
 		} else {
-		return null;
+			return null;
 		}
 	}
 
@@ -132,4 +135,30 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 		this.groupInfo = groupInfo;
 	}
 
+	public class ConnectTask implements Runnable {
+
+		private String deviceName;
+		private String deviceAddress;
+		private Context context;
+
+		public ConnectTask(String deviceName, String deviceAddress, Context context) {
+			this.deviceName = deviceName;
+			this.deviceAddress = deviceAddress;
+			this.context = context;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Log.i(UiMessages.NEARTWEET_TAG, "Connecting to device " + deviceName + " - " + deviceAddress);
+				Peer peer = new Peer(deviceName, deviceAddress, Constants.CONNECTION_LISTENER_PORT);
+				peer.connect();
+				Log.i(UiMessages.NEARTWEET_TAG, "Connected with " + deviceName + " - " + deviceAddress);
+				new Thread(new MessagesReceiverRunnable(context, peer)).start();
+			} catch (Exception e) {
+				Log.e(UiMessages.NEARTWEET_TAG, "Error connecting with [deviceName: " + deviceName + ", deviceAddress: " + deviceAddress + "]");
+			}
+
+		}
+	}
 }

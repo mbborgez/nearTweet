@@ -22,10 +22,10 @@ public class PollVoteService implements INearTweetService {
 	public boolean execute() {
 		try {
 			String userId = Actions.getUserId(context);
-			String tweetId = Connection.createUniqueID(userId);
+			String tweetId = Actions.createUniqueID(context);
 			PollVotePDU pdu = new PollVotePDU(userId, tweetId, targetMessageId, optionPosition, originalUserId);
 			
-			Connection.getInstance().sendPDU(pdu);
+			Connection.getInstance().broadcastPDU(pdu);
 			
 			return true;
 		} catch(Exception e) {

@@ -58,6 +58,11 @@ public class MemCacheProvider {
 		return memcache.get(tweetID);
 	}
 	
+	public static boolean hasMessage(String messageID){
+	
+		return memcache.containsKey(messageID);
+	}
+	
 	public static Map<String, Integer> getVotesForPoll(String tweetId){
 		return isMyPoll(tweetId) ? pollConversationContainer.get(tweetId).getVotes() : null;
 	}

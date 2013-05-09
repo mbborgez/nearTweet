@@ -1,14 +1,13 @@
 package pt.utl.ist.cm.neartweetclient.sync;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.UUID;
+import java.util.Collection;
+import java.util.HashMap;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetclient.core.Peer;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.content.Context;
 import android.util.Log;
 
@@ -19,9 +18,9 @@ public class Connection {
 	public final int DEFAULT_PORT = 8008;
 
 	public static Connection currentConnection;
-	private ObjectOutputStream outputStream;
-	private ObjectInputStream inputStream;
-	private Socket socket;
+	
+	//maps DeviceId -> Peer 
+	private HashMap<String, Peer> peers;
 
 	private Connection() { /* Avoid instantiation */ }
 
@@ -37,72 +36,18 @@ public class Connection {
 	 * @param pdu
 	 * @throws IOException
 	 */
-	public void sendPDU(PDU pdu) throws NearTweetException {
-		try{
-			if (this.outputStream != null) {
-				Log.i("DEBUG", "SEND PDU: " + pdu.getClass().getName());
-				this.outputStream.writeObject(pdu);
-				this.outputStream.flush();
-			}
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			throw new NearTweetException(e.getMessage());
-		}
-	}
-
-	public PDU receiveData() {
-		PDU pdu = null;
-		Object obj = null;
-
-		if (this.inputStream != null) {
-			while(pdu == null) {
-				try {
-					obj = inputStream.readObject();
-					Log.i("DEBUG", "NEW OBJECT ARRIVED");
-					if(obj != null && obj instanceof PDU) {
-						pdu = (PDU) obj;
-					}
-				} catch (Exception e) { obj = null; }
-			}
-		}
-		return pdu;
-	}
-
-	public boolean isAlive() {
-		return (this.socket != null);
-	}
-
-	public void connect(String serverAddress, int serverPort) throws NearTweetException{
-		try {
-			Log.i("DEBUG", "STARTING CONNECTION");
-			this.socket = new Socket(serverAddress, serverPort);
-			Log.i("DEBUG", "CONNECTION STARTED SUCCESSFULL");
-			
-			this.outputStream = new ObjectOutputStream(socket.getOutputStream());
-			this.inputStream  = new ObjectInputStream(socket.getInputStream());
-		} catch (UnknownHostException e) {
-			throw new NearTweetException(e.getMessage() + "\n" + "Error Connecting");
-		} catch (IOException e) {
-			throw new NearTweetException(e.getMessage() + "\n" + "Error Connecting");
-		}
-	}
-
-	public void disconnect() throws NearTweetException {
-		try {
-			this.socket.close();
-			this.socket = null;
-			this.outputStream = null;
-			this.inputStream = null;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new NearTweetException(e.getMessage());
+	public void broadcastPDU(PDU pdu) throws NearTweetException {
+		Log.i(UiMessages.NEARTWEET_TAG, "broadcastPDU: " + pdu);
+		for(Peer peer : peers.values()){
+			Log.i(UiMessages.NEARTWEET_TAG, "send pdu to peer: " + peer.getDeviceName());
+			peer.sendPDU(pdu);
 		}
 	}
 
 	public void startAsyncReceive(Context contex) throws NearTweetException{
 		try{
-			new Thread(new MessagesReceiverRunnable(contex)).start();
+			new Thread(new ConnectionsReceiverRunnable(contex)).start();
+			//new Thread(new MessagesReceiverRunnable(contex)).start();
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -110,7 +55,49 @@ public class Connection {
 		}
 	}
 	
-	public static String createUniqueID(String deviceName) {
-		return deviceName + UUID.randomUUID();
+
+	
+	public void init() {
+		peers = new HashMap<String, Peer>();
 	}
+	
+	public boolean hasPeers() {
+		return !peers.isEmpty();
+	}
+	
+	public Collection<Peer> getPeers() {
+		return peers.values();
+	}
+	
+	public Peer getPeer(String peerId) {
+		return peers.get(peerId);
+	}
+	
+	public void removePeer(String peerId) {
+		if(peers.containsKey(peerId)) {
+			if(!peers.get(peerId).isClosed()) {
+				peers.get(peerId).closeConnection();
+			}
+			peers.remove(peerId);
+		}
+	}
+	
+	public void removeAllPeers() {
+		HashMap<String, Peer> peersCopy = new HashMap<String, Peer>(peers);
+		for(String peerId : peersCopy.keySet()) {
+			removePeer(peerId);
+		}
+	}
+	
+	public void addPeer(Peer peer) {
+		if(peers.containsKey(peer.getDeviceName())) {
+			peers.remove(peer.getDeviceName());
+		}
+		peers.put(peer.getDeviceName(), peer);
+	}
+	
+	public boolean hasPeer(String peerName) {
+		return peers.containsKey(peerName);
+	}
+	
 }

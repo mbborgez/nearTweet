@@ -14,5 +14,6 @@ public class UiMessages {
 	public static final String WELCOME_MESSAGE = "Welcome to NearTweet %s!!";
 	public static final String ERROR_MESSAGE = "Cannot establish connection to the server!";
 	public static final String ERROR_CONNECTING_MESSAGE = "Error connecting";
+	public static final String NEARTWEET_TAG = "NearTweet";
 
 }

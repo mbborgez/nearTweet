@@ -15,7 +15,7 @@ public class RegisterUserService implements INearTweetService {
 	@Override
 	public boolean execute() {
 		try {
-			Connection.getInstance().sendPDU(new RegisterPDU(userId, userId));
+			Connection.getInstance().broadcastPDU(new RegisterPDU(userId, userId));
 		} catch (NearTweetException e) {
 			return false;
 		}

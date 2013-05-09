@@ -4,33 +4,51 @@ import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.services.RegisterUserService;
-import pt.utl.ist.cm.neartweetclient.sync.AuthenticationHandler;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
+import pt.utl.ist.cm.neartweetclient.sync.ConnectionsReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import pt.utl.ist.cm.neartweetclient.SimWifiP2pBroadcastReceiver;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pDevice;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pDeviceList;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pInfo;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.Channel;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.GroupInfoListener;
+import pt.utl.ist.cmov.wifidirect.service.SimWifiP2pService;
 import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity implements GroupInfoListener {
 	
 	private Button loginButton;
 	private EditText userNameText;
 	private boolean connectionError;
 	private SimWifiP2pBroadcastReceiver receiver;
+	private SimWifiP2pManager mManager = null;
+	private Messenger mService = null;
+	private Channel mChannel = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +65,7 @@ public class LoginActivity extends Activity {
 		loginButton.setOnClickListener(loginRequestCallback());
 		
 		// initialize the WDSim API
-//		SimWifiP2pSocketManager.Init(getApplicationContext());
+		SimWifiP2pSocketManager.Init(getApplicationContext());
 
 		// register broadcast receiver
 		IntentFilter filter = new IntentFilter();
@@ -55,38 +73,33 @@ public class LoginActivity extends Activity {
 		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
 		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
 		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-//		receiver = new SimWifiP2pBroadcastReceiver(this);
-//		registerReceiver(receiver, filter);
+		receiver = new SimWifiP2pBroadcastReceiver(this);
+		registerReceiver(receiver, filter);
+				
 	}
 	
-	/**
-	 * registerUser - it is responsible to delegate the Registration to the 
-	 * Service Layer
-	 * @param username - the name which this user will identify future interactions with
-	 * the remaining entities on the network
-	 */
-	private void registerUser(final String username) {
-		try {
-			new AsyncTask<String, Void, Boolean>() {
-				@Override
-				protected Boolean doInBackground(String... params) {
-					return new RegisterUserService(username).execute();
-				}
+	private ServiceConnection mConnection = new ServiceConnection() {
+		// callbacks for service binding, passed to bindService()
 
-				@Override
-				protected void onPostExecute(Boolean result) {
-					if (!result) {
-						connectionError();
-					} else {
-						waitForAuthenticationResponse();
-					}
-				}
-			}.execute();
-		} catch(NearTweetException e) {
-			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-			loginButton.setEnabled(false);
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			Log.i(UiMessages.NEARTWEET_TAG, "service connected");
+			mService = new Messenger(service);
+			mManager = new SimWifiP2pManager(mService);
+			mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
+			mManager.requestGroupInfo(mChannel, (GroupInfoListener) LoginActivity.this);
+			new Thread(new ConnectionsReceiverRunnable(getApplicationContext())).start();
 		}
-	}
+
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			Log.i(UiMessages.NEARTWEET_TAG, "service disconnected");
+			mService = null;
+			mManager = null;
+			mChannel = null;
+		}
+	};
+	
 	
 	/**
 	 * Login Button should only be active when text field area isn't empty.  
@@ -118,30 +131,45 @@ public class LoginActivity extends Activity {
 		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String userName = userNameText.getText().toString();
-				if (userName.length() > 0) {
-					verifyConnection();
-					registerUser(userName);
-					return;
-				}
-				invalidTextFormat();
+				bindService();		
 			}
 		};
 	}
+		
+	@Override
+	public void onGroupInfoAvailable(SimWifiP2pDeviceList devices, SimWifiP2pInfo groupInfo) {
+
+		createCookieSession(groupInfo.getDeviceName());
+		
+//		String clientStr = "I'm client - GOs List: " + groupInfo.getHomeGroups();
+//		String goStr = "I'm GO - Clients List: " + groupInfo.getGroupClients();
+//		Toast.makeText(getApplicationContext(), groupInfo.askIsGO() ? clientStr : goStr, Toast.LENGTH_SHORT).show();
+
+		// compile list of network members
+//		StringBuilder peersStr = new StringBuilder();
+//		for (String deviceName : groupInfo.getDevicesInNetwork()) {
+//			SimWifiP2pDevice device = devices.getByName(deviceName);
+//			String devstr = "" + deviceName + " (" + ((device == null) ? "??" : device.getVirtIp()) + ")\n";
+//			peersStr.append(devstr);
+//		}
+//
+//		// display list of network members
+//		new AlertDialog.Builder(this)
+//		.setTitle("Devices in WiFi Network")
+//		.setMessage(peersStr.toString())
+//		.setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+//							public void onClick(DialogInterface dialog, int which) {
+//						}}).show();
+		
+		receiver.setGroupInfo(groupInfo);
+//		receiver.updateNetworkInfo();
+		nextScreen();
+	}
 	
-	/**
-	 * Method responsible for dealing with the logic before making a Server response
-	 * @return
-	 */
-	public void loginResponseCallback(boolean authenticated) {
-		String name = userNameText.getText().toString();
-		if (authenticated) {
-			Connection.getInstance().startAsyncReceive(getApplicationContext());
-			createCookieSession(name);
-			nextScreen();
-		} else {
-			invalidLogin(name);
-		}
+	private void bindService(){
+		Intent intent = new Intent(getApplicationContext(), SimWifiP2pService.class);
+		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		
 	}
 	
 	/**
@@ -152,38 +180,7 @@ public class LoginActivity extends Activity {
 	public void nextScreen() {
 		startActivity(new Intent(this, TweetsStreamActivity.class));
 	}
-	
-	/**
-	 *  Toast messages for invalid text format and connection error
-	 */
-	
-	/**
-	 * shows an alert message with the user didn't type anything on the text field
-	 */
-	public void invalidTextFormat() {
-		Toast.makeText(this, 
-				UiMessages.ENTER_LOGIN, 
-				Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * shows an alert message with invalid Login
-	 */
-	public void invalidLogin(String name) {
-		Toast.makeText(this, 
-				String.format(UiMessages.INVALID_LOGIN, name),
-				Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * shows an alert message with invalid Login
-	 */
-	public void connectionError() {
-		this.connectionError = true;
-		Toast.makeText(this, 
-				UiMessages.ERROR_MESSAGE,
-				Toast.LENGTH_SHORT).show();
-	}
+
 	
 	/**
 	 * createCookieSession - it should only be activated when 
@@ -196,19 +193,5 @@ public class LoginActivity extends Activity {
 		editor.commit();
 		MemCacheProvider.setUserName(userName);
 	}
-	
-	protected void verifyConnection() {
-		if (connectionError == true) {
- 			// Start listening the socket for authentication response
- 			new AuthenticationHandler(this).execute();
-		}
-	}
-	
-
-	private void waitForAuthenticationResponse() {
-		// Start listening the socket for authentication response
-		new AuthenticationHandler(this).execute();
-		
-	}
-	 
+			 
 }
