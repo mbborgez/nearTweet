@@ -47,7 +47,7 @@ public class LoginActivity extends Activity {
 		loginButton.setOnClickListener(loginRequestCallback());
 		
 		// initialize the WDSim API
-		SimWifiP2pSocketManager.Init(getApplicationContext());
+//		SimWifiP2pSocketManager.Init(getApplicationContext());
 
 		// register broadcast receiver
 		IntentFilter filter = new IntentFilter();
@@ -55,8 +55,8 @@ public class LoginActivity extends Activity {
 		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
 		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
 		filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-		receiver = new SimWifiP2pBroadcastReceiver(this);
-		registerReceiver(receiver, filter);
+//		receiver = new SimWifiP2pBroadcastReceiver(this);
+//		registerReceiver(receiver, filter);
 	}
 	
 	/**

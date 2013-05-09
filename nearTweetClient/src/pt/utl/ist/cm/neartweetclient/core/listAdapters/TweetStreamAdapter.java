@@ -56,25 +56,25 @@ public class TweetStreamAdapter extends ArrayAdapter<PDU> {
 	}
 
 	private void populatePollItem(TextView name, TextView message, PublishPollPDU publishPDU) {
-		boolean hasunreadMessages = MemCacheProvider.getPollConversation(publishPDU.GetTweetId()).isHasUnreadMessages();
-		Log.i("DEBUG", "populatePollItem" + publishPDU.GetTweetId());
+		boolean hasunreadMessages = MemCacheProvider.getPollConversation(publishPDU.getId()).isHasUnreadMessages();
+		Log.i("DEBUG", "populatePollItem" + publishPDU.getId());
 		if (name != null) {
-			name.setText(publishPDU.GetTweetId());
+			name.setText(publishPDU.getId());
 			name.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 		if (message != null) {
-			message.setText("POLL MESSAGE: " + publishPDU.GetText());
+			message.setText("POLL MESSAGE: " + publishPDU.getText());
 			message.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 	}
 
 	private void populateTweetItem(TextView name, TextView message, ImageView image, TweetPDU tweetPDU) {
-		Log.i("DEBUG", "populateTweetItem" + tweetPDU.GetTweetId());
+		Log.i("DEBUG", "populateTweetItem" + tweetPDU.getId());
 		
-		boolean hasunreadMessages = MemCacheProvider.getTweetConversation(tweetPDU.GetTweetId()).isHasUnreadMessages();
+		boolean hasunreadMessages = MemCacheProvider.getTweetConversation(tweetPDU.getId()).isHasUnreadMessages();
 		
 		if (name != null) {
-			name.setText(tweetPDU.GetTweetId());
+			name.setText(tweetPDU.getId());
 			name.setTextColor(hasunreadMessages ? Color.RED : Color.BLACK);
 		}
 		

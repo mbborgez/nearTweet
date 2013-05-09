@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.UUID;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
@@ -15,7 +16,7 @@ public class Connection {
 
 	// Network configurations
 	public final String DEFAULT_IP_ADDRESS = "10.0.2.2";
-	public final int DEFAULT_PORT = 8004;
+	public final int DEFAULT_PORT = 8008;
 
 	public static Connection currentConnection;
 	private ObjectOutputStream outputStream;
@@ -107,5 +108,9 @@ public class Connection {
 			e.printStackTrace();
 			throw new NearTweetException(e.getMessage());
 		}
+	}
+	
+	public static String createUniqueID(String deviceName) {
+		return deviceName + UUID.randomUUID();
 	}
 }

@@ -23,14 +23,14 @@ public class PollConversation {
 
 	private void initVotes(PublishPollPDU mainMessage) {
 		votes = new HashMap<String, Integer>();
-		for(String voteOption : mainMessage.GetOptions()){
+		for(String voteOption : mainMessage.getOptions()){
 			votes.put(voteOption, 0);
 		}
 	}
 
 	public void addVote(PollVotePDU newMessage){
 		conversation.add(newMessage);
-		String selectedVote = mainMessage.GetOptions().get(newMessage.GetOptionPosition());
+		String selectedVote = mainMessage.getOptions().get(newMessage.getOptionPosition());
 		int numVotes = 0;
 		if(votes.containsKey(selectedVote)){
 			numVotes = votes.get(selectedVote);
@@ -41,9 +41,9 @@ public class PollConversation {
 	}
 
 	public void removeMessage(String tweetId){
-		if(!mainMessage.GetTweetId().equals(tweetId)){
+		if(!mainMessage.getId().equals(tweetId)){
 			for(int i=0; i<conversation.size();++i){
-				if(conversation.get(i).GetTweetId().equals(tweetId)){
+				if(conversation.get(i).getId().equals(tweetId)){
 					conversation.remove(i);
 					return;
 				}

@@ -7,7 +7,6 @@ public class PublishPollPDU extends PDU
 {
 
 	private static final long serialVersionUID = 1L;
-	private String tweetId;
 	private String text;
 	private ArrayList<String> options;
 
@@ -19,26 +18,16 @@ public class PublishPollPDU extends PDU
 	 */
 	public PublishPollPDU(String userId, String tweetId, String text, ArrayList<String> options) 
 	{
-		super(userId);
-		this.tweetId = tweetId;
+		super(tweetId, userId, null);
 		this.text = text;
 		this.options = options;
 	}
 
 	/**
 	 * 
-	 * @return Unique ID of the message
-	 */
-	public String GetTweetId()
-	{
-		return this.tweetId;
-	}
-	
-	/**
-	 * 
 	 * @return description of the poll
 	 */
-	public String GetText()
+	public String getText()
 	{
 		return this.text;
 	}
@@ -47,7 +36,7 @@ public class PublishPollPDU extends PDU
 	 * 
 	 * @return options in which the other users can vote
 	 */
-	public ArrayList<String> GetOptions()
+	public ArrayList<String> getOptions()
 	{
 		return this.options;
 	}

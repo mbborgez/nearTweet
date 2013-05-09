@@ -6,7 +6,6 @@ public class PollVotePDU extends PDU
 	private static final long serialVersionUID = 1L;
 	private String targetMessageId;
 	private int optionPosition;
-	private String tweetId;
 	private String originalUserId;
 	
 	/**
@@ -18,9 +17,8 @@ public class PollVotePDU extends PDU
 	 */
 	public PollVotePDU(String userId, String tweetId, String targetMessageId, int optionPosition, String originalUserId) 
 	{
-		super(userId);
+		super(tweetId, userId, originalUserId);
 		
-		this.tweetId = tweetId;
 		this.targetMessageId = targetMessageId;
 		this.optionPosition = optionPosition;
 		this.originalUserId = originalUserId;
@@ -30,7 +28,7 @@ public class PollVotePDU extends PDU
 	 * @return the ID of the user who should receive this message. 
 	 * The target should be the ID of the user who created the original Poll
 	 */
-	public String GetTargetMessageId()
+	public String getTargetMessageId()
 	{
 		return this.targetMessageId;
 	}
@@ -38,7 +36,7 @@ public class PollVotePDU extends PDU
 	/**
 	 * @return ID of the vote
 	 */
-	public int GetOptionPosition()
+	public int getOptionPosition()
 	{
 		return this.optionPosition;
 	}
@@ -47,10 +45,6 @@ public class PollVotePDU extends PDU
 	public void accept(PDUVisitor visitor) 
 	{
 		visitor.processPollVotePDU(this);
-	}
-
-	public String GetTweetId() {
-		return tweetId;
 	}
 
 	public String getOriginalUserId() {

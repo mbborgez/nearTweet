@@ -13,9 +13,9 @@ public class SpamVotePDU extends PDU
 	 * @param targetMessageId
 	 * @param targerUserId
 	 */
-	public SpamVotePDU(String userId, String targetMessageId, String targerUserId) 
+	public SpamVotePDU(String id, String userId, String targetMessageId, String targerUserId) 
 	{
-		super(userId);
+		super(id, userId, targerUserId);
 		
 		this.targetMessageId = targetMessageId;
 		this.targetUserId = targerUserId;
@@ -25,7 +25,7 @@ public class SpamVotePDU extends PDU
 	 * 
 	 * @return the id of the message marked as spam
 	 */
-	public String GetTargetMessageId()
+	public String getTargetMessageId()
 	{
 		return this.targetMessageId;
 	}

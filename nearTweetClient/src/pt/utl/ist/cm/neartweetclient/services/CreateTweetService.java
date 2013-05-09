@@ -22,12 +22,10 @@ public class CreateTweetService implements INearTweetService {
 	public boolean execute() {
 		try {
 			String userId = Actions.getUserId(context);
-			int lastTweetId = Actions.getLastTweet(context);
+			String tweetId = Connection.createUniqueID(userId);
 			
-			TweetPDU pdu = new TweetPDU(userId, userId + lastTweetId, tweetText, tweetImageBytes);
+			TweetPDU pdu = new TweetPDU(userId, tweetId, tweetText, tweetImageBytes);
 			Connection.getInstance().sendPDU(pdu);
-			
-			Actions.incrementTweetID(context);
 			
 			return true;
 		} catch (NearTweetException e) {

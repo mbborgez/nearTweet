@@ -37,7 +37,7 @@ public class BroadcastNotifier {
     	
     	// The Intent contains the custom broadcast action for this app
         localIntent.setAction(Actions.BROADCAST_TWEET);
-		localIntent.putExtra(Actions.TWEET_DATA, String.format(tweetTemplate, pdu.GetUserId(), pdu.GetText()));
+		localIntent.putExtra(Actions.TWEET_DATA, String.format(tweetTemplate, pdu.getUserId(), pdu.GetText()));
 		
         // Broadcasts the Intent
         mBroadcaster.sendBroadcast(localIntent);

@@ -9,9 +9,9 @@ public class RegisterPDU extends PDU
 	 * This message can be used when a user wants to register in a given server/network
 	 * @param userId
 	 */
-	public RegisterPDU(String userId) 
+	public RegisterPDU(String id, String userId) 
 	{
-		super(userId);
+		super(id, userId, null);
 	}
 
 	@Override

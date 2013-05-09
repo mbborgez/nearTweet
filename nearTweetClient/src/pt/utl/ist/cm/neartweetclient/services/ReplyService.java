@@ -26,12 +26,10 @@ public class ReplyService implements INearTweetService {
 	public boolean execute() {
 		try {
 			String userId = Actions.getUserId(context);
-			String tweetId = userId + Actions.getLastTweet(context);
+			String tweetId = Connection.createUniqueID(userId);
 			ReplyPDU pdu = new ReplyPDU(userId, tweetId, targetMessageId, text, targetUserId, isBroadcast);
 			
 			Connection.getInstance().sendPDU(pdu);
-			
-			Actions.incrementTweetID(context);
 			return true;
 		} catch (Exception e) {
 			return false;

@@ -11,8 +11,9 @@ public class GenericMessagePDU extends PDU
 	 * @param userId
 	 * @param description
 	 */
-	public GenericMessagePDU(String userId, String description) {
-		super(userId);
+	
+	public GenericMessagePDU(String id, String userId, String description) {
+		super(id, userId, null);
 		this.description = description;
 		this.response = false;
 	}
@@ -23,8 +24,8 @@ public class GenericMessagePDU extends PDU
 	 * @param description
 	 * @param response
 	 */
-	public GenericMessagePDU(String userId, String description, boolean response) {
-		super(userId);
+	public GenericMessagePDU(String id, String userId, String description, boolean response) {
+		super(id, userId, null);
 		this.description = description;
 		this.response = response;
 	}
@@ -33,7 +34,7 @@ public class GenericMessagePDU extends PDU
 	 * 
 	 * @return the description of the generic message
 	 */
-	public String GetDescription() {
+	public String getDescription() {
 		return this.description;  
 	}
 	
@@ -41,7 +42,7 @@ public class GenericMessagePDU extends PDU
 	 * 
 	 * @return true if the generic message is a response and returns false otherwise
 	 */
-	public boolean GetResponse() {
+	public boolean getResponse() {
 		return this.response;  
 	}
 

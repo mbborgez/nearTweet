@@ -4,7 +4,6 @@ package pt.utl.ist.cm.neartweetEntities.pdu;
 public class TweetPDU extends PDU
 {
 	private static final long serialVersionUID = 1L;
-	private String tweetId;
 	private String text;
 	private byte[] mediaObject;
 	
@@ -14,24 +13,14 @@ public class TweetPDU extends PDU
 	 * @param text
 	 * @param mediaObject
 	 */
-	public TweetPDU(String userId, String tweetId, String text, byte[] mediaObject) 
+	public TweetPDU(String userId, String id, String text, byte[] mediaObject) 
 	{
-		super(userId);
+		super(id, userId, null);
 		
-		this.tweetId = tweetId;
 		this.text = text;
 		this.mediaObject = mediaObject;
 	}
 
-	/**
-	 * 
-	 * @return unique ID of this message
-	 */
-	public String GetTweetId()
-	{
-		return this.tweetId;
-	}
-	
 	/**
 	 * 
 	 * @return content of the tweet message

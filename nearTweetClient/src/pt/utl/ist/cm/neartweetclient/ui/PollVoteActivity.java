@@ -36,10 +36,10 @@ public class PollVoteActivity extends ListActivity {
 		
 		pollPdu = (PublishPollPDU) MemCacheProvider.getTweet(getIntent().getExtras().getString(TWEET_ID_EXTRA));
 
-		pollDescriptionTextView.setText(pollPdu.GetText());
+		pollDescriptionTextView.setText(pollPdu.getText());
 		pollVoteButton.setOnClickListener(createSubmitPollVoteClickListener());
-		setListAdapter(new PollVotesAdapter(getApplicationContext(),  R.layout.poll_option_layout, pollPdu.GetOptions()));
-		MemCacheProvider.getPollConversation(pollPdu.GetTweetId()).setHasUnreadMessages(false);
+		setListAdapter(new PollVotesAdapter(getApplicationContext(),  R.layout.poll_option_layout, pollPdu.getOptions()));
+		MemCacheProvider.getPollConversation(pollPdu.getId()).setHasUnreadMessages(false);
 	}
 	
 	/*****************************************************************************
@@ -72,7 +72,7 @@ public class PollVoteActivity extends ListActivity {
 
 		@Override
 		protected Boolean doInBackground(String... params) {
-			return (new PollVoteService(pollPdu.GetUserId(), pollPdu.GetTweetId(), pollVoteIndex, getApplicationContext())).execute();
+			return (new PollVoteService(pollPdu.getUserId(), pollPdu.getId(), pollVoteIndex, getApplicationContext())).execute();
 		}
 
 		@Override
@@ -97,7 +97,7 @@ public class PollVoteActivity extends ListActivity {
 	 ********************************* Messages **********************************
 	 *****************************************************************************/
 	private void showSuccessMessage() {
-		Toast.makeText(this, "Submitted: vote in " + pollPdu.GetOptions().get(selectedVoteIndex), Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Submitted: vote in " + pollPdu.getOptions().get(selectedVoteIndex), Toast.LENGTH_LONG).show();
 	}
 
 	public void showErrorMessage() {
