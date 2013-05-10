@@ -1,10 +1,10 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.SimWifiP2pBroadcastReceiver;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.sync.ConnectionsReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
-import pt.utl.ist.cm.neartweetclient.SimWifiP2pBroadcastReceiver;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pDeviceList;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pInfo;
@@ -30,7 +30,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 
 public class LoginActivity extends Activity implements GroupInfoListener {
 	

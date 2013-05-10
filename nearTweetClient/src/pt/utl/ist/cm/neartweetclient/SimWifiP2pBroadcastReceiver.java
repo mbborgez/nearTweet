@@ -105,11 +105,10 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 		Log.i(UiMessages.NEARTWEET_TAG, "# Device name: " + userId);
 	}
 	
-	public void updateNetworkInfo() {
-		Log.i("NearTweet", "before");
+	public synchronized void updateNetworkInfo() {
+		Log.i("NearTweet", "before updateNetworkInfo");
 
 		if (this.getGroupInfo() != null) {
-			Log.i("NearTweet-UPDATE", "before2");
 
 			this.getGroupInfo().print();
 
@@ -129,6 +128,8 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 			}
 
 		}
+		Log.i("NearTweet", "after updateNetworkInfo");
+
 	}
 
 	public String getDeviceAddress(String deviceName){

@@ -61,6 +61,7 @@ public class PollVotesDetailsActivity extends Activity {
     }
 
 	private void populateVotes(Map<String, Integer> votes){
+		votesLinearLayout.removeAllViews();
 		for(java.util.Map.Entry<String, Integer> voteEntry : votes.entrySet()){
 			TextView pollVoteTextLine = new EditText(getApplicationContext());
 			pollVoteTextLine.setTextColor(Color.BLACK);

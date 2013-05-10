@@ -1,0 +1,73 @@
+package pt.utl.ist.cm.neartweetclient.sync;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.*;
+import android.content.Context;
+import android.util.Log;
+import pt.utl.ist.cm.neartweetclient.core.*;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+
+public class MessagesReceiverRunnable implements Runnable {
+	//Just To check!!!
+	private Context context;
+	private Peer peer;
+	private PDUVisitor visitor;
+
+	public MessagesReceiverRunnable(Context context, Peer peer){
+		Log.i(UiMessages.NEARTWEET_TAG, "MessagesReceiverRunnable<Init> peer: " + peer); 
+		this.context = context;
+		this.peer = peer;
+		this.visitor = new PDUHandler(this.context);
+	}
+
+	@Override
+	public void run() {
+		PDU receivedMessage;
+
+		try {
+			PDU registerPDU = new RegisterPDU(Actions.createUniqueID(context), Actions.getUserId(context));
+			MemCacheProvider.addTweet(registerPDU.getId(), registerPDU);
+			if(peer.sendPDU(registerPDU)) {
+				while (true) {
+					receivedMessage = peer.receivePDU();
+					if (receivedMessage == null) {
+						Log.i(UiMessages.NEARTWEET_TAG, "start disconnecting..");
+						// end of connection
+						break;
+					}
+					checkReceivedMessage(receivedMessage, peer);
+				}
+			}
+		} catch (Exception e) {
+			Log.d("Error reading socket:", e.getMessage());
+		}
+		Connection.getInstance().removePeer(peer.getDeviceName());
+	}
+	
+	protected void checkReceivedMessage(PDU message, Peer peer) {
+		Log.i(UiMessages.NEARTWEET_TAG, "checkReceivedMessage: [message: " + message + ", peer: " + peer);
+		if(!MemCacheProvider.hasMessage(message.getId())) {
+			Log.i("NEARTWEET-RECEIVE", "I do not have this message");
+			if(!isMyMessage(message) && !existsPeer(message)) {
+				Log.i("NEARTWEET-RECEIVE", "The device is not registered yet");
+				if(peer.getDeviceName()==null) {
+					Log.i("NEARTWEET-RECEIVE", "The peer has not a name yet: i will name it " + message.getUserId());
+					peer.setDeviceName(message.getUserId());
+				}
+				Connection.getInstance().addPeer(peer);
+				Log.i("NEARTWEET-RECEIVE", "The peer is now registered " + peer);
+			}
+			message.accept(visitor);
+		} else {
+			Log.i(UiMessages.NEARTWEET_TAG, "i wallready have this message : " + message.getId());
+		}
+	}
+
+	private boolean existsPeer(PDU message) {
+		return Connection.getInstance().hasPeer(message.getUserId());
+	}
+
+	private boolean isMyMessage(PDU message) {
+		return MemCacheProvider.getUserName().equals(message.getUserId());
+	}
+}

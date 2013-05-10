@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.services.CreatePollService;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +25,7 @@ public class CreatePollActivity extends Activity {
 	protected static final CharSequence MESSAGE_ENTER_POLL_OPTION = "Please enter a description";
 	private static final CharSequence MESSAGE_ENTER_MINIMUM_POLL_OPTIONS = "Enter at least two options";
 	protected static final int MIN_NUM_POLL_OPTIONS = 1;
+	
 	private RadioGroup pollOptions;
 	private Button addPollOptionButton;
 	private EditText newPollOptionEditText;
@@ -146,7 +149,7 @@ public class CreatePollActivity extends Activity {
     	for(int i = 0; i < pollOptions.getChildCount(); i++) {
     		RadioButton option = (RadioButton) pollOptions.getChildAt(i);
     		options.add(option.getText().toString());
-    		System.out.println(option.getText().toString());
+    		Log.i(UiMessages.NEARTWEET_TAG, "creating pollOption " + i + " - " + option.getText().toString());
     	}
     	return options;
 	}

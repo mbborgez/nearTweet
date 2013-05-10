@@ -66,7 +66,7 @@ public class Peer {
 			
 			return true;
 		} catch (IOException e) {
-			Log.e("CHAT-PEER-SEND-PDU", "Error sending message [ " + pdu + " ]" + "\n");
+			Log.e(UiMessages.NEARTWEET_TAG, "Error sending message [ " + pdu + " ]" + "\n");
 			e.printStackTrace();
 			return false;
 		}
@@ -81,7 +81,7 @@ public class Peer {
 					return (PDU) receivedObj;
 				}
 			} catch (Exception e) {
-				Log.e("CHAT-PEER-SEND-PDU", "Error receiving message " + "\n");
+				Log.e(UiMessages.NEARTWEET_TAG, "Error receiving message " + "\n");
 				return null;
 			}
 		}
@@ -90,11 +90,11 @@ public class Peer {
 	public void closeConnection () {
 		if(!isClosed()) {
 			try {
-				Log.i("CHAT-PEER-DISCONNECT", "closing socket");
+				Log.i(UiMessages.NEARTWEET_TAG, "closing socket");
 				socket.close();
-				Log.i("CHAT-PEER-DISCONNECT", "socket closed");
+				Log.i(UiMessages.NEARTWEET_TAG, "socket closed");
 			} catch (Exception e) {
-				Log.d("Error closing socket connection:", e.getMessage());
+				Log.d(UiMessages.NEARTWEET_TAG, "Error closing socket connection: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

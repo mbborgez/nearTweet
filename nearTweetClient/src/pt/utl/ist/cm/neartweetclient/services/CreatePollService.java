@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -29,8 +30,8 @@ public class CreatePollService implements INearTweetService {
 	    	String userId = settings.getString("username", null);
 	    	
 			String tweetId = Actions.createUniqueID(context);
-			PublishPollPDU publishPdu = new PublishPollPDU(userId,	tweetId, tweetMessage,pollOptions);
-			
+			PublishPollPDU publishPdu = new PublishPollPDU(userId, tweetId, tweetMessage, pollOptions);
+			Log.i(UiMessages.NEARTWEET_TAG, "createPollService - will broadcast poll " + publishPdu);
 			Connection.getInstance().broadcastPDU(publishPdu);
 			return true;
 		} catch (Exception e) {

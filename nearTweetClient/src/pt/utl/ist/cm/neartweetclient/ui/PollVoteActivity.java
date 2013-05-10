@@ -38,6 +38,7 @@ public class PollVoteActivity extends ListActivity {
 
 		pollDescriptionTextView.setText(pollPdu.getText());
 		pollVoteButton.setOnClickListener(createSubmitPollVoteClickListener());
+		
 		setListAdapter(new PollVotesAdapter(getApplicationContext(),  R.layout.poll_option_layout, pollPdu.getOptions()));
 		MemCacheProvider.getPollConversation(pollPdu.getId()).setHasUnreadMessages(false);
 	}
