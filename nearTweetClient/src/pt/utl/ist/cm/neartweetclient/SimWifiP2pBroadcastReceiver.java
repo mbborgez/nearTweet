@@ -113,6 +113,8 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
 			this.getGroupInfo().print();
 
+			MemCacheProvider.setIsGroupOwner(this.getGroupInfo().askIsGO());
+			
 			Collection<String> groupOwners = this.getGroupInfo().getHomeGroups();
 			Log.i(UiMessages.NEARTWEET_TAG, "update for GOs " + groupOwners);
 			Log.i(UiMessages.NEARTWEET_TAG, "peers: " + Connection.getInstance().getPeers());

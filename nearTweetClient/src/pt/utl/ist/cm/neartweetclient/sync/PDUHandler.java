@@ -12,6 +12,7 @@ import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.SpamManager;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -60,6 +61,7 @@ public class PDUHandler extends PDUVisitor {
 			intent.setAction(Actions.BROADCAST_TWEET);
 			intent.putExtra(Actions.TWEET_DATA, pdu.getId());
 			if (this.context != null) {
+				Log.i(UiMessages.NEARTWEET_TAG, "processPublishPollPdu: " + pdu);
 				MemCacheProvider.addTweet(pdu.getId(), pdu);
 				this.context.sendBroadcast(intent);
 			}

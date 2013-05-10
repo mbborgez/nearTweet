@@ -63,6 +63,7 @@ public class Peer {
 		try {
 			out.writeObject(pdu);
 			out.flush();
+			
 			return true;
 		} catch (IOException e) {
 			Log.e("CHAT-PEER-SEND-PDU", "Error sending message [ " + pdu + " ]" + "\n");

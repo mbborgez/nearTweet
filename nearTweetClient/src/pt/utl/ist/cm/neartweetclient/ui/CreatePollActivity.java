@@ -21,7 +21,7 @@ public class CreatePollActivity extends Activity {
 
 	private static final int MAX_NUM_POLL_OPTIONS = 4;
 	protected static final CharSequence MESSAGE_ENTER_POLL_OPTION = "Please enter a description";
-	private static final CharSequence MESSAGE_ENTER_MINIMUM_POLL_OPTIONS = "Enter at least one option";
+	private static final CharSequence MESSAGE_ENTER_MINIMUM_POLL_OPTIONS = "Enter at least two options";
 	protected static final int MIN_NUM_POLL_OPTIONS = 1;
 	private RadioGroup pollOptions;
 	private Button addPollOptionButton;

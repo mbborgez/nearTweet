@@ -21,15 +21,18 @@ public class MemCacheProvider {
 
 	private static HashMap<String, TweetConversation> tweetConversationContainer = new HashMap<String, TweetConversation>();
 	
-	private static ArrayList<PDU> tweetsStream = new ArrayList<PDU>();
+	private static ArrayList<PDU> inboxMessages = new ArrayList<PDU>();
+
+	private static boolean isGroupOwner;
 	
+
 	public static void addTweet(String tweetID, PDU pdu) {
 		Log.i(UiMessages.NEARTWEET_TAG, "Memory - registering new tweet " + tweetID + " - [ pdu:  " + pdu + "  ]");
 		memcache.put(tweetID, pdu);
 		
 		if(pdu instanceof TweetPDU){
 			TweetPDU tweetPdu = (TweetPDU) pdu;
-			tweetsStream.add(tweetPdu);
+			registerInboxMessage(tweetPdu);
 			tweetConversationContainer.put(tweetPdu.getId(), new TweetConversation(tweetPdu));
 		} else if(pdu instanceof ReplyPDU){
 			ReplyPDU replyPdu = (ReplyPDU) pdu;
@@ -43,7 +46,7 @@ public class MemCacheProvider {
 			}
 		} else if(pdu instanceof PublishPollPDU){
 			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
-			tweetsStream.add(publishPollPdu);
+			registerInboxMessage(publishPollPdu);
 			Log.i(UiMessages.NEARTWEET_TAG, "publish pdu: " + publishPollPdu);
 			pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
 		}
@@ -59,6 +62,16 @@ public class MemCacheProvider {
 			return publishPdu.getUserId().equals(getUserName());
 		}
 		return false;
+	}
+	
+	public static synchronized ArrayList<PDU> readInboxMessages() {
+		ArrayList<PDU> messages = new ArrayList<PDU>(inboxMessages);
+		inboxMessages = new ArrayList<PDU>();
+		return messages;
+	}
+	
+	private static synchronized void registerInboxMessage(PDU message) {
+		inboxMessages.add(message);
 	}
 	
 	public static PDU getTweet(String tweetID) {
@@ -82,10 +95,6 @@ public class MemCacheProvider {
 		return tweetConversationContainer.containsKey(tweetId) ? tweetConversationContainer.get(tweetId) : null;
 	}
 	
-	public static ArrayList<PDU> getTweetsStream() {
-		return tweetsStream;
-	}
-	
 	public static boolean isEmpty() {
 		return memcache.isEmpty();
 	}
@@ -96,4 +105,17 @@ public class MemCacheProvider {
 	public static String getUserName(){
 		return MemCacheProvider.userName;
 	}
+
+	public static void setIsGroupOwner(boolean isGroupOwner) {
+		MemCacheProvider.isGroupOwner = isGroupOwner;
+	}
+
+	public static boolean isGroupOwner() {
+		return isGroupOwner;
+	}
+
+	public static void setGroupOwner(boolean isGroupOwner) {
+		MemCacheProvider.isGroupOwner = isGroupOwner;
+	}
+	
 }

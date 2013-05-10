@@ -1,5 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.util.ArrayList;
+
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
@@ -42,7 +44,7 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
 		
 		showGreetingUser();
 		
-		tweetStreamAdapter = new TweetStreamAdapter(getApplicationContext(), R.layout.tweet_layout, MemCacheProvider.getTweetsStream());
+		tweetStreamAdapter = new TweetStreamAdapter(getApplicationContext(), R.layout.tweet_layout, new ArrayList<PDU>());
         setListAdapter(tweetStreamAdapter);
 		
         createTweetButton = (Button) findViewById(R.id.createTweet);
@@ -74,6 +76,7 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
         this.registerReceiver(this.tweetsReceiver,iff);
         
         //Update all the PDUS on the Adapter
+        tweetStreamAdapter.addAll(MemCacheProvider.readInboxMessages());
         tweetStreamAdapter.notifyDataSetChanged();
         
     }
@@ -104,7 +107,8 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {  
-    	PDU pdu = MemCacheProvider.getTweetsStream().get(item.getItemId());
+//    	PDU pdu = MemCacheProvider.getTweetsStream().get(item.getItemId());
+    	PDU pdu = tweetStreamAdapter.getItem(item.getItemId());
         if (item.getOrder() == 0 && pdu instanceof TweetPDU) { 
         	makeRetweetRequest(pdu);
         } else {
@@ -213,28 +217,13 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
 		}
 	};
 	
-	@SuppressWarnings("unused")
-	private final OnItemClickListener tweetsStreamItemClickListener = new OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			showTweetDetails(MemCacheProvider.getTweetsStream().get(position));
-		}
-	};
-	
-	@SuppressWarnings("unused")
-	private final OnItemLongClickListener tweetsStreamItemLOngClickListener = new OnItemLongClickListener() {
-		@Override
-		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-			makeRetweetRequest(MemCacheProvider.getTweetsStream().get(position));
-			return true;
-		}
-	};
-	
+
 	private final BroadcastReceiver tweetsReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
-				tweetStreamAdapter.notifyDataSetChanged();	
+				tweetStreamAdapter.addAll(MemCacheProvider.readInboxMessages());
+				tweetStreamAdapter.notifyDataSetChanged();
 				Toast.makeText(getApplicationContext(), "Received a new tweet", Toast.LENGTH_SHORT).show();
 			}
 			if (intent.getAction().equals(Actions.POLL_VOTE)) {
