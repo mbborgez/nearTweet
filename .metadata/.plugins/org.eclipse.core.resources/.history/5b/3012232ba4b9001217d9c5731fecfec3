@@ -1,0 +1,113 @@
+package pt.utl.ist.cm.neartweetclient.sync;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
+import pt.utl.ist.cm.neartweetclient.core.Peer;
+import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import android.content.Context;
+import android.util.Log;
+
+public class Connection {
+
+	// Network configurations
+	public final String DEFAULT_IP_ADDRESS = "10.0.2.2";
+	public final int DEFAULT_PORT = 8008;
+
+	public static Connection currentConnection;
+	
+	//maps DeviceId -> Peer 
+	private HashMap<String, Peer> peers;
+
+	private Connection() { /* Avoid instantiation */ }
+
+	public static Connection getInstance() {
+		if (currentConnection == null) {
+			currentConnection = new Connection();
+		}
+		return currentConnection;
+	}
+
+	/**
+	 * sendPDU sends a pdu through the socket created
+	 * @param pdu
+	 * @throws IOException
+	 */
+	public void broadcastPDU(PDU pdu) throws NearTweetException {
+		Log.i(UiMessages.NEARTWEET_TAG, "broadcastPDU: " + pdu);
+		for(Peer peer : peers.values()){
+			Log.i(UiMessages.NEARTWEET_TAG, "send pdu to peer: " + peer.getDeviceName());
+			peer.sendPDU(pdu);
+		}
+	}
+
+	public void startAsyncReceive(Context contex) throws NearTweetException{
+		try{
+			new Thread(new ConnectionsReceiverRunnable(contex)).start();
+			//new Thread(new MessagesReceiverRunnable(contex)).start();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			throw new NearTweetException(e.getMessage());
+		}
+	}
+	
+
+	
+	public void init() {
+		peers = new HashMap<String, Peer>();
+	}
+	
+	public boolean hasPeers() {
+		return !peers.isEmpty();
+	}
+	
+	public Collection<Peer> getPeers() {
+		return peers.values();
+	}
+	
+	public Peer getPeer(String peerId) {
+		return peers.get(peerId);
+	}
+	
+	public void removePeer(String peerId) {
+		Log.i(UiMessages.NEARTWEET_TAG, "Start removing peer " + peerId);
+		if(peers.containsKey(peerId)) {
+			
+			if(!peers.get(peerId).isClosed()) {
+				peers.get(peerId).closeConnection();
+			}
+			if(ClientsManager.existsUser(peerId)){
+				ClientsManager.unregisterUser(peerId);
+			}
+			
+			peers.remove(peerId);
+			
+			Log.i(UiMessages.NEARTWEET_TAG, "The peer " + peerId + " is now removed");
+			Log.i(UiMessages.NEARTWEET_TAG, "Peers list: " + peers.keySet());
+		}
+	}
+	
+	public void removeAllPeers() {
+		HashMap<String, Peer> peersCopy = new HashMap<String, Peer>(peers);
+		for(String peerId : peersCopy.keySet()) {
+			removePeer(peerId);
+		}
+	}
+	
+	public void addPeer(Peer peer) {
+		if(peers.containsKey(peer.getDeviceName())) {
+			peers.remove(peer.getDeviceName());
+		}
+		peers.put(peer.getDeviceName(), peer);
+	}
+	
+	public boolean hasPeer(String peerName) {
+		return peers.containsKey(peerName);
+	}
+	
+}

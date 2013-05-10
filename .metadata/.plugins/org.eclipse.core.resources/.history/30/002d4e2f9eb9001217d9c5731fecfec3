@@ -1,0 +1,197 @@
+package pt.utl.ist.cm.neartweetclient.ui;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
+import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
+import pt.utl.ist.cm.neartweetclient.services.RetweetService;
+import pt.utl.ist.cm.neartweetclient.sync.HTTPConnection;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class RetweetActivity extends ListActivity {
+	
+	public static final String TWEET_ID_EXTRA = "tweet_item";
+	private TextView tweetDetailsTextView;
+	private ImageView tweetImage;
+
+	private Button retweetButton;
+
+	// do not change tweetId to not static -  when the callback (OAuth) happens
+	// if tweetId has not static properties we receive null instead
+//	private static String tweetId;
+	private TweetPDU tweetPdu;
+	private RetweetService service;
+	ProgressDialog progressDialog;
+	
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_retweet);
+		
+		String userId = Actions.getUserId(getApplicationContext());
+		service = new RetweetService(userId,getApplicationContext());
+		
+		if (!HTTPConnection.isConnectingToInternet(getApplicationContext())) {
+			Toast.makeText(getApplicationContext(), 
+					"There are no internet connection. We cannot Continue!",
+					Toast.LENGTH_LONG).show();
+			finish();
+		}
+		
+		String tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+		if(tweetId==null || !MemCacheProvider.hasMessage(tweetId) || !(MemCacheProvider.getTweet(tweetId) instanceof TweetPDU)) {
+			Toast.makeText(getApplicationContext(), "This is not a valid tweet " + tweetId, Toast.LENGTH_LONG);
+			return;
+		}
+		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
+
+		if(service.userAlreadyLoggedIn()) {
+			Toast.makeText(getApplicationContext(), "User already logged once!", Toast.LENGTH_SHORT).show();
+			populateView();
+		} else if (service.intentFromOAuthCallback(getIntent())) {
+			Toast.makeText(getApplicationContext(), "The user is now logged on", Toast.LENGTH_SHORT).show();
+			populateView();
+			new HandleOAuthProtocol().execute();
+		} else {
+			Toast.makeText(getApplicationContext(), "Please login", Toast.LENGTH_SHORT).show();
+			new RequestOAuthProtocol().execute();
+		}
+	}
+	
+	/**
+	 * populates the view when needed
+	 */
+	private void populateView() {
+		tweetDetailsTextView = (TextView) findViewById(R.id.retweet_details_text);
+		tweetImage = (ImageView) findViewById(R.id.retweet_details_image);
+		retweetButton = (Button) findViewById(R.id.submitRetweetButton);
+		retweetButton.setOnClickListener(retweetClickListener);
+		Log.i("POPULATEVIEW", "Before get PDU");
+//		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
+		Log.i("POPULATEVIEW", "After get PDU");
+		Log.i("POPULATEVIEW", "PDU: " + tweetPdu);
+		tweetDetailsTextView.setText(tweetPdu.GetText());
+		Log.i("POPULATEVIEW", "After set text");
+		if(tweetPdu.GetMediaObject()!=null && tweetPdu.GetMediaObject().length>0){
+			Bitmap bitmap = BitmapFactory.decodeByteArray(tweetPdu.GetMediaObject(), 0, tweetPdu.GetMediaObject().length);
+			tweetImage.setImageBitmap(bitmap);
+			tweetImage.setVisibility(View.VISIBLE);
+		} else {
+			tweetImage.setVisibility(View.GONE);
+		}
+	}
+	
+	/**
+	 * Handler responsible to take the message from the PDU and dispatch it 
+	 * to the Async Task
+	 */
+	private final OnClickListener retweetClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			String message = tweetPdu.GetText();
+			new SendMessageToTwitter().execute(message);
+		}
+	};
+	
+	private void startRequestIntent() {
+		startActivity(new Intent(Intent.ACTION_VIEW, 
+				Uri.parse(service.getAuthenticationUrl())));
+	}
+	
+	/**
+	 * Task handler of OAuth Requests asynchronously
+	 */
+	class RequestOAuthProtocol extends AsyncTask<Void, Void, Void> {
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				service.setRequestToken();
+//				tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+				startRequestIntent();
+			} catch (Exception e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), 
+						"Something went wrong during the Request!", 
+						Toast.LENGTH_LONG).show();
+				finish();
+			}
+			return null;
+		}
+		
+	}
+	
+	/**
+	 * Task handler of OAuth Callbacks asynchronously
+	 */
+	class HandleOAuthProtocol extends AsyncTask<Void, Void, Void> {
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			service.handleOAuthCallback(getIntent().getData());
+			return null;
+		}
+		
+	}
+	
+	/**
+	 * Async Task responsible to call the service
+	 */
+	class SendMessageToTwitter extends AsyncTask<String, Boolean, Boolean> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progressDialog = new ProgressDialog(RetweetActivity.this);
+			progressDialog.setMessage("Sending Message...");
+			progressDialog.setIndeterminate(false);
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
+
+		@Override
+		protected Boolean doInBackground(String... args) {
+			String message = args[0];
+			service.setMessage(message);
+			return service.execute();
+		}
+
+		/**
+		 * After completing background task Dismiss the progress dialog and show
+		 * the data in UI Always use runOnUiThread(new Runnable()) to update UI
+		 * from background thread, otherwise you will get error
+		 * **/
+		protected void onPostExecute(final Boolean requestWellHandled) {
+			progressDialog.dismiss();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (requestWellHandled) {
+						Toast.makeText(getApplicationContext(),
+								"Status Tweeted successfully", Toast.LENGTH_SHORT)
+								.show();
+					} else {
+						Toast.makeText(getApplicationContext(),
+								"Tweet cannot be sent!", Toast.LENGTH_LONG)
+								.show();
+					}
+					finish();
+
+				}
+			});
+		}
+	}
+}

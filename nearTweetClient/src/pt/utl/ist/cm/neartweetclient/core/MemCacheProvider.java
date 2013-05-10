@@ -30,25 +30,45 @@ public class MemCacheProvider {
 		Log.i(UiMessages.NEARTWEET_TAG, "Memory - registering new tweet " + tweetID + " - [ pdu:  " + pdu + "  ]");
 		memcache.put(tweetID, pdu);
 		
-		if(pdu instanceof TweetPDU){
-			TweetPDU tweetPdu = (TweetPDU) pdu;
-			registerInboxMessage(tweetPdu);
-			tweetConversationContainer.put(tweetPdu.getId(), new TweetConversation(tweetPdu));
-		} else if(pdu instanceof ReplyPDU){
-			ReplyPDU replyPdu = (ReplyPDU) pdu;
-			if(tweetConversationContainer.containsKey(replyPdu.getTargetMessageId())){
-				tweetConversationContainer.get(replyPdu.getTargetMessageId()).addMessage(replyPdu);
-			}
-		} else if(pdu instanceof PollVotePDU){
-			PollVotePDU pollVotePdu = (PollVotePDU) pdu;
-			if(pollConversationContainer.containsKey(pollVotePdu.getTargetMessageId())){
-				pollConversationContainer.get(pollVotePdu.getTargetMessageId()).addVote(pollVotePdu);
-			}
-		} else if(pdu instanceof PublishPollPDU){
-			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
-			registerInboxMessage(publishPollPdu);
-			Log.i(UiMessages.NEARTWEET_TAG, "publish pdu: " + publishPollPdu);
-			pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
+//		if(pdu instanceof TweetPDU){
+//			TweetPDU tweetPdu = (TweetPDU) pdu;
+//			registerInboxMessage(tweetPdu);
+//			tweetConversationContainer.put(tweetPdu.getId(), new TweetConversation(tweetPdu));
+//		} else if(pdu instanceof ReplyPDU){
+//			ReplyPDU replyPdu = (ReplyPDU) pdu;
+//			if(tweetConversationContainer.containsKey(replyPdu.getTargetMessageId())){
+//				tweetConversationContainer.get(replyPdu.getTargetMessageId()).addMessage(replyPdu);
+//			}
+//		} else if(pdu instanceof PollVotePDU){
+//			PollVotePDU pollVotePdu = (PollVotePDU) pdu;
+//			if(pollConversationContainer.containsKey(pollVotePdu.getTargetMessageId())){
+//				pollConversationContainer.get(pollVotePdu.getTargetMessageId()).addVote(pollVotePdu);
+//			}
+//		} else if(pdu instanceof PublishPollPDU){
+//			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
+//			registerInboxMessage(publishPollPdu);
+//			Log.i(UiMessages.NEARTWEET_TAG, "publish pdu: " + publishPollPdu);
+//			pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
+//		}
+	}
+	
+	public static synchronized void registerPollConversation(PollVotePDU pollVotePdu) {
+		if(pollConversationContainer.containsKey(pollVotePdu.getTargetMessageId())){
+			pollConversationContainer.get(pollVotePdu.getTargetMessageId()).addVote(pollVotePdu);
+		}
+	}
+	
+	public static synchronized void registerPollConversation(PublishPollPDU publishPollPdu) {
+		pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
+	}
+	
+	public static synchronized void registerTweetConversation(TweetPDU tweetPdu) {
+		tweetConversationContainer.put(tweetPdu.getId(), new TweetConversation(tweetPdu));
+	}
+	
+	public static synchronized void registerTweetConversation(ReplyPDU replyPdu) {
+		if(tweetConversationContainer.containsKey(replyPdu.getTargetMessageId())){
+			tweetConversationContainer.get(replyPdu.getTargetMessageId()).addMessage(replyPdu);
 		}
 	}
 	
@@ -70,7 +90,7 @@ public class MemCacheProvider {
 		return messages;
 	}
 	
-	private static synchronized void registerInboxMessage(PDU message) {
+	public static synchronized void registerInboxMessage(PDU message) {
 		inboxMessages.add(message);
 	}
 	

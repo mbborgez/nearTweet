@@ -56,7 +56,7 @@ public class MessagesReceiverRunnable implements Runnable {
 		Log.i(UiMessages.NEARTWEET_TAG, "checkReceivedMessage: [message: " + message + ", peer: " + peer);
 		if(!MemCacheProvider.hasMessage(message.getId())) {
 			Log.i("NEARTWEET-RECEIVE", "I do not have this message");
-			if(!Connection.getInstance().hasPeer(message.getUserId())) {
+			if(!isMyMessage(message) && !existsPeer(message)) {
 				Log.i("NEARTWEET-RECEIVE", "The device is not registered yet");
 				if(peer.getDeviceName()==null) {
 					Log.i("NEARTWEET-RECEIVE", "The peer has not a name yet: i will name it " + message.getUserId());
@@ -69,5 +69,13 @@ public class MessagesReceiverRunnable implements Runnable {
 		} else {
 			Log.i(UiMessages.NEARTWEET_TAG, "i wallready have this message : " + message.getId());
 		}
+	}
+
+	private boolean existsPeer(PDU message) {
+		return Connection.getInstance().hasPeer(message.getUserId());
+	}
+
+	private boolean isMyMessage(PDU message) {
+		return MemCacheProvider.getUserName().equals(message.getUserId());
 	}
 }
