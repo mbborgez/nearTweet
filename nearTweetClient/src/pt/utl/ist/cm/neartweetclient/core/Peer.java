@@ -33,7 +33,7 @@ public class Peer {
 	}
 
 	public Peer(String deviceName, String deviceAddress, int devicePort) {
-		this.deviceName = deviceAddress;
+		this.deviceName = deviceName;
 		this.deviceAddress = deviceAddress;
 		this.devicePort = devicePort;
 	}
@@ -149,5 +149,10 @@ public class Peer {
 
 	public void setIn(ObjectInputStream in) {
 		this.in = in;
+	}
+	
+	@Override
+	public String toString() {
+		return "Peer: [ deviceName: " + deviceName + ", deviceAddress: " + deviceAddress + ", devicePort: " + devicePort + ", socket: " + socket + ", out: " + out + ", in: " + in + " ] ";
 	}
 }

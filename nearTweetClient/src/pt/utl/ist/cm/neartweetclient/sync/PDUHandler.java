@@ -116,6 +116,7 @@ public class PDUHandler extends PDUVisitor {
 			if (this.context != null) {
 				MemCacheProvider.addTweet(pdu.getId(), pdu);
 				this.context.sendBroadcast(intent);
+				Connection.getInstance().broadcastPDU(pdu);
 			}
 		}
 	}

@@ -20,4 +20,9 @@ public class RegisterPDU extends PDU
 		visitor.processRegisterPDU(this);
 	}
 	
+	@Override
+	public String toString() {
+		return "RegisterPDU: [ " + super.toString() + "]"; 
+	}
+	
 }

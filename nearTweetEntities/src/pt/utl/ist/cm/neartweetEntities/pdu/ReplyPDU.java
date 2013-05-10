@@ -69,5 +69,10 @@ public class ReplyPDU extends PDU {
 	{
 		visitor.processReplyPDU(this);
 	}
+	
+	@Override
+	public String toString() {
+		return "ReplyPDU: [ " + super.toString() + ", targetMessageId: " + targetMessageId + ", text: " + text + ", targetUserId: " + targetUserId + ", isBroadcast: " + isBroadcast + "]"; 
+	}
 
 }

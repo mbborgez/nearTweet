@@ -50,4 +50,9 @@ public class GenericMessagePDU extends PDU
 	public void accept(PDUVisitor visitor)  {
 		visitor.processGenericMessagePDU(this);
 	}
+	
+	@Override
+	public String toString() {
+		return "GenericMessagePDU: [ " + super.toString() + ", description: " + description + ", response: " + response + "]"; 
+	}
 }

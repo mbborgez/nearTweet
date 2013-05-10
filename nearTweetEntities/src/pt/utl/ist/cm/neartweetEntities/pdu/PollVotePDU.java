@@ -54,4 +54,9 @@ public class PollVotePDU extends PDU
 	public void setOriginalUserId(String originalUserId) {
 		this.originalUserId = originalUserId;
 	}
+	@Override
+	public String toString() {
+		return "PollVotePDU: [ " + super.toString() + ", targetMessageId: " + getTargetMessageId() + ", optionPosition: " + getOptionPosition() + ", originalUserId: " + getOriginalUserId() + "]"; 
+	}
+	
 }

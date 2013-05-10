@@ -35,7 +35,6 @@ import android.widget.EditText;
 public class LoginActivity extends Activity implements GroupInfoListener {
 	
 	private Button loginButton;
-	private EditText userNameText;
 	private SimWifiP2pBroadcastReceiver receiver;
 	private SimWifiP2pManager mManager = null;
 	private Messenger mService = null;
@@ -48,10 +47,8 @@ public class LoginActivity extends Activity implements GroupInfoListener {
 		
 		// referencing objects
 		loginButton = (Button) findViewById(R.id.loginButton);
-		userNameText = (EditText) findViewById(R.id.usernameText);
 		
 		//arming listeners
-	    userNameText.addTextChangedListener(textWatcherGuard());
 		loginButton.setOnClickListener(loginRequestCallback());
 		
 		// initialize the WDSim API

@@ -44,25 +44,8 @@ public abstract class PDU implements Serializable {
 
 	abstract public void accept(PDUVisitor visitor);
 	
-}
-
-
-/*
-public abstract class PDU implements Serializable
-{
-
-	private static final long serialVersionUID = 1L;
-	private String userId;
-	
-	public PDU(String userId)
-	{
-		this.userId = userId;
-	}	
-	
-	public String GetUserId()
-	{
-		return this.userId;
+	@Override
+	public String toString() {
+		return "id: " + getId() + ", userId: " + getUserId() + ", destinationUserId" + getDestinationUserId();
 	}
-	
-	abstract public void accept(PDUVisitor visitor);
-}*/
+}

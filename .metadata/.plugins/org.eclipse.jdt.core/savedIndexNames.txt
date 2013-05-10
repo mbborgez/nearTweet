@@ -1,0 +1,14 @@
+INDEX VERSION 1.126+C:\Users\Miguel\workspace\CM\nearTweet\MYMY\.metadata\.plugins\org.eclipse.jdt.core
+1148908097.index
+82312720.index
+3748317680.index
+1455504700.index
+2695407156.index
+2305426540.index
+3450769338.index
+1877036362.index
+2976873206.index
+2563916471.index
+2868467036.index
+2156529412.index
+4244725679.index

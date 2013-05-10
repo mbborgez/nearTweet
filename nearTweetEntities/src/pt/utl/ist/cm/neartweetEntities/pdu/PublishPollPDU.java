@@ -47,4 +47,8 @@ public class PublishPollPDU extends PDU
 		visitor.processPublishPollPDU(this);
 	}
 	
+	@Override
+	public String toString() {
+		return "PublishPollPDU: [ " + super.toString() + ", text: " + getText() + ", options: " + getOptions() + "]"; 
+	}
 }

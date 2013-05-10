@@ -52,4 +52,9 @@ public class TweetPDU extends PDU
 		visitor.processTweetPDU(this);
 	}
 	
+	@Override
+	public String toString() {
+		return "TweetPDU: [ " + super.toString() + ", text: " + text + ", mediaObject: " + mediaObject + "]"; 
+	}
+	
 }

@@ -43,4 +43,9 @@ public class SpamVotePDU extends PDU
 	{
 		visitor.processSpamVotePDU(this);
 	}
+	
+	@Override
+	public String toString() {
+		return "SpamVotePDU: [ " + super.toString() + ", targetMessageId: " + targetMessageId + ", targetUserId: " + targetUserId + "]"; 
+	}
 }

@@ -24,6 +24,7 @@ public class MemCacheProvider {
 	private static ArrayList<PDU> tweetsStream = new ArrayList<PDU>();
 	
 	public static void addTweet(String tweetID, PDU pdu) {
+		Log.i(UiMessages.NEARTWEET_TAG, "Memory - registering new tweet " + tweetID + " - [ pdu:  " + pdu + "  ]");
 		memcache.put(tweetID, pdu);
 		
 		if(pdu instanceof TweetPDU){
