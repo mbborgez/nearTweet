@@ -8,11 +8,10 @@ import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 
 public class MessagesReceiverRunnable implements Runnable {
-
+	//Just To check!!!
 	private Context context;
 	private Peer peer;
 	private PDUVisitor visitor;
-	String clientName = null;
 
 	public MessagesReceiverRunnable(Context context, Peer peer){
 		this.context = context;
@@ -26,38 +25,35 @@ public class MessagesReceiverRunnable implements Runnable {
 
 		try {
 			PDU registerPDU = new RegisterPDU(Actions.createUniqueID(context), Actions.getUserId(context));
-			peer.sendPDU(registerPDU);
-			MemCacheProvider.addTweet(registerPDU.getId(), registerPDU);
-			while (true) {
-				Log.i(UiMessages.NEARTWEET_TAG, "waiting receive");
-				receivedMessage = peer.receivePDU();
-				Log.i(UiMessages.NEARTWEET_TAG, "received a new pdu: " + receivedMessage);
-				if (receivedMessage == null) {
-					Log.i("CHAT-RECEIVE", "start disconnecting..");
-					// end of connection
-					break;
-				}
-//				if (clientName == null) { 
-//					Log.i(UiMessages.NEARTWEET_TAG, "registering new peer: " + receivedMessage.getUserId());
-//					// the first message is a connect message
-//					clientName = receivedMessage.getUserId();
-					if(!Connection.getInstance().hasPeer(receivedMessage.getUserId())) {
-						peer.setDeviceName(receivedMessage.getUserId());
-						Connection.getInstance().addPeer(peer);
+			if(peer.sendPDU(registerPDU)) {
+//				MemCacheProvider.addTweet(registerPDU.getId(), registerPDU);
+				while (true) {
+					Log.i(UiMessages.NEARTWEET_TAG, "waiting receive");
+					receivedMessage = peer.receivePDU();
+					if (receivedMessage == null) {
+						Log.i("CHAT-RECEIVE", "start disconnecting..");
+						// end of connection
+						break;
 					}
-//				} else {
-					checkReceivedMessage(receivedMessage);
-//				}
+					Log.i(UiMessages.NEARTWEET_TAG, "received a new pdu: " + receivedMessage + " from " + receivedMessage.getUserId());
+					checkReceivedMessage(receivedMessage, peer);
+				}
 			}
 		} catch (Exception e) {
 			Log.d("Error reading socket:", e.getMessage());
 		}
+		Log.i(UiMessages.NEARTWEET_TAG, "The connection has ended with an error - i will remove the peer " + peer.getDeviceName() + "START");
+		Connection.getInstance().removePeer(peer.getDeviceName());
+		Log.i(UiMessages.NEARTWEET_TAG, "The connection has ended with an error - i will remove the peer " + peer.getDeviceName() + "DONE");
 
-		Connection.getInstance().removePeer(clientName);
 	}
-
-	protected void checkReceivedMessage(PDU message) {
+	
+	protected void checkReceivedMessage(PDU message, Peer peer) {
 		if(!MemCacheProvider.hasMessage(message.getId())){
+			if(!Connection.getInstance().hasPeer(message.getUserId())) {
+				peer.setDeviceName(message.getUserId());
+				Connection.getInstance().addPeer(peer);
+			}
 			Log.i("NEARTWEET-RECEIVE", "I do not have this message -> i will broadcast it");
 			message.accept(visitor);
 			Connection.getInstance().broadcastPDU(message);

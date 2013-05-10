@@ -14,6 +14,8 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -95,6 +97,10 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 	}
 
 	private void updateUserID(String userId){
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mActivity);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("username", userId);
+		editor.commit();
 		MemCacheProvider.setUserName(userId);
 		Log.i(UiMessages.NEARTWEET_TAG, "# Device name: " + userId);
 	}
@@ -108,12 +114,13 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 			this.getGroupInfo().print();
 
 			Collection<String> groupOwners = this.getGroupInfo().getHomeGroups();
-
+			Log.i(UiMessages.NEARTWEET_TAG, "update for GOs " + groupOwners);
+			Log.i(UiMessages.NEARTWEET_TAG, "peers: " + Connection.getInstance().getPeers());
 			for (String groupOwner : groupOwners) {
+				Log.i(UiMessages.NEARTWEET_TAG, "update for GO " + groupOwner);
 				if (!this.getGroupInfo().getDeviceName().equals(groupOwner) && !Connection.getInstance().hasPeer(groupOwner)) {
 
-					Log.i("NearTweet-UPDATE",
-							"Need to perform a new conenction to GO named "
+					Log.i("NearTweet-UPDATE", "Need to perform a new conenction to GO named "
 									+ groupOwner);
 					new Thread(new ConnectTask(groupOwner, getDeviceAddress(groupOwner), mActivity)).start();
 				}

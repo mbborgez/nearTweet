@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
 import pt.utl.ist.cm.neartweetclient.core.Peer;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
@@ -74,11 +75,20 @@ public class Connection {
 	}
 	
 	public void removePeer(String peerId) {
+		Log.i(UiMessages.NEARTWEET_TAG, "Start removing peer " + peerId);
 		if(peers.containsKey(peerId)) {
+			
 			if(!peers.get(peerId).isClosed()) {
 				peers.get(peerId).closeConnection();
 			}
+			if(ClientsManager.existsUser(peerId)){
+				ClientsManager.unregisterUser(peerId);
+			}
+			
 			peers.remove(peerId);
+			
+			Log.i(UiMessages.NEARTWEET_TAG, "The peer " + peerId + " is now removed");
+			Log.i(UiMessages.NEARTWEET_TAG, "Peers list: " + peers.keySet());
 		}
 	}
 	
