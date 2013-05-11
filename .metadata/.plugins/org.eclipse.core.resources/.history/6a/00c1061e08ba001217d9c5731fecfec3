@@ -81,14 +81,10 @@ public class Peer {
 					Log.i(UiMessages.NEARTWEET_TAG, "received a new pdu " + receivedObj + " from " + deviceName);
 					return (PDU) receivedObj;
 				}
-			}
-			catch(IOException e) {
+			} catch (Exception e) {
 				Log.e(UiMessages.NEARTWEET_TAG, "Error receiving message " + "\n");
 				e.printStackTrace();
 				return null;
-			}
-			catch (Exception e) {
-				continue;
 			}
 		}
 	}

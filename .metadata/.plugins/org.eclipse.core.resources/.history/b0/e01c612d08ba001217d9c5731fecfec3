@@ -88,7 +88,9 @@ public class Peer {
 				return null;
 			}
 			catch (Exception e) {
-				continue;
+				Log.e(UiMessages.NEARTWEET_TAG, "Error receiving message " + "\n");
+				e.printStackTrace();
+				return null;
 			}
 		}
 	}

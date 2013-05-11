@@ -58,6 +58,10 @@ public class Peer {
 				getSocket().isClosed();
 	}
 	
+	public boolean sendConnectPDU(String id) {
+		return sendPDU(new RegisterPDU(id, deviceName));
+	}
+	
 	public boolean sendPDU(PDU pdu) {
 		Log.i(UiMessages.NEARTWEET_TAG, "sending pdu " + pdu + " to " + deviceName);
 		try {
@@ -81,14 +85,10 @@ public class Peer {
 					Log.i(UiMessages.NEARTWEET_TAG, "received a new pdu " + receivedObj + " from " + deviceName);
 					return (PDU) receivedObj;
 				}
-			}
-			catch(IOException e) {
+			} catch (Exception e) {
 				Log.e(UiMessages.NEARTWEET_TAG, "Error receiving message " + "\n");
 				e.printStackTrace();
 				return null;
-			}
-			catch (Exception e) {
-				continue;
 			}
 		}
 	}
