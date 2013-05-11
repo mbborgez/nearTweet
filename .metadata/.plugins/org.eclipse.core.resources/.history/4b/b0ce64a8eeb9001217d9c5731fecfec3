@@ -23,9 +23,9 @@ public class Peer {
 
 	public Peer(SimWifiP2pSocket socket) throws Exception {
 		try {
-			setSocket(socket);
-			setOut(new ObjectOutputStream(socket.getOutputStream()));
-			setIn(new ObjectInputStream(socket.getInputStream()));
+			this.socket = socket;
+			this.out = new ObjectOutputStream(socket.getOutputStream());
+			this.in  = new ObjectInputStream(socket.getInputStream());
 		} catch (Exception e) {
 			Log.i("CHAT-PEER", "Error creating peer by socket");
 			e.printStackTrace();
@@ -41,9 +41,9 @@ public class Peer {
 	
 	public synchronized void connect() throws Exception {
 		try {
-			setSocket(new SimWifiP2pSocket(deviceAddress, devicePort));
-			setOut(new ObjectOutputStream(socket.getOutputStream()));
-			setIn(new ObjectInputStream(socket.getInputStream()));
+			this.socket = new SimWifiP2pSocket(deviceAddress, devicePort);
+			this.out = new ObjectOutputStream(socket.getOutputStream());
+			this.in  = new ObjectInputStream(socket.getInputStream());
 		} catch (Exception e) {
 			Log.i("CHAT-PEER", "Error connecting");
 			e.printStackTrace();
@@ -52,10 +52,10 @@ public class Peer {
 	}
 	
 	public synchronized boolean isClosed() {
-		return  getOut()==null || 
-				getIn() ==null || 
-				getSocket()==null ||
-				getSocket().isClosed();
+		return  this.out==null || 
+				this.in ==null || 
+				this.socket==null ||
+				this.socket.isClosed();
 	}
 	
 	public boolean sendConnectPDU(String id) {

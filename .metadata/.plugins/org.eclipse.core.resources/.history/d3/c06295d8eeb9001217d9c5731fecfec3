@@ -52,10 +52,10 @@ public class Peer {
 	}
 	
 	public synchronized boolean isClosed() {
-		return  getOut()==null || 
-				getIn() ==null || 
-				getSocket()==null ||
-				getSocket().isClosed();
+		return  this.getOut()==null || 
+				this.getIn() ==null || 
+				this.getSocket()==null ||
+				this.getSocket().isClosed();
 	}
 	
 	public boolean sendConnectPDU(String id) {
