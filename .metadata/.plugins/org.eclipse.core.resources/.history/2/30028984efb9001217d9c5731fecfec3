@@ -49,7 +49,7 @@ public class TweetConversationAdapter extends ArrayAdapter<ReplyPDU> {
 				TweetPDU currentPDU = (TweetPDU) pdu;
 
 				if (name != null) {
-					name.setText(currentPDU.getUserId());
+					name.setText(currentPDU.getId());
 				}
 				if (message != null) {
 					message.setText(currentPDU.GetText());
@@ -65,7 +65,7 @@ public class TweetConversationAdapter extends ArrayAdapter<ReplyPDU> {
 				ReplyPDU currentPDU = (ReplyPDU) pdu;
 
 				if (name != null) {
-					name.setText(currentPDU.getUserId());
+					name.setText(currentPDU.getId());
 				}
 				if (message != null) {
 					message.setText(currentPDU.getText());
