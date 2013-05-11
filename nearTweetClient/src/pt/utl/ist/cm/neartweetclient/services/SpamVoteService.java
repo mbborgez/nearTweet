@@ -9,13 +9,11 @@ import android.util.Log;
 
 public class SpamVoteService implements INearTweetService {
 	
-	private String userId;
 	String targetUserId;
 	private String targetMessageId;
 	private Context context;
 	
-	public SpamVoteService(String userId, String targetMessageId, String targerUserId, Context context) {
-		this.userId = userId;
+	public SpamVoteService(String targetMessageId, String targerUserId, Context context) {
 		this.targetMessageId = targetMessageId;
 		this.targetUserId = targerUserId;
 		this.context = context;
@@ -24,9 +22,8 @@ public class SpamVoteService implements INearTweetService {
 	@Override
 	public boolean execute() {
 		try {
-			Log.i("DEBUG", "SpamVoteService - sending spamVote [userId: " + userId + ", targetMessageId: " + targetMessageId + ", targetUserId: " + targetUserId);
-			
-			SpamVotePDU pdu = new SpamVotePDU(Actions.createUniqueID(context), userId, targetMessageId, targetUserId);
+			SpamVotePDU pdu = new SpamVotePDU(Actions.createUniqueID(context), Actions.getUserId(context), targetMessageId, targetUserId);
+			Log.i("DEBUG", "SpamVoteService - sending spamVote - " + pdu); 
 			Connection.getInstance().broadcastPDU(pdu);
 			return true;
 		} catch(Exception e) {

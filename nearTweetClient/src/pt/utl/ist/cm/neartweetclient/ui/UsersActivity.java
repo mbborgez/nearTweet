@@ -1,5 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.util.ArrayList;
+
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.PeersManager;
 import pt.utl.ist.cm.neartweetclient.core.listAdapters.ClientsListAdapter;
@@ -21,7 +23,7 @@ public class UsersActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_users);
 		
-		clientsListAdapter = new ClientsListAdapter(getApplicationContext(), R.layout.user_layout, PeersManager.getUsers());
+		clientsListAdapter = new ClientsListAdapter(getApplicationContext(), R.layout.user_layout, new ArrayList<String>(PeersManager.getUsers()));
         setListAdapter(clientsListAdapter);
 	    
         // Put whatever message you want to receive as the action

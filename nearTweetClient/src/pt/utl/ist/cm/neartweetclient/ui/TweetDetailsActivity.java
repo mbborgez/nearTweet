@@ -132,7 +132,7 @@ public class TweetDetailsActivity extends ListActivity {
 	private class SubmitSpamVoteTask extends AsyncTask<String, Integer, Boolean> {
 		@Override
 		protected Boolean doInBackground(String... params) {
-			return new SpamVoteService(Actions.getUserId(getApplicationContext()), tweetId, tweetPdu.getUserId(), getApplicationContext()).execute();
+			return new SpamVoteService(tweetId, tweetPdu.getUserId(), getApplicationContext()).execute();
 		}
 		@Override
 		protected void onPostExecute(Boolean result) {

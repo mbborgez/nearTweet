@@ -1,0 +1,41 @@
+package pt.utl.ist.cm.neartweetclient.core;
+
+import java.util.HashMap;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import android.util.Log;
+
+public class SpamManager {
+
+	private static final int MAX_NUM_SPAM_VOTES = 2;
+
+//	private static HashMap<String, List<SpamVotePDU>> spamVotes = new HashMap<String, List<SpamVotePDU>>();
+	private static HashMap<String, Integer> spamVotes = new HashMap<String, Integer>();
+	
+	public static void registerSpamVote(SpamVotePDU pdu) {
+		Log.i(UiMessages.NEARTWEET_TAG, " registerSpamVote - " + pdu );
+//		if(!spamVotes.containsKey(pdu.getTargetUserId())) {
+//			spamVotes.put(pdu.getTargetUserId(), new ArrayList<SpamVotePDU>());
+//		}
+//		spamVotes.get(pdu.getTargetUserId()).add(pdu);
+		spamVotes.put(pdu.getTargetUserId(), numVotes(pdu.getTargetUserId())+1);
+		Log.i(UiMessages.NEARTWEET_TAG, " numVotes for - " + pdu.getTargetUserId() + " is " + numVotes(pdu.getTargetUserId()));
+	}
+	
+	public static boolean isBlocked(String userId) {
+		Log.i(UiMessages.NEARTWEET_TAG, " numVotes for " + userId + ": " +  numVotes(userId) + " isBlocked ? - " + (numVotes(userId) > MAX_NUM_SPAM_VOTES) );
+		return numVotes(userId) > MAX_NUM_SPAM_VOTES;
+	}
+
+	private static int numVotes(String userId) {
+		return spamVotes.containsKey(userId) ? spamVotes.get(userId) : 0;
+	}
+	
+	public static void unblockUser(String userId) {
+		if(spamVotes.containsKey(userId)) {
+			spamVotes.remove(userId);
+		}
+	}
+
+}

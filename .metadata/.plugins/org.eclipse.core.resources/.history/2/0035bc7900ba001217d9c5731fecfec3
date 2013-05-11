@@ -1,0 +1,156 @@
+package pt.utl.ist.cm.neartweetclient.sync;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.GenericMessagePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PDUVisitor;
+import pt.utl.ist.cm.neartweetEntities.pdu.PollVotePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.PublishPollPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
+import pt.utl.ist.cm.neartweetclient.core.SpamManager;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+
+public class PDUHandler extends PDUVisitor {
+
+	private final Context context;
+
+	public PDUHandler(Context c) {
+		this.context = c;
+	}
+
+	public void processGenericMessagePDU(GenericMessagePDU pdu) {
+		genericProcess(pdu, createGenericMessageIntent(pdu));
+	}
+
+	@Override
+	public void processPollVotePDU(PollVotePDU pdu) {
+		if(canProcess(pdu)){
+			MemCacheProvider.registerPollConversation(pdu);
+			genericProcess(pdu, createPollVoteIntent(pdu));
+		}
+	}
+
+	@Override
+	public void processPublishPollPDU(PublishPollPDU pdu) {
+		if(canProcess(pdu)){
+			MemCacheProvider.registerInboxMessage(pdu);
+			MemCacheProvider.registerPollConversation(pdu);
+			genericProcess(pdu, createPublishPollIntent(pdu));
+		}
+	}
+
+	@Override
+	public void processRegisterPDU(RegisterPDU pdu) {
+		genericProcess(pdu, createRegisterIntent(pdu));
+	}
+
+	@Override
+	public void processReplyPDU(ReplyPDU pdu) {
+		if(canProcess(pdu)){
+			Intent createReplyIntent = new Intent();
+			String myDeviceName = Actions.getUserId(context);
+			if(pdu.getIsBroadcast() || 
+					myDeviceName.equals(pdu.getTargetUserId()) ||
+					myDeviceName.equals(pdu.getUserId())) {
+				Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU " + pdu);
+				MemCacheProvider.registerTweetConversation(pdu);
+				createReplyIntent = createReplyIntent(pdu);
+			} 
+			genericProcess(pdu, createReplyIntent);
+		}
+
+	}
+
+	@Override
+	public void processSpamVotePDU(SpamVotePDU pdu) {
+		if(canProcess(pdu)){
+			SpamManager.registerSpamVote(pdu);
+			Intent createSpamVoteIntent = createSpamVoteIntent(pdu);
+			genericProcess(pdu, createSpamVoteIntent);
+		}
+	}
+
+	@Override
+	public void processTweetPDU(TweetPDU pdu) {
+		if(canProcess(pdu)){
+			MemCacheProvider.registerTweetConversation(pdu);
+			MemCacheProvider.registerInboxMessage(pdu);
+			genericProcess(pdu, createTweetIntent(pdu));
+		}
+	}
+
+	/*******************************************************************
+	 ************************ Generic processing ************************
+	 *******************************************************************/
+
+	private void genericProcess(PDU pdu, Intent intent) {
+		if (this.context != null) {
+			MemCacheProvider.addTweet(pdu.getId(), pdu);
+			Connection.getInstance().broadcastPDU(pdu);
+			this.context.sendBroadcast(intent);
+		}
+	}
+	
+	private boolean canProcess(PDU pdu) {
+		return !SpamManager.isBlocked(pdu.getUserId()) && !MemCacheProvider.hasMessage(pdu.getId());
+	}
+
+	/*******************************************************************
+	 ************************ Broadcast intents ************************
+	 *******************************************************************/
+
+	private Intent createPublishPollIntent(PublishPollPDU pdu) {
+		return createNewMessageIntent(pdu);
+	}
+
+	private Intent createTweetIntent(TweetPDU pdu) {
+		return createNewMessageIntent(pdu);
+	}
+
+	private Intent createReplyIntent(ReplyPDU pdu) {
+		return createNewMessageIntent(pdu);
+	}
+
+	private Intent createRegisterIntent(RegisterPDU pdu) {
+		Intent intent = new Intent();
+		intent.setAction(Actions.BROADCAST_NEW_USER);
+		intent.putExtra(Actions.NEW_USER_DATA, pdu.getUserId());
+		return intent;
+	}
+
+	private Intent createGenericMessageIntent(GenericMessagePDU pdu) {
+		Intent intent = new Intent();
+		intent.setAction(Actions.REGISTER_CONFIRMATION);
+		intent.putExtra(Actions.SUCCESS_LOGIN, pdu.getResponse());
+		return intent;
+	}
+
+	private Intent createPollVoteIntent(PollVotePDU pdu) {
+		Intent intent = createNewMessageIntent(pdu);
+		intent.setAction(Actions.POLL_VOTE);
+		intent.putExtra(Actions.POLL_VOTE_DATA, pdu.getId());
+		return intent;
+	}
+
+	private Intent createSpamVoteIntent(SpamVotePDU pdu) {
+		Intent intent = new Intent();
+		intent.setAction(Actions.BROADCAST_SPAMMER_BLOCKED);
+		intent.putExtra(Actions.SPAMMER_ID_DATA, pdu.getTargetUserId());
+		return intent;
+	}
+
+	private Intent createNewMessageIntent(PDU pdu) {
+		Intent intent = new Intent();
+		intent.setAction(Actions.BROADCAST_TWEET);
+		intent.putExtra(Actions.TWEET_DATA, pdu.getId());
+		return intent;
+	}
+
+}

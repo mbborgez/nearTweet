@@ -23,3 +23,5 @@
 1368247026540	Rename method 'getUnreadMessages'
 1368247830620	Convert local variable 'tweetConversationAdapter' to field
 1368249142115	Extract local variable 'readInboxMessages'
+1368252162942	Extract local variable 'createSpamVoteIntent'
+1368253014148	Extract method 'extracted'
