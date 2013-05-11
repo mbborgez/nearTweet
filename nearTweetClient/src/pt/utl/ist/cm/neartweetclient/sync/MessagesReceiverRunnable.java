@@ -40,10 +40,6 @@ public class MessagesReceiverRunnable implements Runnable {
 		}
 		Connection.getInstance().removePeer(peer.getDeviceName());
 	}
-
-	private boolean isEndOfConnection(PDU receivedMessage) {
-		return receivedMessage == null;
-	}
 	
 	protected void processReceivedMessage(PDU message, Peer peer) {
 		if(!MemCacheProvider.hasMessage(message.getId())) {
@@ -57,6 +53,10 @@ public class MessagesReceiverRunnable implements Runnable {
 		}
 	}
 
+	private boolean isEndOfConnection(PDU receivedMessage) {
+		return receivedMessage == null;
+	}
+	
 	private boolean existsPeer(PDU message) {
 		return Connection.getInstance().hasPeer(message.getUserId());
 	}

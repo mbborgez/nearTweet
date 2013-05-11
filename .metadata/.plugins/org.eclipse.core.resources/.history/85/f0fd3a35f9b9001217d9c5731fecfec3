@@ -1,0 +1,175 @@
+package pt.utl.ist.cm.neartweetclient.ui;
+
+import java.util.ArrayList;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
+import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
+import pt.utl.ist.cm.neartweetclient.R;
+import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
+import pt.utl.ist.cm.neartweetclient.core.TweetConversation;
+import pt.utl.ist.cm.neartweetclient.core.listAdapters.TweetConversationAdapter;
+import pt.utl.ist.cm.neartweetclient.services.SpamVoteService;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import android.app.ListActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class TweetDetailsActivity extends ListActivity {
+
+	public static final String TWEET_ID_EXTRA = "tweet_item";
+	private TextView tweetDetailsTextView;
+	private ImageView tweetImage;
+
+	private Button repplyButton;
+	private Button spamButton;
+
+	private String tweetId;
+	private TweetPDU tweetPdu;
+	
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_tweet_details);
+
+		tweetDetailsTextView = (TextView) findViewById(R.id.tweet_details_text);
+		tweetImage = (ImageView) findViewById(R.id.tweet_details_image);
+		repplyButton = (Button) findViewById(R.id.submitReplyTweetButton);
+		spamButton = (Button) findViewById(R.id.markSpamTweetButton);
+
+		repplyButton.setOnClickListener(repplyClickListener);
+		spamButton.setOnClickListener(spamClickListener);
+
+		tweetId = getIntent().getStringExtra(TWEET_ID_EXTRA);
+		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
+
+		populateTweetDetails();
+//		updateTweetConversation();
+		TweetConversation tweetConversation = MemCacheProvider.getTweetConversation(tweetId);
+		tweetConversationAdapter = new TweetConversationAdapter(this.getApplicationContext(), R.layout.tweet_layout, tweetConversation.get);
+		setListAdapter(tweetConversationAdapter);
+		updateTweetConversation();
+		registerConversationListener();
+	}
+
+	@Override
+    public void onResume() {
+        super.onResume();
+
+        registerConversationListener();
+		updateTweetConversation();
+        
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.unregisterReceiver(repliesReceiver);
+    }
+	
+	
+	private void populateTweetDetails() {
+		tweetDetailsTextView.setText(tweetPdu.GetText());
+		if(tweetPdu.GetMediaObject()!=null && tweetPdu.GetMediaObject().length>0){
+			Bitmap bitmap = BitmapFactory.decodeByteArray(tweetPdu.GetMediaObject(), 0, tweetPdu.GetMediaObject().length);
+			tweetImage.setImageBitmap(bitmap);
+			tweetImage.setVisibility(View.VISIBLE);
+		} else {
+			tweetImage.setVisibility(View.GONE);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.reply_tweet_button:
+			replyTweetScreen();
+			return true;
+		case R.id.spam_button:
+			(new SubmitSpamVoteTask()).execute();
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.tweet_details_acitivity, menu);
+		return true;
+	}
+
+	private void replyTweetScreen() {
+		Intent intent = new Intent(this, ReplyActivity.class);
+		intent.putExtra(ReplyActivity.TWEET_ID_EXTRA, this.tweetId);
+		startActivity(intent);
+	}
+
+	private void updateTweetConversation() {
+		ArrayList<PDU> inboxMessages = MemCacheProvider.getTweetConversation(tweetId).readInboxMessages();
+		tweetConversationAdapter.addAll(inboxMessages);
+		tweetConversationAdapter.notifyDataSetChanged();
+	}
+
+	private class SubmitSpamVoteTask extends AsyncTask<String, Integer, Boolean> {
+		@Override
+		protected Boolean doInBackground(String... params) {
+			return new SpamVoteService(Actions.getUserId(getApplicationContext()), tweetId, tweetPdu.getUserId(), getApplicationContext()).execute();
+		}
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if(result){
+				finish();
+			} else {
+				showErrorSendingSpamMessage();
+			}
+		}
+	}
+
+	private final BroadcastReceiver repliesReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(Actions.BROADCAST_TWEET)) {
+				updateTweetConversation();
+			}
+		}
+	};
+
+	private final OnClickListener repplyClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			replyTweetScreen();
+		}
+	};
+
+	private final OnClickListener spamClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			(new SubmitSpamVoteTask()).execute();
+		}
+	};
+	private TweetConversationAdapter tweetConversationAdapter;
+
+	private void showErrorSendingSpamMessage() {
+		Toast.makeText(getApplicationContext(), "Error sending spam vorte", Toast.LENGTH_SHORT).show();
+	}
+	
+	private void registerConversationListener() {
+		IntentFilter iff = new IntentFilter();
+		iff.addAction(Actions.BROADCAST_TWEET);
+		registerReceiver(repliesReceiver,iff);
+	}
+}

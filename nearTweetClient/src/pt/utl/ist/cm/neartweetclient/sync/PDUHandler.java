@@ -55,12 +55,11 @@ public class PDUHandler extends PDUVisitor {
 	public void processReplyPDU(ReplyPDU pdu) {
 		if(canProcess(pdu)){
 			Intent createReplyIntent = new Intent();
-			Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU: " + pdu);
 			String myDeviceName = Actions.getUserId(context);
 			if(pdu.getIsBroadcast() || 
 					myDeviceName.equals(pdu.getTargetUserId()) ||
 					myDeviceName.equals(pdu.getUserId())) {
-				Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU: " + "registering pdu");
+				Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU " + pdu);
 				MemCacheProvider.registerTweetConversation(pdu);
 				createReplyIntent = createReplyIntent(pdu);
 			} 

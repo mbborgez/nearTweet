@@ -1,5 +1,8 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
+import java.util.ArrayList;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
@@ -36,6 +39,7 @@ public class TweetDetailsActivity extends ListActivity {
 
 	private String tweetId;
 	private TweetPDU tweetPdu;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +58,12 @@ public class TweetDetailsActivity extends ListActivity {
 		tweetPdu = (TweetPDU) MemCacheProvider.getTweet(tweetId);
 
 		populateTweetDetails();
-		updateTweetConversation();
-
+		TweetConversation tweetConversation = MemCacheProvider.getTweetConversation(tweetId);
+		ArrayList<PDU> initialMessages = new ArrayList<PDU>(tweetConversation.getConversation());
+		tweetConversationAdapter = new TweetConversationAdapter(this.getApplicationContext(), R.layout.tweet_layout, initialMessages);
+		setListAdapter(tweetConversationAdapter);
+		tweetConversationAdapter.notifyDataSetChanged();
+		
 		registerConversationListener();
 	}
 
@@ -64,7 +72,11 @@ public class TweetDetailsActivity extends ListActivity {
         super.onResume();
 
         registerConversationListener();
-		updateTweetConversation();
+		TweetConversation tweetConversation = MemCacheProvider.getTweetConversation(tweetId);
+		ArrayList<PDU> initialMessages = new ArrayList<PDU>(tweetConversation.getConversation());
+		tweetConversationAdapter = new TweetConversationAdapter(this.getApplicationContext(), R.layout.tweet_layout, initialMessages);
+		setListAdapter(tweetConversationAdapter);
+		tweetConversationAdapter.notifyDataSetChanged();
         
     }
     @Override
@@ -112,11 +124,9 @@ public class TweetDetailsActivity extends ListActivity {
 	}
 
 	private void updateTweetConversation() {
-		TweetConversation tweetConversation = MemCacheProvider.getTweetConversation(tweetId);
-		TweetConversationAdapter tweetConversationAdapter = 
-				new TweetConversationAdapter(this.getApplicationContext(), R.layout.tweet_layout, tweetConversation);
-		setListAdapter(tweetConversationAdapter);
-		MemCacheProvider.getTweetConversation(tweetId).setHasUnreadMessages(false);
+		ArrayList<PDU> inboxMessages = MemCacheProvider.getTweetConversation(tweetId).readInboxMessages();
+		tweetConversationAdapter.addAll(inboxMessages);
+		tweetConversationAdapter.notifyDataSetChanged();
 	}
 
 	private class SubmitSpamVoteTask extends AsyncTask<String, Integer, Boolean> {
@@ -156,6 +166,7 @@ public class TweetDetailsActivity extends ListActivity {
 			(new SubmitSpamVoteTask()).execute();
 		}
 	};
+	private TweetConversationAdapter tweetConversationAdapter;
 
 	private void showErrorSendingSpamMessage() {
 		Toast.makeText(getApplicationContext(), "Error sending spam vorte", Toast.LENGTH_SHORT).show();
