@@ -27,29 +27,8 @@ public class MemCacheProvider {
 	
 
 	public static void addTweet(String tweetID, PDU pdu) {
-		Log.i(UiMessages.NEARTWEET_TAG, "Memory - registering new tweet " + tweetID + " - [ pdu:  " + pdu + "  ]");
+		Log.i(UiMessages.NEARTWEET_TAG, "Memory - registering tweet " + tweetID);
 		memcache.put(tweetID, pdu);
-		
-//		if(pdu instanceof TweetPDU){
-//			TweetPDU tweetPdu = (TweetPDU) pdu;
-//			registerInboxMessage(tweetPdu);
-//			tweetConversationContainer.put(tweetPdu.getId(), new TweetConversation(tweetPdu));
-//		} else if(pdu instanceof ReplyPDU){
-//			ReplyPDU replyPdu = (ReplyPDU) pdu;
-//			if(tweetConversationContainer.containsKey(replyPdu.getTargetMessageId())){
-//				tweetConversationContainer.get(replyPdu.getTargetMessageId()).addMessage(replyPdu);
-//			}
-//		} else if(pdu instanceof PollVotePDU){
-//			PollVotePDU pollVotePdu = (PollVotePDU) pdu;
-//			if(pollConversationContainer.containsKey(pollVotePdu.getTargetMessageId())){
-//				pollConversationContainer.get(pollVotePdu.getTargetMessageId()).addVote(pollVotePdu);
-//			}
-//		} else if(pdu instanceof PublishPollPDU){
-//			PublishPollPDU publishPollPdu = (PublishPollPDU) pdu;
-//			registerInboxMessage(publishPollPdu);
-//			Log.i(UiMessages.NEARTWEET_TAG, "publish pdu: " + publishPollPdu);
-//			pollConversationContainer.put(publishPollPdu.getId(), new PollConversation(publishPollPdu));
-//		}
 	}
 	
 	public static synchronized void registerPollConversation(PollVotePDU pollVotePdu) {
@@ -72,13 +51,9 @@ public class MemCacheProvider {
 		}
 	}
 	
-	public static boolean isMyPoll(String tweetId){
-		Log.i(UiMessages.NEARTWEET_TAG, "isMyPoll? " + tweetId);
+	public static synchronized boolean isMyPoll(String tweetId){
 		if(pollConversationContainer.containsKey(tweetId)){
-
 			PublishPollPDU publishPdu = (PublishPollPDU) getTweet(tweetId);
-			Log.i(UiMessages.NEARTWEET_TAG, "isMyPoll? " + tweetId + " yes");
-			Log.i(UiMessages.NEARTWEET_TAG, "username: " + getUserName() + ", pdu-user: " + publishPdu.getUserId());
 			return publishPdu.getUserId().equals(getUserName());
 		}
 		return false;
@@ -94,7 +69,7 @@ public class MemCacheProvider {
 		inboxMessages.add(message);
 	}
 	
-	public static PDU getTweet(String tweetID) {
+	public static synchronized PDU getTweet(String tweetID) {
 		return memcache.get(tweetID);
 	}
 	
@@ -103,19 +78,19 @@ public class MemCacheProvider {
 		return memcache.containsKey(messageID);
 	}
 	
-	public static Map<String, Integer> getVotesForPoll(String tweetId){
+	public static synchronized Map<String, Integer> getVotesForPoll(String tweetId){
 		return isMyPoll(tweetId) ? pollConversationContainer.get(tweetId).getVotes() : null;
 	}
 	
-	public static PollConversation getPollConversation(String tweetId){
+	public static synchronized PollConversation getPollConversation(String tweetId){
 		return pollConversationContainer.containsKey(tweetId) ? pollConversationContainer.get(tweetId) : null;
 	}
 	
-	public static TweetConversation getTweetConversation(String tweetId){
+	public static synchronized TweetConversation getTweetConversation(String tweetId){
 		return tweetConversationContainer.containsKey(tweetId) ? tweetConversationContainer.get(tweetId) : null;
 	}
 	
-	public static boolean isEmpty() {
+	public static synchronized boolean isEmpty() {
 		return memcache.isEmpty();
 	}
 	

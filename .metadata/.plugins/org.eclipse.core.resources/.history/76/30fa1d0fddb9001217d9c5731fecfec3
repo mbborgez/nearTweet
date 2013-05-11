@@ -1,0 +1,35 @@
+package pt.utl.ist.cm.neartweetclient.sync;
+
+import pt.utl.ist.cm.neartweetclient.core.Peer;
+import pt.utl.ist.cm.neartweetclient.utils.Constants;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import android.content.Context;
+import android.util.Log;
+
+public class ConnectRunnable implements Runnable {
+
+	private String deviceName;
+	private String deviceAddress;
+	private Context context;
+
+	public ConnectRunnable(String deviceName, String deviceAddress, Context context) {
+		this.deviceName = deviceName;
+		this.deviceAddress = deviceAddress;
+		this.context = context;
+	}
+
+	@Override
+	public void run() {
+		try {
+			Log.i(UiMessages.NEARTWEET_TAG, "Connecting to device " + deviceName + " - " + deviceAddress);
+			Peer peer = new Peer(deviceName, deviceAddress, Constants.CONNECTION_LISTENER_PORT);
+			peer.connect();
+			Log.i(UiMessages.NEARTWEET_TAG, "Connected with " + deviceName + " - " + deviceAddress);
+			Thread connectionThread = new Thread(new MessagesReceiverRunnable(context, peer));
+			connectionThread.start();
+		} catch (Exception e) {
+			Log.e(UiMessages.NEARTWEET_TAG, "Error connecting with [deviceName: " + deviceName + ", deviceAddress: " + deviceAddress + "]");
+		}
+
+	}
+}

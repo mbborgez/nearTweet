@@ -5,15 +5,19 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import pt.utl.ist.cm.neartweetEntities.pdu.PDU;
-import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
 import pt.utl.ist.cm.neartweetclient.core.Peer;
 import pt.utl.ist.cm.neartweetclient.exceptions.NearTweetException;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pDeviceList;
+import pt.utl.ist.cmov.wifidirect.SimWifiP2pInfo;
 import android.content.Context;
 import android.util.Log;
 
 public class Connection {
 
+	private SimWifiP2pInfo groupInfo;
+	private SimWifiP2pDeviceList deviceList;
+	
 	// Network configurations
 	public static Connection currentConnection;
 	
@@ -37,7 +41,6 @@ public class Connection {
 	public void broadcastPDU(PDU pdu) throws NearTweetException {
 		Log.i(UiMessages.NEARTWEET_TAG, "broadcastPDU: " + pdu);
 		for(Peer peer : peers.values()){
-			Log.i(UiMessages.NEARTWEET_TAG, "broadcast - send pdu to peer: " + peer.getDeviceName());
 			peer.sendPDU(pdu);
 		}
 	}
@@ -78,10 +81,6 @@ public class Connection {
 				peers.get(peerId).closeConnection();
 			}
 			
-			if(ClientsManager.existsUser(peerId)){
-				ClientsManager.unregisterUser(peerId);
-			}
-			
 			peers.remove(peerId);
 			
 		}
@@ -96,6 +95,7 @@ public class Connection {
 	}
 	
 	public void addPeer(Peer peer) {
+		Log.i(UiMessages.NEARTWEET_TAG, "Adding peer " + peer.getDeviceName() + "...");
 		if(peers.containsKey(peer.getDeviceName())) {
 			peers.remove(peer.getDeviceName());
 		}
@@ -104,6 +104,22 @@ public class Connection {
 	
 	public boolean hasPeer(String peerName) {
 		return peers.containsKey(peerName);
+	}
+
+	public SimWifiP2pInfo getGroupInfo() {
+		return groupInfo;
+	}
+
+	public void setGroupInfo(SimWifiP2pInfo groupInfo) {
+		this.groupInfo = groupInfo;
+	}
+
+	public SimWifiP2pDeviceList getDeviceList() {
+		return deviceList;
+	}
+
+	public void setDeviceList(SimWifiP2pDeviceList deviceList) {
+		this.deviceList = deviceList;
 	}
 	
 }

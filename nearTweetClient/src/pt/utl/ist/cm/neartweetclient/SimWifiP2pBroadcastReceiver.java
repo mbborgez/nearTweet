@@ -4,7 +4,8 @@ import java.util.Collection;
 
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.Peer;
-import pt.utl.ist.cm.neartweetclient.sync.*;
+import pt.utl.ist.cm.neartweetclient.sync.Connection;
+import pt.utl.ist.cm.neartweetclient.sync.MessagesReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.Constants;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
@@ -23,14 +24,14 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
 	private Activity mActivity;
 
-	private SimWifiP2pDeviceList deviceList;
-	private SimWifiP2pInfo groupInfo;
+//	private SimWifiP2pDeviceList deviceList;
+//	private SimWifiP2pInfo groupInfo;
 
 	public SimWifiP2pBroadcastReceiver(Activity activity) {
 		super();
 		this.mActivity = activity;
-		deviceList = null;
-		groupInfo = null;
+//		deviceList = null;
+//		groupInfo = null;
 	}
 
 	@Override
@@ -57,9 +58,9 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
 
-			deviceList = (SimWifiP2pDeviceList) intent.getSerializableExtra(
-					SimWifiP2pBroadcast.EXTRA_DEVICE_LIST);
-
+			SimWifiP2pDeviceList deviceList = (SimWifiP2pDeviceList) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_DEVICE_LIST);
+			Connection.getInstance().setDeviceList(deviceList);
+			
 			Log.i("DEVICES_LIST", deviceList.getDeviceList().toString());
 
 			Toast.makeText(mActivity, "Peer list changed: " + deviceList.getDeviceList().toString(),
@@ -69,28 +70,25 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
 		} else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
 
-			groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
-					SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			SimWifiP2pInfo groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			Connection.getInstance().setGroupInfo(groupInfo);
 			
 			updateUserID(groupInfo.getDeviceName());
 
-			groupInfo.print();
-			Toast.makeText(mActivity, "Network membership changed",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(mActivity, "Network membership changed", Toast.LENGTH_SHORT).show();
 
 			updateNetworkInfo();
 
 		} else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
 
-			groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(
-					SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			SimWifiP2pInfo groupInfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+			Connection.getInstance().setGroupInfo(groupInfo);
 			
 			updateUserID(groupInfo.getDeviceName());
-			
+
 			groupInfo.print();
 
-			Toast.makeText(mActivity, "Group ownership changed",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(mActivity, "Group ownership changed", Toast.LENGTH_SHORT).show();
 			updateNetworkInfo();
 
 		}
@@ -104,65 +102,50 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 		MemCacheProvider.setUserName(userId);
 		Log.i(UiMessages.NEARTWEET_TAG, "# Device name: " + userId);
 	}
-	
+
 	public synchronized void updateNetworkInfo() {
 		Log.i("NearTweet", "before updateNetworkInfo");
 
-		if (this.getGroupInfo() != null) {
+		SimWifiP2pInfo groupInfo = Connection.getInstance().getGroupInfo();
+		if (groupInfo != null) {
 
-			this.getGroupInfo().print();
+			groupInfo.print();
 
-			MemCacheProvider.setIsGroupOwner(this.getGroupInfo().askIsGO());
-			
-			Collection<String> groupOwners = this.getGroupInfo().getHomeGroups();
+			MemCacheProvider.setIsGroupOwner(groupInfo.askIsGO());
+
+			Collection<String> groupOwners = groupInfo.getHomeGroups();
 			Log.i(UiMessages.NEARTWEET_TAG, "update for GOs " + groupOwners);
 			Log.i(UiMessages.NEARTWEET_TAG, "peers: " + Connection.getInstance().getPeers());
 			for (String groupOwner : groupOwners) {
 				Log.i(UiMessages.NEARTWEET_TAG, "update for GO " + groupOwner);
-				if (!this.getGroupInfo().getDeviceName().equals(groupOwner) && !Connection.getInstance().hasPeer(groupOwner)) {
+				if (!groupInfo.getDeviceName().equals(groupOwner) && !Connection.getInstance().hasPeer(groupOwner)) {
 
 					Log.i("NearTweet-UPDATE", "Need to perform a new conenction to GO named "
-									+ groupOwner);
-					new Thread(new ConnectTask(groupOwner, getDeviceAddress(groupOwner), mActivity)).start();
+							+ groupOwner);
+					new Thread(new ConnectRunnable(groupOwner, getDeviceAddress(groupOwner), mActivity)).start();
 				}
 			}
-
 		}
 		Log.i("NearTweet", "after updateNetworkInfo");
 
 	}
 
 	public String getDeviceAddress(String deviceName){
-		if(getDeviceList()!=null && getDeviceList().getByName(deviceName)!=null){
-			return getDeviceList().getByName(deviceName).getVirtIp();
+		SimWifiP2pDeviceList deviceList = Connection.getInstance().getDeviceList();
+		if(deviceList!=null && deviceList.getByName(deviceName)!=null){
+			return deviceList.getByName(deviceName).getVirtIp();
 		} else {
 			return null;
 		}
 	}
 
-	public SimWifiP2pDeviceList getDeviceList() {
-		return deviceList;
-	}
-
-	public void setDeviceList(SimWifiP2pDeviceList deviceList) {
-		this.deviceList = deviceList;
-	}
-
-	public SimWifiP2pInfo getGroupInfo() {
-		return groupInfo;
-	}
-
-	public void setGroupInfo(SimWifiP2pInfo groupInfo) {
-		this.groupInfo = groupInfo;
-	}
-
-	public class ConnectTask implements Runnable {
+	public class ConnectRunnable implements Runnable {
 
 		private String deviceName;
 		private String deviceAddress;
 		private Context context;
 
-		public ConnectTask(String deviceName, String deviceAddress, Context context) {
+		public ConnectRunnable(String deviceName, String deviceAddress, Context context) {
 			this.deviceName = deviceName;
 			this.deviceAddress = deviceAddress;
 			this.context = context;
@@ -170,16 +153,22 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
 		@Override
 		public void run() {
-			try {
-				Log.i(UiMessages.NEARTWEET_TAG, "Connecting to device " + deviceName + " - " + deviceAddress);
-				Peer peer = new Peer(deviceName, deviceAddress, Constants.CONNECTION_LISTENER_PORT);
-				peer.connect();
-				Log.i(UiMessages.NEARTWEET_TAG, "Connected with " + deviceName + " - " + deviceAddress);
-				new Thread(new MessagesReceiverRunnable(context, peer)).start();
-			} catch (Exception e) {
-				Log.e(UiMessages.NEARTWEET_TAG, "Error connecting with [deviceName: " + deviceName + ", deviceAddress: " + deviceAddress + "]");
+			Thread thread = null;
+			Peer peer = null;
+				try {
+					Log.i(UiMessages.NEARTWEET_TAG, "Connecting to device " + deviceName + " - " + deviceAddress);
+					peer = new Peer(deviceName, deviceAddress, Constants.CONNECTION_LISTENER_PORT);
+					peer.connect();
+					Log.i(UiMessages.NEARTWEET_TAG, "Connected with " + deviceName + " - " + deviceAddress);
+					thread = new Thread(new MessagesReceiverRunnable(context, peer));
+					thread.start();
+					thread.join();
+				} catch (Exception e) {
+					Log.e(UiMessages.NEARTWEET_TAG, "Error connecting with [deviceName: " + deviceName + ", deviceAddress: " + deviceAddress + "]");
+					if( peer != null && !peer.isClosed() ) { peer.closeConnection(); }
+					if( thread != null && thread.isAlive() ) { thread.interrupt(); }
+				}
 			}
-
-		}
 	}
+
 }

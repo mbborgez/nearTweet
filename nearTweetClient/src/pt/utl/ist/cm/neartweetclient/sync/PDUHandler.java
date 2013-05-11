@@ -9,14 +9,11 @@ import pt.utl.ist.cm.neartweetEntities.pdu.RegisterPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.ReplyPDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.SpamVotePDU;
 import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
-import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.SpamManager;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
-import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class PDUHandler extends PDUVisitor {
 
@@ -32,8 +29,6 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processPollVotePDU(PollVotePDU pdu) {
-		Log.i(UiMessages.NEARTWEET_TAG, "processPollVote - " + pdu);
-		Log.i(UiMessages.NEARTWEET_TAG, "processPollVote - canProcesss ? : " + canProcess(pdu));
 		if(canProcess(pdu)){
 			MemCacheProvider.registerPollConversation(pdu);
 			genericProcess(pdu, createPollVoteIntent(pdu));
@@ -43,7 +38,6 @@ public class PDUHandler extends PDUVisitor {
 	@Override
 	public void processPublishPollPDU(PublishPollPDU pdu) {
 		if(canProcess(pdu)){
-			Log.i(UiMessages.NEARTWEET_TAG, "processPublishPollPdu: " + pdu);
 			MemCacheProvider.registerInboxMessage(pdu);
 			MemCacheProvider.registerPollConversation(pdu);
 			genericProcess(pdu, createPublishPollIntent(pdu));
@@ -52,7 +46,6 @@ public class PDUHandler extends PDUVisitor {
 
 	@Override
 	public void processRegisterPDU(RegisterPDU pdu) {
-		ClientsManager.registerUser(pdu.getUserId());
 		genericProcess(pdu, createRegisterIntent(pdu));
 	}
 
@@ -87,7 +80,6 @@ public class PDUHandler extends PDUVisitor {
 	 *******************************************************************/
 
 	private void genericProcess(PDU pdu, Intent intent) {
-		Log.i(UiMessages.NEARTWEET_TAG, "genericProcess [ pdu: " + pdu + ", intent: " + intent + " ]");
 		if (this.context != null) {
 			MemCacheProvider.addTweet(pdu.getId(), pdu);
 			Connection.getInstance().broadcastPDU(pdu);
@@ -130,7 +122,7 @@ public class PDUHandler extends PDUVisitor {
 	}
 
 	private Intent createPollVoteIntent(PollVotePDU pdu) {
-		Intent intent = new Intent();
+		Intent intent = createNewMessageIntent(pdu);
 		intent.setAction(Actions.POLL_VOTE);
 		intent.putExtra(Actions.POLL_VOTE_DATA, pdu.getId());
 		return intent;

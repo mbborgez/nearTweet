@@ -106,7 +106,6 @@ public class TweetsStreamActivity extends ListActivity implements OnItemLongClic
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {  
-//    	PDU pdu = MemCacheProvider.getTweetsStream().get(item.getItemId());
     	PDU pdu = tweetStreamAdapter.getItem(item.getItemId());
         if (item.getOrder() == 0 && pdu instanceof TweetPDU) { 
         	makeRetweetRequest(pdu);

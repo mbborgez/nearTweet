@@ -1,7 +1,7 @@
 package pt.utl.ist.cm.neartweetclient.ui;
 
 import pt.utl.ist.cm.neartweetclient.R;
-import pt.utl.ist.cm.neartweetclient.core.ClientsManager;
+import pt.utl.ist.cm.neartweetclient.core.PeersManager;
 import pt.utl.ist.cm.neartweetclient.core.listAdapters.ClientsListAdapter;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
 import android.app.ListActivity;
@@ -21,7 +21,7 @@ public class UsersActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_users);
 		
-		clientsListAdapter = new ClientsListAdapter(getApplicationContext(), R.layout.user_layout, ClientsManager.getUsers());
+		clientsListAdapter = new ClientsListAdapter(getApplicationContext(), R.layout.user_layout, PeersManager.getUsers());
         setListAdapter(clientsListAdapter);
 	    
         // Put whatever message you want to receive as the action

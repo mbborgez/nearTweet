@@ -38,7 +38,7 @@ public class Peer {
 		this.devicePort = devicePort;
 	}
 	
-	public void connect() throws Exception {
+	public synchronized void connect() throws Exception {
 		try {
 			this.socket = new SimWifiP2pSocket(deviceAddress, devicePort);
 			this.out = new ObjectOutputStream(socket.getOutputStream());
@@ -50,16 +50,19 @@ public class Peer {
 		}
 	}
 	
-	public boolean isClosed() {
-		return this.socket!=null || this.out!=null || this.in !=null || this.socket.isClosed();
+	public synchronized boolean isClosed() {
+		return  this.out==null || 
+				this.in ==null || 
+				this.socket==null ||
+				this.socket.isClosed();
 	}
 	
 	public boolean sendConnectPDU(String id) {
 		return sendPDU(new RegisterPDU(id, deviceName));
 	}
 	
-	public boolean sendPDU(PDU pdu) {
-		Log.i(UiMessages.NEARTWEET_TAG, "sending pdu " + pdu);
+	public synchronized boolean sendPDU(PDU pdu) {
+		Log.i(UiMessages.NEARTWEET_TAG, "sending pdu " + pdu + " to " + deviceName);
 		try {
 			out.writeObject(pdu);
 			out.flush();
@@ -72,29 +75,30 @@ public class Peer {
 		}
 	}
 	
-	public PDU receivePDU() {
+	public synchronized PDU receivePDU() {
 		while (true) {
 			Object receivedObj = null;
 			try {
 				receivedObj = in.readObject();
 				if (receivedObj != null && receivedObj instanceof PDU) {
+					Log.i(UiMessages.NEARTWEET_TAG, "received a new pdu " + receivedObj + " from " + deviceName);
 					return (PDU) receivedObj;
 				}
 			} catch (Exception e) {
 				Log.e(UiMessages.NEARTWEET_TAG, "Error receiving message " + "\n");
+				e.printStackTrace();
 				return null;
 			}
 		}
 	}
 	
-	public void closeConnection () {
+	public synchronized void closeConnection () {
 		if(!isClosed()) {
 			try {
 				Log.i(UiMessages.NEARTWEET_TAG, "closing socket");
 				socket.close();
-				Log.i(UiMessages.NEARTWEET_TAG, "socket closed");
 			} catch (Exception e) {
-				Log.d(UiMessages.NEARTWEET_TAG, "Error closing socket connection: " + e.getMessage());
+				Log.e(UiMessages.NEARTWEET_TAG, "Error closing socket connection: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

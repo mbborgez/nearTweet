@@ -3,6 +3,7 @@ package pt.utl.ist.cm.neartweetclient.ui;
 import pt.utl.ist.cm.neartweetclient.R;
 import pt.utl.ist.cm.neartweetclient.SimWifiP2pBroadcastReceiver;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
+import pt.utl.ist.cm.neartweetclient.sync.Connection;
 import pt.utl.ist.cm.neartweetclient.sync.ConnectionsReceiverRunnable;
 import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pBroadcast;
@@ -24,8 +25,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -88,28 +87,6 @@ public class LoginActivity extends Activity implements GroupInfoListener {
 	
 	
 	/**
-	 * Login Button should only be active when text field area isn't empty.  
-	 * @return Watcher Logic to deal with his responsibility
-	 */
-	private TextWatcher textWatcherGuard() {
-		loginButton.setEnabled(false);
-		return new TextWatcher() {
-			@Override
-			public void afterTextChanged(Editable arg0) {/**empty**/}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				loginButton.setEnabled(s.length() > 0);
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				loginButton.setEnabled(s.length() > 0);
-			}
-		};
-	}
-	
-	/**
 	 * Method responsible for dealing with the logic before making a Server Request
 	 * @return
 	 */
@@ -124,9 +101,9 @@ public class LoginActivity extends Activity implements GroupInfoListener {
 		
 	@Override
 	public void onGroupInfoAvailable(SimWifiP2pDeviceList devices, SimWifiP2pInfo groupInfo) {
-		
 		createCookieSession(groupInfo.getDeviceName());
-		receiver.setGroupInfo(groupInfo);
+		Connection.getInstance().setGroupInfo(groupInfo);
+		receiver.updateNetworkInfo();
 		nextScreen();
 	}
 	

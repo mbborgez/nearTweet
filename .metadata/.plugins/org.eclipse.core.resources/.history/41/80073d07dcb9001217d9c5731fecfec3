@@ -1,0 +1,32 @@
+package pt.utl.ist.cm.neartweetclient.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import pt.utl.ist.cm.neartweetclient.sync.Connection;
+
+public class PeersManager {
+
+	private static List<String> users = new ArrayList<String>();
+	
+	public static boolean existsUser(String userId) {
+		return Connection.getInstance().hasPeer(userId);
+	}
+	
+	public static void unregisterUser(String userId) {
+		if(Connection.getInstance().hasPeer(userId)){
+			Connection.getInstance().removePeer(userId);
+		}
+	}
+	
+	public static void registerUser(String userId) {
+		if(!existsUser(userId)){
+			users.add(userId);
+		}
+	}
+
+	public static List<String> getUsers() {
+		return users;
+	}
+
+}

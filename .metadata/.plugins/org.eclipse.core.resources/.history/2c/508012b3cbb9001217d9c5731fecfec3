@@ -1,0 +1,66 @@
+package pt.utl.ist.cm.neartweetclient.sync;
+
+import pt.utl.ist.cm.neartweetEntities.pdu.*;
+import android.content.Context;
+import android.util.Log;
+import pt.utl.ist.cm.neartweetclient.core.*;
+import pt.utl.ist.cm.neartweetclient.utils.Actions;
+import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
+
+public class MessagesReceiverRunnable implements Runnable {
+	private Context context;
+	private Peer peer;
+	private PDUVisitor visitor;
+
+	public MessagesReceiverRunnable(Context context, Peer peer){
+		this.context = context;
+		this.peer = peer;
+		this.visitor = new PDUHandler(this.context);
+	}
+
+	@Override
+	public void run() {
+		PDU receivedMessage;
+
+		try {
+			PDU registerPDU = new RegisterPDU(Actions.createUniqueID(context), Actions.getUserId(context));
+			MemCacheProvider.addTweet(registerPDU.getId(), registerPDU);
+			if(peer.sendPDU(registerPDU)) {
+				while (true) {
+					if (isEndOfConnection(receivedMessage = peer.receivePDU())) {
+						Log.i(UiMessages.NEARTWEET_TAG, "start disconnecting..");
+						break;
+					}
+					processReceivedMessage(receivedMessage, peer);
+				}
+			}
+		} catch (Exception e) {
+			Log.e(UiMessages.NEARTWEET_TAG, "Error reading socket: " + e.getMessage());
+		}
+		Connection.getInstance().removePeer(peer.getDeviceName());
+	}
+
+	private boolean isEndOfConnection(PDU receivedMessage) {
+		return receivedMessage == null;
+	}
+	
+	protected void processReceivedMessage(PDU message, Peer peer) {
+		if(!MemCacheProvider.hasMessage(message.getId())) {
+			if(!isMyMessage(message) && !existsPeer(message)) {
+				if(peer.getDeviceName()==null) {
+					peer.setDeviceName(message.getUserId());
+				}
+				Connection.getInstance().addPeer(peer);
+			}
+			message.accept(visitor);
+		}
+	}
+
+	private boolean existsPeer(PDU message) {
+		return Connection.getInstance().hasPeer(message.getUserId());
+	}
+
+	private boolean isMyMessage(PDU message) {
+		return MemCacheProvider.getUserName().equals(message.getUserId());
+	}
+}
