@@ -18,3 +18,4 @@
 1368241176903	Extract local variable 'groupInfo2'
 1368241337348	Encapsulate field 'deviceList'
 1368241421470	Extract local variable 'deviceList'
+1368246548857	Extract local variable 'createReplyIntent'

@@ -124,11 +124,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 							+ groupOwner);
 					Thread connectThread = new Thread(new ConnectRunnable(groupOwner, getDeviceAddress(groupOwner), mActivity));
 					connectThread.start();
-					try {
-						connectThread.join();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					connectThread.join();
 				}
 			}
 		}

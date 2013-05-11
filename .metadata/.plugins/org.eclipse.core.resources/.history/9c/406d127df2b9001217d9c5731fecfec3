@@ -127,6 +127,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 					try {
 						connectThread.join();
 					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

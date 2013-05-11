@@ -12,10 +12,8 @@ import pt.utl.ist.cm.neartweetEntities.pdu.TweetPDU;
 import pt.utl.ist.cm.neartweetclient.core.MemCacheProvider;
 import pt.utl.ist.cm.neartweetclient.core.SpamManager;
 import pt.utl.ist.cm.neartweetclient.utils.Actions;
-import pt.utl.ist.cm.neartweetclient.utils.UiMessages;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class PDUHandler extends PDUVisitor {
 
@@ -54,17 +52,9 @@ public class PDUHandler extends PDUVisitor {
 	@Override
 	public void processReplyPDU(ReplyPDU pdu) {
 		if(canProcess(pdu)){
-			Intent createReplyIntent = new Intent();
-			Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU: " + pdu);
-			String myDeviceName = Actions.getUserId(context);
-			if(pdu.getIsBroadcast() || 
-					myDeviceName.equals(pdu.getTargetUserId()) ||
-					myDeviceName.equals(pdu.getUserId())) {
-				Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU: " + "registering pdu");
-				MemCacheProvider.registerTweetConversation(pdu);
-				createReplyIntent = createReplyIntent(pdu);
-			} 
-			genericProcess(pdu, createReplyIntent);
+			if(pdu.getIsBroadcast() || MemCacheProvider.getUserName().equals(pdu.getTargetUserId()))
+			MemCacheProvider.registerTweetConversation(pdu);
+			genericProcess(pdu, createReplyIntent(pdu));
 		}
 
 	}

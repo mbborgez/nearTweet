@@ -54,7 +54,6 @@ public class PDUHandler extends PDUVisitor {
 	@Override
 	public void processReplyPDU(ReplyPDU pdu) {
 		if(canProcess(pdu)){
-			Intent createReplyIntent = new Intent();
 			Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU: " + pdu);
 			String myDeviceName = Actions.getUserId(context);
 			if(pdu.getIsBroadcast() || 
@@ -62,9 +61,8 @@ public class PDUHandler extends PDUVisitor {
 					myDeviceName.equals(pdu.getUserId())) {
 				Log.i(UiMessages.NEARTWEET_TAG, "processReplyPDU: " + "registering pdu");
 				MemCacheProvider.registerTweetConversation(pdu);
-				createReplyIntent = createReplyIntent(pdu);
-			} 
-			genericProcess(pdu, createReplyIntent);
+			}
+			genericProcess(pdu, createReplyIntent(pdu));
 		}
 
 	}

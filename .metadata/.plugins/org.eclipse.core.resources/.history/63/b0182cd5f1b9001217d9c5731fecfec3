@@ -1,0 +1,29 @@
+# File: uc3-02
+#
+#   Uses 3 devices (expects file devices3-1.txt)
+#
+#   Shows the effect of two groups joining when a node B gets close to a node C
+#author: borgez
+
+clear
+load devices3-1
+
+# prologue
+
+commit
+wait 8
+
+# step 1
+
+move A (B)
+creategroup A (B)
+commit
+wait
+
+# step 2
+
+move C (B)
+creategroup C (B)
+commit
+
+
